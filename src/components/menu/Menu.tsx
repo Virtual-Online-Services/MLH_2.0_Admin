@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import "./Menu.scss";
+import "./nenu.scss";
 import { menu } from "../../data";
 import { logout } from "../../pages/slices/authSlice";
 import { useNavigate } from "react-router-dom";

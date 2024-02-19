@@ -5,11 +5,10 @@ import Footer from "../../components/footer/Footer";
 import Menu from "../../components/menu/Menu";
 import Navbar from "../../components/navbar/Navbar";
 import useGetLottoOperator from "../../react-query/api-hooks/useGetLottoOperator";
-// import moment from "moment";
 import { Spinner } from "react-bootstrap";
 import BModal from "../../components/BModal/BModal";
-import AdvertModal from "../../components/AdvertModal/AdvertModal";
 import { Link } from "react-router-dom";
+import LottoModal from "../../components/LottoModal/LottoModal";
 
 const Operators = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -115,7 +114,7 @@ const Operators = () => {
           onHide={handleClose}
           size="md"
         >
-          <AdvertModal />
+          <LottoModal />
         </BModal>
       </div>
     </div>
