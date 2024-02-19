@@ -27,9 +27,9 @@ const DataTable = (props: Props) => {
       let endpoint: string;
       // Construct endpoint based on the slug
       if (props.slug === "advert") {
-        endpoint = `https://sandbox.mylottohub.com/v1/delete/advert/${id}`;
+        endpoint = `/delete/advert/${id}`;
       } else if (props.slug === "operator") {
-        endpoint = `https://sandbox.mylottohub.com/v1/delete/operator/${id}`;
+        endpoint = `/delete/operator/${id}`;
       } else {
         // Handle other slugs if needed
         endpoint = ""; // Set default endpoint or handle error
@@ -59,19 +59,28 @@ const DataTable = (props: Props) => {
   };
 
   const handleEdit = (id: number) => {
-    // // Construct edit endpoint based on the slug and id
-    // let endpoint: string;
-    // if (props.slug === "operator") {
-    //   endpoint = `https://sandbox.mylottohub.com/v1/edit/operator/${id}`;
-    // } else {
-    //   // Handle other slugs if needed
-    //   endpoint = ""; // Set default endpoint or handle error
-    // }
-    // // Perform action for edit
-    // console.log("Edit Endpoint:", endpoint);
-    // // Example: Redirect to edit page
-    // // history.push(`/edit/${props.slug}/${id}`);
-    alert("hello there");
+    let endpoint: string;
+    // Construct endpoint based on the slug
+    if (props.slug === "operator") {
+      endpoint = `/get-operator/${id}`;
+      // } else if (props.slug === "operator") {
+      //   endpoint = `https://sandbox.mylottohub.com/v1/delete/operator/${id}`;
+      // } else {
+      //   // Handle other slugs if needed
+      //   endpoint = ""; // Set default endpoint or handle error
+      // }
+      return HTTP.post(
+        endpoint,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    }
   };
 
   const actionColumn: GridColDef = {
