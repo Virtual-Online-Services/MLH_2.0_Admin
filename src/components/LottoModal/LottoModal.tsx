@@ -5,8 +5,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "react-toastify";
 import * as yup from "yup";
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
 import HTTP from "../../utils/httpClient";
+import { useQueryClient } from "@tanstack/react-query";
 
 const schema = yup.object().shape({
   name: yup.string().required("This is a required field"),
@@ -15,7 +15,7 @@ const schema = yup.object().shape({
   logo: yup.mixed().required("This is a required field"),
 });
 
-const LottoModal = () => {
+const LottoModal = ({ handleClose }) => {
   const {
     register,
     handleSubmit,
@@ -28,35 +28,48 @@ const LottoModal = () => {
   const token = userInfo?.token?.accessToken;
 
   const [isLoading, setIsLoading] = useState(false);
-
-  const mutation = useMutation({
-    mutationFn: (formData) => {
-      return HTTP.post(`/add-operator`, formData, {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
+      Accept: "application/json",
     },
-  });
-  const submitForm = async (data) => {
-    setIsLoading(true);
-    try {
-      await mutation.mutateAsync(data);
-      console.log(data);
+  };
+  const queryClient = useQueryClient();
 
-      toast.success("Operator added successfully");
-    } catch (error) {
-      if (error.response && error.response.data && error.response.data.errors) {
-        const bannerError = error.response.data.errors.logo[0];
-        toast.error(bannerError);
-      } else {
-        toast.error("An error occurred.");
-      }
-    } finally {
-      setIsLoading(false);
-    }
+  const submitForm = (data) => {
+    setIsLoading(true);
+
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("del", data.del);
+    formData.append("play", data.play);
+    formData.append("logo", data.logo[0]);
+
+    HTTP.post("/add-operator", formData, config)
+      .then((response) => {
+        setIsLoading(false);
+        toast.success(response.data.message);
+        handleClose();
+        if (response.data.message) {
+          // Invalidate the query cache for adverts data
+          queryClient.invalidateQueries("GET_LOTTO_OPERATOR");
+        }
+      })
+      .catch((error) => {
+        setIsLoading(false);
+
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.errors
+        ) {
+          const bannerError = error.response.data.errors.logo[0];
+          toast.error(bannerError);
+        } else {
+          toast.error("An error occurred.");
+        }
+      });
   };
 
   return (
@@ -127,7 +140,7 @@ const LottoModal = () => {
                   {...register("logo", {
                     required: "Required",
                   })}
-                  accept=".jpeg, .png, .jpg, .gif"
+                  name="logo"
                 />
                 {errors.logo && (
                   <p className="text-danger text-capitalize">

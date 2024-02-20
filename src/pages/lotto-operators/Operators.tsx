@@ -114,7 +114,7 @@ const Operators = () => {
           onHide={handleClose}
           size="md"
         >
-          <LottoModal />
+          <LottoModal handleClose={handleClose} />
         </BModal>
       </div>
     </div>

@@ -5,7 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "react-toastify";
 import * as yup from "yup";
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import HTTP from "../../utils/httpClient";
 
 const schema = yup.object().shape({
@@ -21,7 +21,7 @@ const schema = yup.object().shape({
   // .min(new Date(), "End date cannot be in the past"),
 });
 
-const AdvertModal = () => {
+const AdvertModal = ({ handleClose }) => {
   const {
     register,
     handleSubmit,
@@ -40,7 +40,7 @@ const AdvertModal = () => {
 
     return `${year}-${month}-${day}`;
   };
-  const isPastDate = (dateString) => {
+  const isPastDate = (dateString: any) => {
     const selectedDate = new Date(dateString);
     const currentDate = new Date();
     return selectedDate < currentDate;
@@ -50,35 +50,54 @@ const AdvertModal = () => {
   const token = userInfo?.token?.accessToken;
 
   const [isLoading, setIsLoading] = useState(false);
-  //   const [endDate, endStartDate] = useState(null);
-  //   const [startDate, setStartDate] = useState(null);
-  //   const queryClient = useQueryClient();
-  const mutation = useMutation({
-    mutationFn: (formData) => {
-      return HTTP.post(`/add-advert`, formData, {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
+      Accept: "application/json",
     },
-  });
-  const submitForm = async (data) => {
+  };
+
+  const queryClient = useQueryClient();
+
+  const submitForm = (data: any) => {
     setIsLoading(true);
-    try {
-      await mutation.mutateAsync(data);
-      toast.success("Advert added successfully");
-    } catch (error) {
-      if (error.response && error.response.data && error.response.data.errors) {
-        const bannerError = error.response.data.errors.banner[0];
-        toast.error(bannerError);
-      } else {
-        toast.error("An error occurred.");
-      }
-    } finally {
-      setIsLoading(false);
-    }
+
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("company", data.company);
+    formData.append("link", data.link);
+
+    formData.append("start_date", data.start_date.toISOString());
+    formData.append("end_date", data.end_date.toISOString());
+    formData.append("banner", data.banner[0]);
+
+    HTTP.post("/add-advert", formData, config)
+      .then((response: any) => {
+        setIsLoading(false);
+        toast.success(response.data.message);
+        handleClose();
+
+        if (response.data.message) {
+          // Invalidate the query cache for adverts data
+          queryClient.invalidateQueries("GET_USER_ADVERT");
+        }
+      })
+      .catch((error: any) => {
+        setIsLoading(false);
+
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.errors
+        ) {
+          const bannerError = error.response.data.errors.banner[0];
+          toast.error(bannerError);
+        } else {
+          toast.error("An error occurred.");
+        }
+      });
   };
 
   return (

@@ -20,7 +20,7 @@ const ChartOperator = (props: Props) => {
           )}
         </div>
         <h1>{props.total_operators}</h1>
-        <Link to="#" style={{ color: "#8884d8" }}>
+        <Link to="/lotto-operator" style={{ color: "#8884d8" }}>
           View all
         </Link>
       </div>

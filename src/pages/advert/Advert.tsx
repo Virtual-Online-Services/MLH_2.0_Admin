@@ -21,7 +21,7 @@ const Advert = () => {
   const { userAdvertResponse, isLoadingAdvert } = useGetAdvert([]);
 
   const formatDate = (timestamp) => {
-    return moment.unix(timestamp).format("YYYY-MM-DD");
+    return moment.unix(timestamp).format("Do MMM YYYY");
   };
 
   const getStatus = (endTimestamp) => {
@@ -163,7 +163,7 @@ const Advert = () => {
           onHide={handleClose}
           size="md"
         >
-          <AdvertModal />
+          <AdvertModal handleClose={handleClose} />
         </BModal>
       </div>
     </div>
