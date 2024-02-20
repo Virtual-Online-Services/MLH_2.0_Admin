@@ -6,6 +6,8 @@ import Users from "../pages/users/Users";
 import UserLogin from "../pages/login/UserLogin";
 import Advert from "../pages/advert/Advert";
 import Operators from "../pages/lotto-operators/Operators";
+import Games from "../pages/lotto-games/Games";
+import GameDateTime from "../pages/lotto-games/GameDateTime";
 
 export const routes = [
   {
@@ -36,6 +38,18 @@ export const routes = [
     id: 5,
     path: "/lotto-operator",
     element: <Operators />,
+    protected: true,
+  },
+  {
+    id: 6,
+    path: "/lotto-game",
+    element: <Games />,
+    protected: true,
+  },
+  {
+    id: 6,
+    path: "/game-datetime/:id",
+    element: <GameDateTime />,
     protected: true,
   },
 ];

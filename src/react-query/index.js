@@ -4,3 +4,4 @@ export { default as useGetProfileUser } from "./api-hooks/useGetProfileUser";
 export { default as useGetReferral } from "./api-hooks/useGetReferral";
 export { default as useGetAdvert } from "./api-hooks/useGetAdvert";
 export { default as useGetLottoOperator } from "./api-hooks/useGetLottoOperator";
+export { default as useGetLottoGames } from "./api-hooks/useGetLottoGames";

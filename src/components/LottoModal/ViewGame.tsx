@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
-const EditOperatorModal = ({ operatorDetails, setOperatorDetails }) => {
+const ViewGame = ({ gameDetails, setGameDetails }) => {
   const [editedDetails, setEditedDetails] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const userInfo = useSelector((state) => state.auth.userInfo);
@@ -24,7 +24,7 @@ const EditOperatorModal = ({ operatorDetails, setOperatorDetails }) => {
     setIsLoading(true);
     try {
       const response = await HTTP.post(
-        `/operator/${operatorDetails.data.id}`,
+        `/operator/${gameDetails.data.id}`,
         editedDetails,
         {
           headers: {
@@ -35,11 +35,11 @@ const EditOperatorModal = ({ operatorDetails, setOperatorDetails }) => {
         }
       );
       toast.success(response.data.status);
-      setOperatorDetails(response.data);
-      setOperatorDetails(null);
+      setGameDetails(response.data);
+      setGameDetails(null);
       if (response.data.status) {
         // Invalidate the query cache for adverts data
-        queryClient.invalidateQueries("GET_LOTTO_OPERATOR");
+        queryClient.invalidateQueries("GET_LOTTO_GAME");
       }
     } catch (error) {
       console.error("Error editing operator:", error);
@@ -52,8 +52,8 @@ const EditOperatorModal = ({ operatorDetails, setOperatorDetails }) => {
   return (
     <div>
       <Modal
-        show={operatorDetails !== null}
-        onHide={() => setOperatorDetails(null)}
+        show={gameDetails !== null}
+        onHide={() => setGameDetails(null)}
         centered
       >
         <Modal.Header closeButton>
@@ -62,7 +62,7 @@ const EditOperatorModal = ({ operatorDetails, setOperatorDetails }) => {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {operatorDetails && (
+          {gameDetails && (
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
                 <label
@@ -76,39 +76,24 @@ const EditOperatorModal = ({ operatorDetails, setOperatorDetails }) => {
                   className="form-control"
                   id="name"
                   name="name"
-                  value={editedDetails.name || operatorDetails.data.name}
+                  value={editedDetails.name || gameDetails.data.name}
                   onChange={handleChange}
                 />
               </div>
               <div className="mb-3">
                 <label htmlFor="del" className="form-label fw-bolder text-dark">
-                  Del
+                  Operator
                 </label>
                 <input
                   type="text"
                   className="form-control"
-                  id="del"
-                  name="del"
-                  value={editedDetails.del || operatorDetails.data.del}
+                  id="operator"
+                  name="operator"
+                  value={editedDetails.operator || gameDetails.data.operator}
                   onChange={handleChange}
                 />
               </div>
-              <div className="mb-3">
-                <label
-                  htmlFor="play"
-                  className="form-label fw-bolder text-dark"
-                >
-                  Play
-                </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="play"
-                  name="play"
-                  value={editedDetails.play || operatorDetails.data.play}
-                  onChange={handleChange}
-                />
-              </div>
+
               <Button variant="primary" type="submit" disabled={isLoading}>
                 {isLoading ? (
                   <Spinner animation="border" size="sm" />
@@ -124,4 +109,4 @@ const EditOperatorModal = ({ operatorDetails, setOperatorDetails }) => {
   );
 };
 
-export default EditOperatorModal;
+export default ViewGame;

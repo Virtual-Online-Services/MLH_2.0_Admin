@@ -16,7 +16,7 @@ const ChartGames = (props: Props) => {
           {props.total_games ? <span>Total Games</span> : <h1>Total Games</h1>}
         </div>
         <h1>{props.total_games}</h1>
-        <Link to="#" style={{ color: "#8884d8" }}>
+        <Link to="/lotto-game" style={{ color: "#8884d8" }}>
           View all
         </Link>
       </div>

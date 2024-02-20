@@ -92,7 +92,7 @@ export const menu = [
       {
         id: 3,
         title: "Game",
-        url: "#",
+        url: "/lotto-game",
         icon: "fa fa-gamepad",
       },
       {
