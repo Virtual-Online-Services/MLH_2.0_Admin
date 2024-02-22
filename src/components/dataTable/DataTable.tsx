@@ -164,9 +164,9 @@ const DataTable = (props: Props) => {
     }
   };
   const actionColumn: GridColDef = {
-    field: "action",
-    headerName: "Action",
-    width: 200,
+    field: props.slug === "withdraw" ? "" : "action",
+    headerName: props.slug === "withdraw" ? "" : "Action",
+    width: props.slug === "withdraw" ? 0 : 200,
     renderCell: (params) => {
       return (
         <div className="action">

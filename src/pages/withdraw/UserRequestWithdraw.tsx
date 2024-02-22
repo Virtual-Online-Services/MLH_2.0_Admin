@@ -7,19 +7,92 @@ import { Spinner } from "react-bootstrap";
 import useGetAllRequestWithdraw from "../../react-query/api-hooks/useGetAllRequestWithdraw";
 import Footer from "../../components/footer/Footer";
 import moment from "moment";
+import { useSelector } from "react-redux";
+import { useState } from "react";
+import SingleUser from "../../components/SingleUser/SingleUser";
 
 const UserRequestWithdraw = () => {
   const { userWithdrawDetails, isLoadingUserWithdraw } =
     useGetAllRequestWithdraw([]);
+  const userInfo = useSelector((state) => state.auth.userInfo);
+  const [userDetails, setUserDetails] = useState(null);
+  const token = userInfo?.token?.accessToken;
   const formatCreatedAt = (createdAt: any) => {
     return moment(createdAt).format("MMM Do YYYY | hh:mm:ss a");
   };
+
+  //   const handleEdit = async (id: number) => {
+  //     try {
+  //       const endpoint = `https://sandbox.mylottohub.com/v1/admin/get-user/${id}`;
+  //       const requestOptions = {
+  //         method: "GET",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Accept: "application/json",
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       };
+
+  //       try {
+  //         const response = await fetch(endpoint, requestOptions);
+  //         if (!response.ok) {
+  //           throw new Error("Network response was not ok");
+  //         }
+  //         const data = await response.json();
+  //         setUserDetails(data);
+  //       } catch (error) {
+  //         console.error("There was a problem with the fetch request:", error);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching game details:", error);
+  //       // Handle error
+  //     }
+  //   };
+
+  const handleEdit = async (id: number) => {
+    try {
+      const endpoint = `https://sandbox.mylottohub.com/v1/admin/get-user/${id}`;
+      const requestOptions = {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      const response = await fetch(endpoint, requestOptions);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Network response was not ok");
+      }
+
+      const data = await response.json();
+      setUserDetails(data);
+    } catch (error: any) {
+      console.error(
+        "There was a problem with the fetch request:",
+        error.message
+      );
+      // Display error message or handle error appropriately
+    }
+  };
+
   const columns: GridColDef[] = [
     {
       field: "username",
       type: "string",
       headerName: "USER",
-      width: 80,
+      width: 130,
+      renderCell: (params) => (
+        <a
+          //   to={`/user-profile/${params.row.id}`}
+          className="text-primary"
+          onClick={() => handleEdit(params.row.id)}
+        >
+          {params.value}
+        </a>
+      ),
     },
     {
       field: "amount",
@@ -46,13 +119,13 @@ const UserRequestWithdraw = () => {
       type: "string",
     },
     {
-      field: "amount",
+      field: "pbalance",
       headerName: "PREV BALANCE",
-      width: 100,
+      width: 150,
       type: "string",
     },
     {
-      field: "amount",
+      field: "bamount",
       headerName: "BALANCE",
       width: 150,
       type: "string",
@@ -79,7 +152,7 @@ const UserRequestWithdraw = () => {
       width: 550,
       renderCell: (params) => (
         <div className="d-flex">
-          {params.row.status === "pending" && (
+          {params.row.status === "Pending" && (
             <>
               <button
                 className="btn btn-success"
@@ -96,7 +169,7 @@ const UserRequestWithdraw = () => {
               </button>
               &nbsp; &nbsp;
               <button
-                className="btn btn-primary"
+                className="btn btn-danger"
                 // onClick={() => handleViewDatetime(params.row)}
               >
                 Cancel
@@ -119,14 +192,14 @@ const UserRequestWithdraw = () => {
             </div>
             <div className="container">
               <div className="page-title mb-4">
-                <h4 className="mb-0"> Withdraw </h4>
+                <h4 className="mb-0">Withdrawals </h4>
                 <ol className="breadcrumb mb-0 pl-0 pt-1 pb-0">
                   <li className="breadcrumb-item mt-3">
                     <Link to="/home" className="default-color">
                       Dashboard
                     </Link>
                   </li>
-                  <li className="breadcrumb-item active mt-3">Withdraw</li>
+                  <li className="breadcrumb-item active mt-3">Withdrawals</li>
                 </ol>
               </div>
 
@@ -174,6 +247,7 @@ const UserRequestWithdraw = () => {
           <Footer />
         </div>
       </div>
+      <SingleUser userDetails={userDetails} setUserDetails={setUserDetails} />
     </div>
   );
 };

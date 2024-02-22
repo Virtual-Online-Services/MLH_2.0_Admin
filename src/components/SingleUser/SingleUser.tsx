@@ -47,6 +47,20 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
   //       setIsLoading(false);
   //     }
   //   };
+  const getStatusText = (status: number) => {
+    switch (status) {
+      case 1:
+        return "Active";
+      case 2:
+        return "Blocked";
+      case 3:
+        return "Not Verified";
+      case 0:
+        return "Inactive";
+      default:
+        return "Unknown Status";
+    }
+  };
 
   return (
     <div>
@@ -137,6 +151,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                           {userDetails?.data?.id}
                         </span>
                       </p>
+                      <hr style={{ backgroundColor: "black" }} />
                       <p
                         style={{
                           display: "flex",
@@ -148,6 +163,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                           {userDetails?.data?.name}
                         </span>
                       </p>
+                      <hr style={{ backgroundColor: "black" }} />
                       <p
                         style={{
                           display: "flex",
@@ -159,6 +175,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                           {userDetails?.data?.username}
                         </span>
                       </p>
+                      <hr style={{ backgroundColor: "black" }} />
                       <p
                         style={{
                           display: "flex",
@@ -170,7 +187,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                           {userDetails?.data?.tell}
                         </span>
                       </p>
-
+                      <hr style={{ backgroundColor: "black" }} />
                       <p
                         style={{
                           display: "flex",
@@ -182,7 +199,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                           {userDetails?.data?.email}
                         </span>
                       </p>
-
+                      <hr style={{ backgroundColor: "black" }} />
                       <p
                         style={{
                           display: "flex",
@@ -194,7 +211,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                           {userDetails?.data?.state}
                         </span>
                       </p>
-
+                      <hr style={{ backgroundColor: "black" }} />
                       <p
                         style={{
                           display: "flex",
@@ -208,7 +225,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                           {userDetails?.data?.dob}
                         </span>
                       </p>
-
+                      <hr style={{ backgroundColor: "black" }} />
                       <p
                         style={{
                           display: "flex",
@@ -218,6 +235,142 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                         <span className="fw-bolder text-dark">Gender:</span>{" "}
                         <span className="text-dark">
                           {userDetails?.data?.gender}
+                        </span>
+                      </p>
+                      <hr style={{ backgroundColor: "black" }} />
+                      <p
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <span className="fw-bolder text-dark">User Type:</span>{" "}
+                        <span className="text-dark">
+                          {userDetails?.data?.type}
+                        </span>
+                      </p>
+                      <hr style={{ backgroundColor: "black" }} />
+                      <p
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <span className="fw-bolder text-dark">
+                          Wallet Balance:
+                        </span>{" "}
+                        <span className="text-dark">
+                          ₦{userDetails?.data?.wallet}
+                        </span>
+                      </p>
+                      <hr style={{ backgroundColor: "black" }} />
+                      <p
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <span className="fw-bolder text-dark">
+                          Winning Wallet Balance:
+                        </span>{" "}
+                        <span className="text-dark">
+                          ₦{userDetails?.data?.wwallet}
+                        </span>
+                      </p>
+                      <hr style={{ backgroundColor: "black" }} />
+                      <p
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <span className="fw-bolder text-dark">
+                          Bonus Wallet Balance:
+                        </span>{" "}
+                        <span className="text-dark">
+                          ₦{userDetails?.data?.bwallet}
+                        </span>
+                      </p>
+                      <hr style={{ backgroundColor: "black" }} />
+                      <p
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <span className="fw-bolder text-dark">Status:</span>{" "}
+                        <span className="text-dark">
+                          <span>
+                            {getStatusText(userDetails?.data?.status)}
+                          </span>
+                        </span>
+                      </p>
+                      <hr style={{ backgroundColor: "black" }} />
+                      <p
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <span className="fw-bolder text-dark">
+                          Signup Date:
+                        </span>{" "}
+                        <span className="text-dark">
+                          {userDetails?.data?.date}
+                        </span>
+                      </p>
+                      <hr style={{ backgroundColor: "black" }} />
+                      <p
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <span className="fw-bolder text-dark">
+                          Referred By:
+                        </span>{" "}
+                        <span className="text-dark">
+                          {userDetails?.data?.ref}
+                        </span>
+                      </p>
+                      <hr style={{ backgroundColor: "black" }} />
+                      <p
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <span className="fw-bolder text-dark">Bank:</span>{" "}
+                        <span className="text-dark">
+                          {userDetails?.data?.bname}
+                        </span>
+                      </p>
+                      <hr style={{ backgroundColor: "black" }} />
+                      <p
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <span className="fw-bolder text-dark">
+                          Account Name:
+                        </span>{" "}
+                        <span className="text-dark">
+                          {userDetails?.data?.accname}
+                        </span>
+                      </p>
+                      <hr style={{ backgroundColor: "black" }} />
+                      <p
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <span className="fw-bolder text-dark">
+                          Account Number:
+                        </span>{" "}
+                        <span className="text-dark">
+                          {userDetails?.data?.accno}
                         </span>
                       </p>
                     </div>
