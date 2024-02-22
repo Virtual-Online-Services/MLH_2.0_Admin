@@ -117,14 +117,13 @@ const Advert = () => {
                   <i className="fa fa-plus-circle"></i>{" "}
                 </a>
               </p>
-              <p>{formattedData.length} Records</p>
-              {/* <DataTable slug="users" columns={columns} rows={formattedData} /> */}
+              <p>{formattedData?.length} Records</p>
               {isLoadingAdvert ? (
                 <div className="spinner text-dark text-center mt-5">
                   <Spinner
                     as="span"
                     animation="border"
-                    size="sm"
+                    size="lg"
                     role="status"
                     aria-hidden="true"
                   />

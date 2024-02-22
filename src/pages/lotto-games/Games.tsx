@@ -87,11 +87,11 @@ const Games = () => {
               <p>{userLottoGame?.data?.length} Records</p>
               {/* <DataTable slug="users" columns={columns} rows={formattedData} /> */}
               {isLoadingLottoGame ? (
-                <div className="spinner text-dark text-center mt-5">
+                <div className="spinner text-center mt-5">
                   <Spinner
                     as="span"
                     animation="border"
-                    size="sm"
+                    size="lg"
                     role="status"
                     aria-hidden="true"
                   />

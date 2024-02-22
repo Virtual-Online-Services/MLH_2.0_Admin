@@ -92,7 +92,7 @@ const GameDateTime = () => {
                   <Spinner
                     as="span"
                     animation="border"
-                    size="sm"
+                    size="lg"
                     role="status"
                     aria-hidden="true"
                   />

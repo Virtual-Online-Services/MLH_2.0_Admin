@@ -102,15 +102,18 @@ const LottoModal = ({ handleClose }) => {
                   </p>
                 )}
               </div>
+
               <div className="mb-3">
-                <input
-                  type="text"
-                  className="form-control mb-2 p-3"
-                  placeholder="P"
+                <select
+                  className="form-select mb-2 p-3"
                   {...register("play", {
                     required: "Required",
                   })}
-                />
+                >
+                  <option value="">Enable Play</option>
+                  <option value="Y">Yes</option>
+                  <option value="N">No</option>
+                </select>
                 {errors.play && (
                   <p className="text-danger text-capitalize">
                     {errors.play.message}
@@ -118,14 +121,16 @@ const LottoModal = ({ handleClose }) => {
                 )}
               </div>
               <div className="mb-3">
-                <input
-                  type="text"
-                  className="form-control mb-2 p-3"
-                  placeholder="N"
+                <select
+                  className="form-select mb-2 p-3"
                   {...register("del", {
                     required: "Required",
                   })}
-                />
+                >
+                  <option value="">Temporary Delete</option>
+                  <option value="Y">Yes</option>
+                  <option value="N">No</option>
+                </select>
                 {errors.del && (
                   <p className="text-danger text-capitalize">
                     {errors.del.message}
@@ -159,7 +164,7 @@ const LottoModal = ({ handleClose }) => {
                   <Spinner
                     as="span"
                     animation="border"
-                    size="sm"
+                    size="lg"
                     role="status"
                     aria-hidden="true"
                   />

@@ -80,38 +80,44 @@ const EditOperatorModal = ({ operatorDetails, setOperatorDetails }) => {
                   onChange={handleChange}
                 />
               </div>
+
               <div className="mb-3">
                 <label htmlFor="del" className="form-label fw-bolder text-dark">
-                  Del
+                  Temporary Delete
                 </label>
-                <input
-                  type="text"
-                  className="form-control"
+                <select
+                  className="form-select"
                   id="del"
                   name="del"
                   value={editedDetails.del || operatorDetails.data.del}
                   onChange={handleChange}
-                />
+                >
+                  <option value="Y">Yes</option>
+                  <option value="N">No</option>
+                </select>
               </div>
               <div className="mb-3">
                 <label
                   htmlFor="play"
                   className="form-label fw-bolder text-dark"
                 >
-                  Play
+                  Enable Play
                 </label>
-                <input
-                  type="text"
-                  className="form-control"
+                <select
+                  className="form-select"
                   id="play"
                   name="play"
                   value={editedDetails.play || operatorDetails.data.play}
                   onChange={handleChange}
-                />
+                >
+                  <option value="Y">Yes</option>
+                  <option value="N">No</option>
+                </select>
               </div>
+
               <Button variant="primary" type="submit" disabled={isLoading}>
                 {isLoading ? (
-                  <Spinner animation="border" size="sm" />
+                  <Spinner animation="border" size="lg" />
                 ) : (
                   "Save Changes"
                 )}

@@ -36,13 +36,13 @@ const TopFiveTransactions = () => {
       field: "type",
       type: "string",
       headerName: "TYPE",
-      width: 200,
+      width: 150,
     },
     {
       field: "description",
       type: "string",
       headerName: "DESCRIPTION",
-      width: 200,
+      width: 150,
     },
     {
       field: "amount",
@@ -66,7 +66,7 @@ const TopFiveTransactions = () => {
       field: "date",
       type: "string",
       headerName: "DATE",
-      width: 200,
+      width: 100,
     },
   ];
 
@@ -80,7 +80,7 @@ const TopFiveTransactions = () => {
               <Spinner
                 as="span"
                 animation="border"
-                size="sm"
+                size="lg"
                 role="status"
                 aria-hidden="true"
               />

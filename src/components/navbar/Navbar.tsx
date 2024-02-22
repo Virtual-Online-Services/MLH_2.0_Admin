@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
 import "./navbar.scss";
 import { Switch } from "../switch/Switch";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const userInfo = useSelector((state) => state.auth.userInfo);
@@ -8,7 +9,7 @@ const Navbar = () => {
 
   return (
     <div className="navbar">
-      <div className="logo">
+      <Link to="/home" className="logo">
         <span>
           <img
             src="https://www.mylottohub.com/megzy/images/logo.png"
@@ -16,7 +17,7 @@ const Navbar = () => {
             height="40"
           />
         </span>
-      </div>
+      </Link>
       <div className="icons">
         <div className="user">
           <span>
@@ -27,7 +28,6 @@ const Navbar = () => {
             <Switch />
           </span>
         </div>
-        <img src="/settings.svg" alt="" className="icon" />
       </div>
     </div>
   );

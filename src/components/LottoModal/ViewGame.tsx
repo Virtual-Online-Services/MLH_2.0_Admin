@@ -57,9 +57,7 @@ const ViewGame = ({ gameDetails, setGameDetails }) => {
         centered
       >
         <Modal.Header closeButton>
-          <Modal.Title className="fw-bolder text-dark">
-            Edit Operator
-          </Modal.Title>
+          <Modal.Title className="fw-bolder text-dark">Edit Game</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {gameDetails && (
@@ -96,7 +94,7 @@ const ViewGame = ({ gameDetails, setGameDetails }) => {
 
               <Button variant="primary" type="submit" disabled={isLoading}>
                 {isLoading ? (
-                  <Spinner animation="border" size="sm" />
+                  <Spinner animation="border" size="lg" />
                 ) : (
                   "Save Changes"
                 )}

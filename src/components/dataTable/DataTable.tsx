@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import ViewLottoModal from "../LottoModal/ViewLottoModal";
 import { useState } from "react";
 import ViewGame from "../LottoModal/ViewGame";
+import SingleUser from "../SingleUser/SingleUser";
 
 interface Row {
   id: number;
@@ -25,6 +26,7 @@ const DataTable = (props: Props) => {
   const userInfo = useSelector((state) => state.auth.userInfo);
   const [operatorDetails, setOperatorDetails] = useState(null);
   const [gameDetails, setGameDetails] = useState(null);
+  const [userDetails, setUserDetails] = useState(null);
   const token = userInfo?.token?.accessToken;
 
   const mutation = useMutation({
@@ -108,19 +110,6 @@ const DataTable = (props: Props) => {
         );
         setOperatorDetails(response.data); // Set operator details
       } else if (props.slug === "game") {
-        // endpoint = `/get-game/${id}`;
-        // const response = await HTTP.get(
-        //   endpoint,
-        //   {},
-        //   {
-        //     headers: {
-        //       "Content-Type": "application/json",
-        //       Accept: "application/json",
-        //       Authorization: `Bearer ${token}`,
-        //     },
-        //   }
-        // );
-        // setGameDetails(response.data); // Set Games details
         const endpoint = `https://sandbox.mylottohub.com/v1/get-game/${id}`;
         const requestOptions = {
           method: "GET",
@@ -144,6 +133,30 @@ const DataTable = (props: Props) => {
             error.message
           );
         }
+      } else if (props.slug === "users") {
+        const endpoint = `https://sandbox.mylottohub.com/v1/admin/get-user/${id}`;
+        const requestOptions = {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        };
+
+        try {
+          const response = await fetch(endpoint, requestOptions);
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          const data = await response.json();
+          setUserDetails(data);
+        } catch (error) {
+          console.error(
+            "There was a problem with the fetch request:",
+            error.message
+          );
+        }
       }
     } catch (error) {
       console.error("Error fetching game details:", error);
@@ -157,15 +170,20 @@ const DataTable = (props: Props) => {
     renderCell: (params) => {
       return (
         <div className="action">
-          {(props.slug === "operator" || props.slug === "game") && (
+          {(props.slug === "operator" ||
+            props.slug === "game" ||
+            props.slug === "users") && (
             <div className="edit" onClick={() => handleEdit(params.row.id)}>
               <img src="/view.svg" alt="" />
             </div>
           )}
 
-          <div className="delete" onClick={() => handleDelete(params.row.id)}>
-            <img src="/delete.svg" alt="" />
-          </div>
+          {/* Render delete action only if props.slug is not "withdraw" */}
+          {props.slug !== "withdraw" && (
+            <div className="delete" onClick={() => handleDelete(params.row.id)}>
+              <img src="/delete.svg" alt="" />
+            </div>
+          )}
         </div>
       );
     },
@@ -210,6 +228,7 @@ const DataTable = (props: Props) => {
         setOperatorDetails={setOperatorDetails}
       />
       <ViewGame gameDetails={gameDetails} setGameDetails={setGameDetails} />
+      <SingleUser userDetails={userDetails} setUserDetails={setUserDetails} />
       {/* </BModal> */}
     </div>
   );

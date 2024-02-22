@@ -16,7 +16,7 @@ const ChartBox = (props: Props) => {
           {props.total_user ? <span>Total users</span> : <h1>Total users</h1>}
         </div>
         <h1>{props.total_user}</h1>
-        <Link to="#" style={{ color: "#8884d8" }}>
+        <Link to="/users" style={{ color: "#8884d8" }}>
           View all
         </Link>
       </div>

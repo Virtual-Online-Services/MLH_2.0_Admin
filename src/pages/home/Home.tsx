@@ -60,9 +60,9 @@ const Home = () => {
             </div>
           </div>
           <div className="mt-5">Top 5 Transactions</div>
-          <>
+          <div className="w-100">
             <TopFiveTransactions />
-          </>
+          </div>
         </div>
       </div>
       <Footer />

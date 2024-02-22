@@ -18,7 +18,6 @@ const Operators = () => {
     handleOpen();
   };
   const { userLottoOperator, isLoadingLottoOperator } = useGetLottoOperator([]);
-  //   console.log(userLottoOperator?.data);
 
   const columns: GridColDef[] = [
     // { field: "id", headerName: "ID", width: 90 },
@@ -71,11 +70,11 @@ const Operators = () => {
               <p>{userLottoOperator?.data?.length} Records</p>
               {/* <DataTable slug="users" columns={columns} rows={formattedData} /> */}
               {isLoadingLottoOperator ? (
-                <div className="spinner text-dark text-center mt-5">
+                <div className="spinner text-center mt-5">
                   <Spinner
                     as="span"
                     animation="border"
-                    size="sm"
+                    size="lg"
                     role="status"
                     aria-hidden="true"
                   />

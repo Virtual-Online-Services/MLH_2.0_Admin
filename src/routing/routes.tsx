@@ -1,13 +1,13 @@
 import Home from "../pages/home/Home";
 import Users from "../pages/users/Users";
-// import Navbar from "../components/navbar/Navbar";
-// import Footer from "../components/footer/Footer";
-// import Menu from "../components/menu/Menu";
 import UserLogin from "../pages/login/UserLogin";
 import Advert from "../pages/advert/Advert";
 import Operators from "../pages/lotto-operators/Operators";
 import Games from "../pages/lotto-games/Games";
 import GameDateTime from "../pages/lotto-games/GameDateTime";
+import AllTransactions from "../pages/transaction/AllTransactions";
+import UserRequestWithdraw from "../pages/withdraw/UserRequestWithdraw";
+// import User from "../pages/user/User";
 
 export const routes = [
   {
@@ -47,9 +47,21 @@ export const routes = [
     protected: true,
   },
   {
-    id: 6,
+    id: 7,
     path: "/game-datetime/:id",
     element: <GameDateTime />,
+    protected: true,
+  },
+  {
+    id: 8,
+    path: "/all-transactions",
+    element: <AllTransactions />,
+    protected: true,
+  },
+  {
+    id: 8,
+    path: "/all-withdraw",
+    element: <UserRequestWithdraw />,
     protected: true,
   },
 ];

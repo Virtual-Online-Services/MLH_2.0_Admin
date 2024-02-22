@@ -19,17 +19,15 @@ const Menu = () => {
   };
   return (
     <div className="menu">
-      {menu.map((item) => (
+      {menu.map((item: any) => (
         <div className="item" key={item?.id}>
           <span className="title">{item?.title}</span>
-          {item?.listItems.map((listItem) => (
-            <>
-              <Link to={listItem?.url} className="listItem" key={listItem?.id}>
-                {/* <img src={listItem?.icon} className="text-dark" alt="" /> */}
-                <i className={`${listItem?.icon}`}></i>
-                <span className="listItemTitle mt-1">{listItem?.title}</span>
-              </Link>
-            </>
+          {item?.listItems.map((listItem: any) => (
+            <Link to={listItem?.url} className="listItem" key={listItem?.id}>
+              {/* <img src={listItem?.icon} className="text-dark" alt="" /> */}
+              <i className={`${listItem?.icon}`}></i>
+              <span className="listItemTitle mt-1">{listItem?.title}</span>
+            </Link>
           ))}
         </div>
       ))}
