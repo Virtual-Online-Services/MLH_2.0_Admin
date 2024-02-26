@@ -10,6 +10,7 @@ import moment from "moment";
 import { useSelector } from "react-redux";
 import { useState } from "react";
 import SingleUser from "../../components/SingleUser/SingleUser";
+import { toast } from "react-toastify";
 
 const UserRequestWithdraw = () => {
   const { userWithdrawDetails, isLoadingUserWithdraw } =
@@ -20,34 +21,6 @@ const UserRequestWithdraw = () => {
   const formatCreatedAt = (createdAt: any) => {
     return moment(createdAt).format("MMM Do YYYY | hh:mm:ss a");
   };
-
-  //   const handleEdit = async (id: number) => {
-  //     try {
-  //       const endpoint = `https://sandbox.mylottohub.com/v1/admin/get-user/${id}`;
-  //       const requestOptions = {
-  //         method: "GET",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Accept: "application/json",
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       };
-
-  //       try {
-  //         const response = await fetch(endpoint, requestOptions);
-  //         if (!response.ok) {
-  //           throw new Error("Network response was not ok");
-  //         }
-  //         const data = await response.json();
-  //         setUserDetails(data);
-  //       } catch (error) {
-  //         console.error("There was a problem with the fetch request:", error);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching game details:", error);
-  //       // Handle error
-  //     }
-  //   };
 
   const handleEdit = async (id: number) => {
     try {
@@ -64,16 +37,18 @@ const UserRequestWithdraw = () => {
       const response = await fetch(endpoint, requestOptions);
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Network response was not ok");
+        if (response.status === 400) {
+          toast.error("User does not Exist");
+          // Display or handle the error here
+        } else {
+          throw new Error(errorData.error || "Network response was not ok");
+        }
       }
 
       const data = await response.json();
       setUserDetails(data);
     } catch (error: any) {
-      console.error(
-        "There was a problem with the fetch request:",
-        error.message
-      );
+      // toast.error(error.error);
       // Display error message or handle error appropriately
     }
   };

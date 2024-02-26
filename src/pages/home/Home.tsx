@@ -11,7 +11,6 @@ import Navbar from "../../components/navbar/Navbar";
 import Footer from "../../components/footer/Footer";
 import useGetDashBoardInfo from "../../react-query/api-hooks/useGetDashBoardInfo.js";
 import ChartGames from "../../components/chartBox/ChartGames.js";
-import ChartProduct from "../../components/chartBox/ChartProduct.js";
 import TopFiveTransactions from "../transaction/TopFiveTransactions.js";
 
 const Home = () => {
@@ -46,9 +45,9 @@ const Home = () => {
             <div className="box box5">
               <ChartGames {...dashboardData} />
             </div>
-            <div className="box box6">
+            {/* <div className="box box6">
               <ChartProduct {...dashboardData} />
-            </div>
+            </div> */}
             <div className="box box7">
               <BigChartBox />
             </div>

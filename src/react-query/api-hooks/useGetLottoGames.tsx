@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 
 const getAllGames = async (token) => {
   try {
-    const res = await HTTP.get(`/get-games`, {
+    const res = await HTTP.get(`/admin/get-games`, {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",

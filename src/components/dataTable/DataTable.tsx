@@ -210,19 +210,18 @@ const DataTable = (props: Props) => {
           },
         }}
         pageSizeOptions={[5]}
-        checkboxSelection
+        checkboxSelection={
+          props.slug !== "users" &&
+          props.slug !== "transactions" &&
+          props.slug !== "top_five_transaction" &&
+          props.slug !== "withdraw"
+        }
         disableRowSelectionOnClick
         disableColumnFilter
         disableDensitySelector
         disableColumnSelector
       />
-      {/* <BModal
-        // backdrop="static"
-        keyboard={false}
-        show={isOpen}
-        onHide={handleClose}
-        size="md"
-      > */}
+
       <ViewLottoModal
         operatorDetails={operatorDetails}
         setOperatorDetails={setOperatorDetails}

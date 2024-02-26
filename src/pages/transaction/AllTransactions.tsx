@@ -252,7 +252,7 @@ const AllTransactions = () => {
                     </p>
 
                     <DataTable
-                      slug="transation"
+                      slug="transactions"
                       columns={columns}
                       rows={filteredTransactions || userTransactions?.data}
                     />

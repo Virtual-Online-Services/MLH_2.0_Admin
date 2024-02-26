@@ -96,7 +96,7 @@ const TopFiveTransactions = () => {
           ) : (
             <>
               <DataTable
-                slug="advert"
+                slug="top_five_transaction"
                 columns={columns}
                 rows={dashboardData?.transaction}
               />
