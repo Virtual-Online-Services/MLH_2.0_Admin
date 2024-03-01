@@ -12,13 +12,13 @@ export const menu = [
       {
         id: 2,
         title: "Message",
-        url: "#",
+        url: "/all-message",
         icon: "fa fa-envelope-o",
       },
       {
         id: 3,
         title: "Message User",
-        url: "#",
+        url: "/single-user-message",
         icon: "fa fa-envelope-o",
       },
       {
@@ -48,20 +48,20 @@ export const menu = [
       {
         id: 8,
         title: "Admin",
-        url: "#",
+        url: "/register-admin",
         icon: "fa fa-buysellads",
       },
 
       {
         id: 10,
         title: "Profile",
-        url: "3",
+        url: "/admin-profile",
         icon: "fa fa-user",
       },
       {
         id: 11,
         title: "Password",
-        url: "#",
+        url: "/reset-password",
         icon: "fa fa-lock",
       },
     ],
@@ -85,15 +85,10 @@ export const menu = [
       {
         id: 4,
         title: "Results",
-        url: "#",
+        url: "/results",
         icon: "fa fa-file",
       },
-      {
-        id: 5,
-        title: "Play Activity",
-        url: "#",
-        icon: "fa fa-play",
-      },
+
       {
         id: 8,
         title: "Play History",
@@ -115,26 +110,20 @@ export const menu = [
       {
         id: 1,
         title: "Commission",
-        url: "#",
+        url: "/agent-commission",
         icon: "fa fa-balance-scale",
       },
       {
         id: 2,
         title: "Transactions",
-        url: "#",
+        url: "/agent-transaction",
         icon: "fa fa-american-sign-language-interpreting",
       },
       {
         id: 3,
         title: "Users",
-        url: "#",
+        url: "/agent-users",
         icon: "fa fa-users",
-      },
-      {
-        id: 4,
-        title: "Withdrawals",
-        url: "#",
-        icon: "fa fa-cloud-download",
       },
     ],
   },
@@ -145,26 +134,26 @@ export const menu = [
       {
         id: 1,
         title: "Operators",
-        url: "#",
+        url: "/sport-operator",
         icon: "fa fa-android",
       },
       {
         id: 2,
         title: "Affiliates",
-        url: "#",
+        url: "/sport-affiliates",
         icon: "fa fa-at",
       },
       {
         id: 6,
         title: "Betting codes",
-        url: "#",
+        url: "/sport-codes",
         icon: "fa fa-barcode",
       },
 
       {
         id: 7,
         title: "Sport Activity",
-        url: "#",
+        url: "/sport-activity",
         icon: "fa fa-bolt",
       },
     ],

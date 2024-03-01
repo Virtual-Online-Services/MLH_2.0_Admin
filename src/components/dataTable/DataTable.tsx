@@ -8,6 +8,9 @@ import ViewLottoModal from "../LottoModal/ViewLottoModal";
 import { useState } from "react";
 import ViewGame from "../LottoModal/ViewGame";
 import SingleUser from "../SingleUser/SingleUser";
+import SingleAdmin from "../admin/SingleAdmin";
+import ViewResult from "../results/ViewResult";
+import AgentUser from "../agent/AgentUser";
 
 interface Row {
   id: number;
@@ -27,6 +30,9 @@ const DataTable = (props: Props) => {
   const [operatorDetails, setOperatorDetails] = useState(null);
   const [gameDetails, setGameDetails] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
+  const [agentDetails, setAgentDetails] = useState(null);
+  const [adminDetails, setAdminDetails] = useState(null);
+  const [resultsDetails, setResultsDetails] = useState(null);
   const token = userInfo?.token?.accessToken;
 
   const mutation = useMutation({
@@ -99,7 +105,7 @@ const DataTable = (props: Props) => {
         endpoint = `/get-operator/${id}`;
         const response = await HTTP.post(
           endpoint,
-          {},
+
           {
             headers: {
               "Content-Type": "application/json",
@@ -110,53 +116,55 @@ const DataTable = (props: Props) => {
         );
         setOperatorDetails(response.data); // Set operator details
       } else if (props.slug === "game") {
-        const endpoint = `https://sandbox.mylottohub.com/v1/get-game/${id}`;
-        const requestOptions = {
-          method: "GET",
+        endpoint = `/get-game/${id}`;
+        const response = await HTTP.get(endpoint, {
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
             Authorization: `Bearer ${token}`,
           },
-        };
-
-        try {
-          const response = await fetch(endpoint, requestOptions);
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          const data = await response.json();
-          setGameDetails(data);
-        } catch (error) {
-          console.error(
-            "There was a problem with the fetch request:",
-            error.message
-          );
-        }
+        });
+        setGameDetails(response.data);
       } else if (props.slug === "users") {
-        const endpoint = `https://sandbox.mylottohub.com/v1/admin/get-user/${id}`;
-        const requestOptions = {
-          method: "GET",
+        endpoint = `/get-user/${id}`;
+        const response = await HTTP.get(endpoint, {
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
             Authorization: `Bearer ${token}`,
           },
-        };
-
-        try {
-          const response = await fetch(endpoint, requestOptions);
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          const data = await response.json();
-          setUserDetails(data);
-        } catch (error) {
-          console.error(
-            "There was a problem with the fetch request:",
-            error.message
-          );
-        }
+        });
+        setUserDetails(response.data);
+      } else if (props.slug === "agent-users") {
+        endpoint = `/get-user/${id}`;
+        const response = await HTTP.get(endpoint, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setAgentDetails(response.data);
+      } else if (props.slug === "admin_register") {
+        endpoint = `/get-admin/${id}`;
+        const response = await HTTP.get(endpoint, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setAdminDetails(response.data);
+      } else if (props.slug === "results") {
+        endpoint = `/get-result/${id}`;
+        const response = await HTTP.get(endpoint, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setResultsDetails(response.data);
       }
     } catch (error) {
       console.error("Error fetching game details:", error);
@@ -164,14 +172,35 @@ const DataTable = (props: Props) => {
     }
   };
   const actionColumn: GridColDef = {
-    field: props.slug === "withdraw" ? "" : "action",
-    headerName: props.slug === "withdraw" ? "" : "Action",
-    width: props.slug === "withdraw" ? 0 : 200,
+    field:
+      props.slug === "withdraw" ||
+      props.slug === "single-transactions" ||
+      props.slug === "agent-commission"
+        ? ""
+        : "action",
+    headerName:
+      props.slug === "withdraw" ||
+      props.slug === "single-transactions" ||
+      props.slug === "agent-commission"
+        ? ""
+        : "Action",
+    width:
+      props.slug === "withdraw" ||
+      props.slug === "single-transactions" ||
+      props.slug === "agent-commission"
+        ? 0
+        : 200,
+
     renderCell: (params) => {
       return (
         <div className="action">
           {(props.slug === "operator" ||
             props.slug === "game" ||
+            props.slug === "admin_register" ||
+            props.slug === "results" ||
+            props.slug === "agent-users" ||
+            props.slug === "sports" ||
+            props.slug === "sports-affilates" ||
             props.slug === "users") && (
             <div className="edit" onClick={() => handleEdit(params.row.id)}>
               <img src="/view.svg" alt="" />
@@ -179,11 +208,17 @@ const DataTable = (props: Props) => {
           )}
 
           {/* Render delete action only if props.slug is not "withdraw" */}
-          {props.slug !== "withdraw" && (
-            <div className="delete" onClick={() => handleDelete(params.row.id)}>
-              <img src="/delete.svg" alt="" />
-            </div>
-          )}
+          {props.slug !== "withdraw" &&
+            props.slug !== "single-transactions" &&
+            props.slug !== "agent-commission" &&
+            props.slug !== "transactions" && (
+              <div
+                className="delete"
+                onClick={() => handleDelete(params.row.id)}
+              >
+                <img src="/delete.svg" alt="" />
+              </div>
+            )}
         </div>
       );
     },
@@ -213,7 +248,9 @@ const DataTable = (props: Props) => {
         checkboxSelection={
           props.slug !== "users" &&
           props.slug !== "transactions" &&
+          props.slug !== "single-transactions" &&
           props.slug !== "top_five_transaction" &&
+          props.slug !== "results" &&
           props.slug !== "withdraw"
         }
         disableRowSelectionOnClick
@@ -228,6 +265,18 @@ const DataTable = (props: Props) => {
       />
       <ViewGame gameDetails={gameDetails} setGameDetails={setGameDetails} />
       <SingleUser userDetails={userDetails} setUserDetails={setUserDetails} />
+      <AgentUser
+        agentDetails={agentDetails}
+        setAgentDetails={setAgentDetails}
+      />
+      <SingleAdmin
+        adminDetails={adminDetails}
+        setAdminDetails={setAdminDetails}
+      />
+      <ViewResult
+        resultsDetails={resultsDetails}
+        setResultsDetails={setResultsDetails}
+      />
       {/* </BModal> */}
     </div>
   );

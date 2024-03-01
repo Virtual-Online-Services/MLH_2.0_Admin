@@ -94,13 +94,13 @@ const UserRequestWithdraw = () => {
       type: "string",
     },
     {
-      field: "pbalance",
+      field: "prevBalance",
       headerName: "PREV BALANCE",
       width: 150,
       type: "string",
     },
     {
-      field: "bamount",
+      field: "balance",
       headerName: "BALANCE",
       width: 150,
       type: "string",

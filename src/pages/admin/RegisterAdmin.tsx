@@ -1,63 +1,35 @@
 import { GridColDef } from "@mui/x-data-grid";
 import DataTable from "../../components/dataTable/DataTable";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Footer from "../../components/footer/Footer";
 import Menu from "../../components/menu/Menu";
 import Navbar from "../../components/navbar/Navbar";
-import useGetLottoGames from "../../react-query/api-hooks/useGetLottoGames";
+import useGetAdmin from "../../react-query/api-hooks/useGetAdmin";
 import { Spinner } from "react-bootstrap";
 import BModal from "../../components/BModal/BModal";
-import { Link, useParams } from "react-router-dom";
-// import GameLotto from "../../components/LottoModal/GameLotto";
+import { Link } from "react-router-dom";
+import AddAdmin from "../../components/admin/AddAdmin";
 
-const GameDateTime = () => {
-  const [game, setGame] = useState(null);
-  const { id } = useParams();
+const RegisterAdmin = () => {
   const [isOpen, setIsOpen] = useState(false);
   const handleClose = () => setIsOpen(false);
   const handleOpen = () => setIsOpen(true);
-  //   const handleGame = () => {
-  //     handleOpen();
-  //   };
-  const { userLottoGame, isLoadingLottoGame } = useGetLottoGames([]);
-
-  useEffect(() => {
-    if (userLottoGame?.data) {
-      const selectedGame = userLottoGame?.data?.find(
-        (game: any) => game.id === parseInt(id)
-      );
-      //   console.log("Selected game:", selectedGame);
-
-      setGame(selectedGame);
-    }
-  }, [userLottoGame?.data, id]);
-
-  //   console.log(game);
+  const handleAdvert = () => {
+    handleOpen();
+  };
+  const { userAdminResponse, isLoadingAdmin } = useGetAdmin([]);
 
   const columns: GridColDef[] = [
-    // { field: "id", headerName: "ID", width: 90 },
     {
       field: "name",
       type: "string",
-      headerName: "GAME NAME",
+      headerName: "Name",
       width: 300,
     },
     {
-      field: "day",
+      field: "username",
       type: "string",
-      headerName: "GAME DAY",
-      width: 300,
-    },
-    {
-      field: "start_time",
-      type: "string",
-      headerName: "START TIME",
-      width: 300,
-    },
-    {
-      field: "end_time",
-      type: "string",
-      headerName: "END TIME",
+      headerName: "Username",
       width: 300,
     },
   ];
@@ -72,30 +44,30 @@ const GameDateTime = () => {
           </div>
           <div className="container">
             <div className="page-title">
-              <h4 className="mb-0"> Game DateTime </h4>
+              <h4 className="mb-0"> Admin </h4>
               <ol className="breadcrumb mb-0 pl-0 pt-1 pb-0">
                 <li className="breadcrumb-item">
                   <Link to="/home" className="default-color">
                     Dashboard
                   </Link>
                 </li>
-                <li className="breadcrumb-item active">Game DateTime</li>
+                <li className="breadcrumb-item active">Admin</li>
               </ol>
             </div>
 
             <div>
               <p>
                 <a
-                  //   onClick={() => handleGame()}
+                  onClick={() => handleAdvert()}
                   className="btn btn-primary mt-4"
                 >
                   <i className="fa fa-plus-circle"></i>{" "}
                 </a>
               </p>
-              <p>1 Record</p>
-              {userLottoGame?.data?.name}
-              {isLoadingLottoGame ? (
-                <div className="spinner text-dark text-center mt-5">
+              <p>{userAdminResponse?.data?.length} Records</p>
+              {/* <DataTable slug="users" columns={columns} rows={formattedData} /> */}
+              {isLoadingAdmin ? (
+                <div className="spinner text-center mt-5">
                   <Spinner
                     as="span"
                     animation="border"
@@ -104,7 +76,7 @@ const GameDateTime = () => {
                     aria-hidden="true"
                   />
                 </div>
-              ) : !game ? (
+              ) : userAdminResponse?.data?.length === 0 ? (
                 <div className="d-flex justify-content-center text-center p-5">
                   <div className="hidden-xs hidden-sm mx-auto">
                     <div
@@ -118,9 +90,9 @@ const GameDateTime = () => {
               ) : (
                 <>
                   <DataTable
-                    slug="games_date_time"
+                    slug="admin_register"
                     columns={columns}
-                    rows={[game]}
+                    rows={[userAdminResponse?.data]}
                   />
                 </>
               )}
@@ -136,14 +108,13 @@ const GameDateTime = () => {
           keyboard={false}
           show={isOpen}
           onHide={handleClose}
-          size="md"
+          size="lg"
         >
-          {/* <GameLotto handleClose={handleClose} /> */}
-          <p>Hi</p>
+          <AddAdmin handleClose={handleClose} />
         </BModal>
       </div>
     </div>
   );
 };
 
-export default GameDateTime;
+export default RegisterAdmin;

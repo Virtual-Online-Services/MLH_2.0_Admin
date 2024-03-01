@@ -7,3 +7,10 @@ export { default as useGetLottoOperator } from "./api-hooks/useGetLottoOperator"
 export { default as useGetLottoGames } from "./api-hooks/useGetLottoGames";
 export { default as useGetUsers } from "./api-hooks/useGetUsers";
 export { default as useGetAllUserTransactions } from "./api-hooks/useGetAllUserTransactions";
+export { default as useGetAllAgentTransactions } from "./api-hooks/useGetAllAgentTransactions";
+export { default as useGetAdmin } from "./api-hooks/useGetAdmin";
+export { default as useGetResults } from "./api-hooks/useGetResults";
+export { default as useGetSingleUserTransactions } from "./api-hooks/useGetSingleUserTransactions";
+export { default as useGetSingleUserTransactions } from "./api-hooks/useGetSingleUserTransactions";
+export { default as useGetAgentUsers } from "./api-hooks/useGetAgentUsers";
+export { default as useGetSportCode } from "./api-hooks/useGetSportCode";

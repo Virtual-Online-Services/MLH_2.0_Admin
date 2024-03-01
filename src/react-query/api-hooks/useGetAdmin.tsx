@@ -3,9 +3,9 @@ import queryKeys from "../constants";
 import { HTTP } from "../../utils";
 import { useSelector } from "react-redux";
 
-const getAllUsers = async (token) => {
+const getUsersAdminProfile = async (userId, token) => {
   try {
-    const res = await HTTP.get(`/admin/get-users`, {
+    const res = await HTTP.get(`/get-admin/${userId}`, {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -18,20 +18,21 @@ const getAllUsers = async (token) => {
   }
 };
 
-const useGetUsers = () => {
+const useGetAdmin = () => {
   const userInfo = useSelector((state) => state.auth.userInfo);
   const token = userInfo?.token?.accessToken;
+  const userId = userInfo?.data?.id;
 
   const { data, isLoading } = useQuery({
-    queryKey: [queryKeys.GET_ALL_USERS],
-    queryFn: () => getAllUsers(token),
+    queryKey: [queryKeys.GET_ADMIN_PROFILE, userId],
+    queryFn: () => getUsersAdminProfile(userId, token),
   });
 
   return {
-    userAllDetails: data?.data,
+    userAdminResponse: data?.data,
     token,
-    isLoadingUser: isLoading,
+    isLoadingAdmin: isLoading,
   };
 };
 
-export default useGetUsers;
+export default useGetAdmin;

@@ -3,9 +3,9 @@ import queryKeys from "../constants";
 import { HTTP } from "../../utils";
 import { useSelector } from "react-redux";
 
-const getAllUsers = async (token) => {
+const getAllCode = async (token) => {
   try {
-    const res = await HTTP.get(`/admin/get-users`, {
+    const res = await HTTP.get(`/get-sports-bet`, {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -18,20 +18,20 @@ const getAllUsers = async (token) => {
   }
 };
 
-const useGetUsers = () => {
+const useGetSportCode = () => {
   const userInfo = useSelector((state) => state.auth.userInfo);
   const token = userInfo?.token?.accessToken;
 
   const { data, isLoading } = useQuery({
-    queryKey: [queryKeys.GET_ALL_USERS],
-    queryFn: () => getAllUsers(token),
+    queryKey: [queryKeys.GET_SPORT_CODE],
+    queryFn: () => getAllCode(token),
   });
 
   return {
-    userAllDetails: data?.data,
+    userSportCode: data?.data,
     token,
-    isLoadingUser: isLoading,
+    isLoadingCode: isLoading,
   };
 };
 
-export default useGetUsers;
+export default useGetSportCode;

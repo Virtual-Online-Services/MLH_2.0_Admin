@@ -1,11 +1,10 @@
 import { GridColDef } from "@mui/x-data-grid";
 import DataTable from "../../components/dataTable/DataTable";
-import "./users.scss";
 import Navbar from "../../components/navbar/Navbar";
 import Menu from "../../components/menu/Menu";
 import { Link } from "react-router-dom";
 import { Spinner } from "react-bootstrap";
-import useGetUsers from "../../react-query/api-hooks/useGetUsers";
+import useGetAgentUsers from "../../react-query/api-hooks/useGetAgentUsers";
 import Footer from "../../components/footer/Footer";
 import moment from "moment";
 import { useState } from "react";
@@ -15,12 +14,13 @@ import "react-date-range/dist/theme/default.css"; // theme css file
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import SingleUser from "../../components/SingleUser/SingleUser";
+import AgentUser from "../../components/agent/AgentUser";
 
-const Users = () => {
-  const { userAllDetails, isLoadingUser } = useGetUsers([]);
+const ListUsers = () => {
+  const { userAgentDetails, isLoadingAgentUser } = useGetAgentUsers([]);
   const userInfo = useSelector((state) => state.auth.userInfo);
   const token = userInfo?.token?.accessToken;
-  const [userDetails, setUserDetails] = useState(null);
+  const [agentDetails, setAgentDetails] = useState(null);
 
   const [dateRange, setDateRange] = useState([
     {
@@ -51,7 +51,7 @@ const Users = () => {
     const searchUser = searchUserInput.value.toLowerCase(); // Convert to lowercase
     const selectedStatus = selectedStatusInput.value;
 
-    const filtered = userAllDetails?.data.filter((record: any) => {
+    const filtered = userAgentDetails?.data.filter((record: any) => {
       // Default filter conditions
       let isMatchingSearch = true;
       let isMatchingStatus = true;
@@ -102,7 +102,7 @@ const Users = () => {
 
   const handleEdit = async (id: number) => {
     try {
-      const endpoint = `https://sandbox.mylottohub.com/v1/admin/get-user/${id}`;
+      const endpoint = `https://sandbox.mylottohub.com/v1/get-agent/${id}`;
       const requestOptions = {
         method: "GET",
         headers: {
@@ -124,7 +124,7 @@ const Users = () => {
       }
 
       const data = await response.json();
-      setUserDetails(data);
+      setAgentDetails(data);
     } catch (error: any) {
       // toast.error(error.error);
       // Display error message or handle error appropriately
@@ -166,6 +166,8 @@ const Users = () => {
       type: "string",
       headerName: "NAME",
       width: 200,
+      valueGetter: (params) =>
+        `${params.row.first_name || ""} ${params.row.last_name || ""}`,
     },
     {
       field: "email",
@@ -182,43 +184,40 @@ const Users = () => {
     {
       field: "state",
       headerName: "STATE",
-      width: 100,
-      type: "string",
-    },
-    {
-      field: "dob",
-      headerName: "DOB",
       width: 150,
       type: "string",
     },
+
     {
       field: "gender",
       headerName: "GENDER",
-      width: 100,
+      width: 150,
       type: "string",
     },
     {
       field: "type",
       headerName: "USER TYPE",
-      width: 100,
+      width: 150,
       type: "string",
     },
     {
       field: "wallet",
       headerName: "WALLET",
-      width: 130,
+      width: 150,
       type: "string",
+      valueGetter: (params) => `₦${params.value}`,
     },
     {
       field: "wwallet",
       headerName: "WIN WALLET",
-      width: 130,
+      width: 150,
       type: "string",
+      valueGetter: (params) => `₦${params.value}`,
     },
     {
       field: "status",
       headerName: "STATUS",
-      width: 80,
+      width: 120,
       type: "string",
       renderCell: (params) => <span>{getStatusText(params.value)}</span>,
     },
@@ -232,7 +231,7 @@ const Users = () => {
     {
       field: "ref",
       headerName: "REFERRED BY",
-      width: 150,
+      width: 200,
       type: "string",
     },
 
@@ -271,19 +270,19 @@ const Users = () => {
             </div>
             <div className="container">
               <div className="page-title mb-4">
-                <h4 className="mb-0"> Users </h4>
+                <h4 className="mb-0">Agent Users </h4>
                 <ol className="breadcrumb mb-0 pl-0 pt-1 pb-0">
                   <li className="breadcrumb-item mt-3">
                     <Link to="/home" className="default-color">
                       Dashboard
                     </Link>
                   </li>
-                  <li className="breadcrumb-item active mt-3">User</li>
+                  <li className="breadcrumb-item active mt-3">Agent User</li>
                 </ol>
               </div>
 
               <div>
-                {isLoadingUser ? (
+                {isLoadingAgentUser ? (
                   <div className="spinner text-center mt-5">
                     <Spinner
                       as="span"
@@ -293,7 +292,7 @@ const Users = () => {
                       aria-hidden="true"
                     />
                   </div>
-                ) : userAllDetails?.data?.length === 0 ? (
+                ) : userAgentDetails?.data?.length === 0 ? (
                   <div className="d-flex justify-content-center text-center p-5">
                     <div className="hidden-xs hidden-sm mx-auto">
                       <div
@@ -384,13 +383,12 @@ const Users = () => {
                       </div>
                     </div>
                     <p className="mt-4">
-                      {userAllDetails?.data?.length} Records
+                      {userAgentDetails?.data?.length} Records
                     </p>
                     <DataTable
-                      slug="users"
+                      slug="agent-users"
                       columns={columns}
-                      // rows={userDetails?.data}
-                      rows={filteredTransactions || userAllDetails?.data}
+                      rows={filteredTransactions || userAgentDetails?.data}
                     />
                   </>
                 )}
@@ -400,9 +398,9 @@ const Users = () => {
               </div>
             </div>
           </div>
-          <SingleUser
-            userDetails={userDetails}
-            setUserDetails={setUserDetails}
+          <AgentUser
+            agentDetails={agentDetails}
+            setAgentDetails={setAgentDetails}
           />
 
           <Footer />
@@ -412,4 +410,4 @@ const Users = () => {
   );
 };
 
-export default Users;
+export default ListUsers;

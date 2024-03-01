@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 
 const getAllUsers = async (token) => {
   try {
-    const res = await HTTP.get(`/admin/get-users`, {
+    const res = await HTTP.get(`/get-agents`, {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -18,20 +18,20 @@ const getAllUsers = async (token) => {
   }
 };
 
-const useGetUsers = () => {
+const useGetAgentUsers = () => {
   const userInfo = useSelector((state) => state.auth.userInfo);
   const token = userInfo?.token?.accessToken;
 
   const { data, isLoading } = useQuery({
-    queryKey: [queryKeys.GET_ALL_USERS],
+    queryKey: [queryKeys.GET_ALL_USERS_AGENT],
     queryFn: () => getAllUsers(token),
   });
 
   return {
-    userAllDetails: data?.data,
+    userAgentDetails: data?.data,
     token,
-    isLoadingUser: isLoading,
+    isLoadingAgentUser: isLoading,
   };
 };
 
-export default useGetUsers;
+export default useGetAgentUsers;

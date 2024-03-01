@@ -2,25 +2,23 @@ import { GridColDef } from "@mui/x-data-grid";
 import DataTable from "../../components/dataTable/DataTable";
 import moment from "moment";
 import { Modal } from "react-bootstrap";
-// import useGetSingleUserTransactions from "../../react-query/api-hooks/useGetSingleUserTransactions";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import HTTP from "../../utils/httpClient";
 
-const SingleUser = ({ userDetails, setUserDetails }) => {
-  // const { userSingleTransactions } = useGetSingleUserTransactions([]);
+const AgentUser = ({ agentDetails, setAgentDetails }) => {
   const [userTransaction, setUserTransaction] = useState([]);
-  const [userBonus, setUserBonus] = useState([]);
+  const [agentBonus, setAgentBonus] = useState([]);
   const userInfo = useSelector((state) => state.auth.userInfo);
   const token = userInfo?.token?.accessToken;
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!userDetails || !userDetails.data || !userDetails.data.id) {
+      if (!agentDetails || !agentDetails.data || !agentDetails.data.id) {
         return;
       }
 
-      const endpoint = `/get-usertransactions/${userDetails.data.id}`;
+      const endpoint = `/get-agenttransactions/${agentDetails.data.id}`;
       try {
         const response = await HTTP.get(endpoint, {
           headers: {
@@ -36,15 +34,15 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
     };
 
     fetchData();
-  }, [userDetails?.data?.id, token]);
+  }, [agentDetails?.data?.id, token]);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!userDetails || !userDetails.data || !userDetails.data.id) {
+      if (!agentDetails || !agentDetails.data || !agentDetails.data.id) {
         return;
       }
 
-      const endpoint = `/get-userwallets/${userDetails.data.id}`;
+      const endpoint = `/get-agentwallets/${agentDetails.data.id}`;
       try {
         const response = await HTTP.get(endpoint, {
           headers: {
@@ -53,14 +51,14 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
             Authorization: `Bearer ${token}`,
           },
         });
-        setUserBonus(response.data);
+        setAgentBonus(response.data);
       } catch (error) {
         console.error("Error fetching user transactions:");
       }
     };
 
     fetchData();
-  }, [userDetails?.data?.id, token]);
+  }, [agentDetails?.data?.id, token]);
 
   const getStatusText = (status: number) => {
     switch (status) {
@@ -129,8 +127,8 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
   return (
     <div>
       <Modal
-        show={userDetails !== null}
-        onHide={() => setUserDetails(null)}
+        show={agentDetails !== null}
+        onHide={() => setAgentDetails(null)}
         centered
         size="lg"
       >
@@ -142,7 +140,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
           <button className="btn btn-primary">Reset Password</button>
         </Modal.Header>
         <Modal.Body>
-          {userDetails && (
+          {agentDetails && (
             <>
               <ul className="nav nav-tabs" id="myTab" role="tablist">
                 <li className="nav-item" role="presentation">
@@ -211,7 +209,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                       >
                         <span className="fw-bolder text-dark">User ID:</span>
                         <span className="text-dark">
-                          {userDetails?.data?.id}
+                          {agentDetails?.data?.id}
                         </span>
                       </p>
                       <hr style={{ backgroundColor: "black" }} />
@@ -223,7 +221,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                       >
                         <span className="fw-bolder text-dark">Name:</span>
                         <span className="text-dark">
-                          {userDetails?.data?.name}
+                          {agentDetails?.data?.name}
                         </span>
                       </p>
                       <hr style={{ backgroundColor: "black" }} />
@@ -235,7 +233,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                       >
                         <span className="fw-bolder text-dark">Username: </span>
                         <span className="text-dark">
-                          {userDetails?.data?.username}
+                          {agentDetails?.data?.username}
                         </span>
                       </p>
                       <hr style={{ backgroundColor: "black" }} />
@@ -247,7 +245,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                       >
                         <span className="fw-bolder text-dark">Phone:</span>{" "}
                         <span className="text-dark">
-                          {userDetails?.data?.tell}
+                          {agentDetails?.data?.tell}
                         </span>
                       </p>
                       <hr style={{ backgroundColor: "black" }} />
@@ -259,7 +257,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                       >
                         <span className="fw-bolder text-dark">Email:</span>{" "}
                         <span className="text-dark">
-                          {userDetails?.data?.email}
+                          {agentDetails?.data?.email}
                         </span>
                       </p>
                       <hr style={{ backgroundColor: "black" }} />
@@ -271,7 +269,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                       >
                         <span className="fw-bolder text-dark">State:</span>{" "}
                         <span className="text-dark">
-                          {userDetails?.data?.state}
+                          {agentDetails?.data?.state}
                         </span>
                       </p>
                       <hr style={{ backgroundColor: "black" }} />
@@ -285,7 +283,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                           Date of birth:
                         </span>{" "}
                         <span className="text-dark">
-                          {userDetails?.data?.dob}
+                          {agentDetails?.data?.dob}
                         </span>
                       </p>
                       <hr style={{ backgroundColor: "black" }} />
@@ -297,7 +295,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                       >
                         <span className="fw-bolder text-dark">Gender:</span>{" "}
                         <span className="text-dark">
-                          {userDetails?.data?.gender}
+                          {agentDetails?.data?.gender}
                         </span>
                       </p>
                       <hr style={{ backgroundColor: "black" }} />
@@ -309,7 +307,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                       >
                         <span className="fw-bolder text-dark">User Type:</span>{" "}
                         <span className="text-dark">
-                          {userDetails?.data?.type}
+                          {agentDetails?.data?.type}
                         </span>
                       </p>
                       <hr style={{ backgroundColor: "black" }} />
@@ -323,7 +321,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                           Wallet Balance:
                         </span>{" "}
                         <span className="text-dark">
-                          ₦{userDetails?.data?.wallet}
+                          ₦{agentDetails?.data?.wallet}
                         </span>
                       </p>
                       <hr style={{ backgroundColor: "black" }} />
@@ -337,23 +335,10 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                           Winning Wallet Balance:
                         </span>{" "}
                         <span className="text-dark">
-                          ₦{userDetails?.data?.wwallet}
+                          ₦{agentDetails?.data?.wwallet}
                         </span>
                       </p>
                       <hr style={{ backgroundColor: "black" }} />
-                      {/* <p
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <span className="fw-bolder text-dark">
-                          Bonus Wallet Balance:
-                        </span>{" "}
-                        <span className="text-dark">
-                          ₦{userDetails?.data?.bwallet}
-                        </span>
-                      </p> */}
                       <p
                         style={{
                           display: "flex",
@@ -364,7 +349,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                           Green Lotto Wallet Balance:
                         </span>{" "}
                         <span className="text-dark">
-                          ₦{userBonus?.green_lotto_bonus_wallet}
+                          ₦{agentBonus?.green_lotto_bonus_wallet}
                         </span>
                       </p>
                       <hr style={{ backgroundColor: "black" }} />
@@ -378,7 +363,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                           Set Lotto Wallet Balance:
                         </span>{" "}
                         <span className="text-dark">
-                          ₦{userBonus?.lotto_nigeria_bonus_wallet}
+                          ₦{agentBonus?.lotto_nigeria_bonus_wallet}
                         </span>
                       </p>
                       <hr style={{ backgroundColor: "black" }} />
@@ -392,7 +377,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                           Lotto Mania Wallet Balance:
                         </span>{" "}
                         <span className="text-dark">
-                          ₦{userBonus?.lottomania_bonus_wallet}
+                          ₦{agentBonus?.lottomania_bonus_wallet}
                         </span>
                       </p>
                       <hr style={{ backgroundColor: "black" }} />
@@ -406,7 +391,9 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                           5/90 Mania Wallet Balance:
                         </span>{" "}
                         <span className="text-dark">
-                          {userBonus ? `₦${userBonus["590_bonus_wallet"]}` : ""}
+                          {agentBonus
+                            ? `₦${agentBonus["590_bonus_wallet"]}`
+                            : ""}
                         </span>
                       </p>
                       <hr style={{ backgroundColor: "black" }} />
@@ -419,7 +406,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                         <span className="fw-bolder text-dark">Status:</span>{" "}
                         <span className="text-dark">
                           <span>
-                            {getStatusText(userDetails?.data?.status)}
+                            {getStatusText(agentDetails?.data?.status)}
                           </span>
                         </span>
                       </p>
@@ -434,7 +421,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                           Signup Date:
                         </span>{" "}
                         <span className="text-dark">
-                          {userDetails?.data?.date}
+                          {agentDetails?.data?.date}
                         </span>
                       </p>
                       <hr style={{ backgroundColor: "black" }} />
@@ -448,7 +435,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                           Referred By:
                         </span>{" "}
                         <span className="text-dark">
-                          {userDetails?.data?.ref}
+                          {agentDetails?.data?.ref}
                         </span>
                       </p>
                       <hr style={{ backgroundColor: "black" }} />
@@ -460,7 +447,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                       >
                         <span className="fw-bolder text-dark">Bank:</span>{" "}
                         <span className="text-dark">
-                          {userDetails?.data?.bname}
+                          {agentDetails?.data?.bname}
                         </span>
                       </p>
                       <hr style={{ backgroundColor: "black" }} />
@@ -474,7 +461,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                           Account Name:
                         </span>{" "}
                         <span className="text-dark">
-                          {userDetails?.data?.accname}
+                          {agentDetails?.data?.accname}
                         </span>
                       </p>
                       <hr style={{ backgroundColor: "black" }} />
@@ -488,7 +475,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                           Account Number:
                         </span>{" "}
                         <span className="text-dark">
-                          {userDetails?.data?.accno}
+                          {agentDetails?.data?.accno}
                         </span>
                       </p>
                     </div>
@@ -584,4 +571,4 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
   );
 };
 
-export default SingleUser;
+export default AgentUser;
