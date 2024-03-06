@@ -49,6 +49,7 @@ const TopFiveTransactions = () => {
       headerName: "AMOUNT",
       width: 150,
       type: "string",
+      valueGetter: (params) => `₦${params.value}`,
     },
     {
       field: "channel",
@@ -61,6 +62,7 @@ const TopFiveTransactions = () => {
       headerName: "CURRENT BALANCE",
       width: 150,
       type: "string",
+      valueGetter: (params) => `₦${params.value}`,
     },
     {
       field: "date",

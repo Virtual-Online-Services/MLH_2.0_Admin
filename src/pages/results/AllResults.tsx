@@ -52,6 +52,10 @@ const columns: GridColDef[] = [
   },
 ];
 
+const generateUniqueId = () => {
+  return "_" + Math.random().toString(36).substr(2, 9);
+};
+
 const AllResults = () => {
   const [isOpen, setIsOpen] = useState(false);
   const handleClose = () => setIsOpen(false);
@@ -59,46 +63,25 @@ const AllResults = () => {
   const handleGame = () => {
     handleOpen();
   };
-  //   const [selectedOperator, setSelectedOperator] = useState("");
-  //   const [selectedGame, setSelectedGame] = useState("");
+
   const operatorIds = [26, 27, 28, 42, 45, 57];
   const { userResults, isLoadingResults } = useGetResults(operatorIds);
+
   const [flattenedResults, setFlattenedResults] = useState([]);
 
   useEffect(() => {
     if (userResults && userResults.length > 0) {
-      // Flatten the array of results
+      // Flatten the array of results and add unique id to each row
       const flattened = userResults.reduce((acc, curr) => {
-        return acc.concat(curr.data);
+        const dataWithIds = curr.data.map((row) => ({
+          id: generateUniqueId(),
+          ...row,
+        }));
+        return acc.concat(dataWithIds);
       }, []);
       setFlattenedResults(flattened);
     }
   }, [userResults]);
-
-  // console.log(userResults);
-
-  // }, []);
-  //   const { userLottoOperator, isLoadingLottoOperator } = useGetLottoOperator([]);
-
-  //   const handleOperatorChange = (event: any) => {
-  //     setSelectedOperator(event.target.value);
-  //     // Clear the selected game when operator changes
-  //     setSelectedGame("");
-  //   };
-
-  //   const handleGameChange = (event: any) => {
-  //     setSelectedGame(event.target.value);
-  //   };
-
-  //   const filteredResults = userResults?.data?.filter(
-  //     (result: any) => result.operator === selectedOperator
-  //   );
-
-  //   const gameOptions = filteredResults?.map((result: any) => (
-  //     <option key={result.id} value={result.game}>
-  //       {result.game}
-  //     </option>
-  //   ));
 
   return (
     <div>
@@ -234,6 +217,7 @@ const AllResults = () => {
                     slug="results"
                     columns={columns}
                     rows={flattenedResults}
+                    getRowId={(row) => row.date}
                   />
                 </>
               )}

@@ -13,7 +13,8 @@ import "react-date-range/dist/styles.css"; // main style file
 import "react-date-range/dist/theme/default.css"; // theme css file
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
-import SingleUser from "../../components/SingleUser/SingleUser";
+import { useQueryClient } from "@tanstack/react-query";
+import HTTP from "../../utils/httpClient";
 import AgentUser from "../../components/agent/AgentUser";
 
 const ListUsers = () => {
@@ -21,6 +22,9 @@ const ListUsers = () => {
   const userInfo = useSelector((state) => state.auth.userInfo);
   const token = userInfo?.token?.accessToken;
   const [agentDetails, setAgentDetails] = useState(null);
+  const [filteredTransactions, setFilteredTransactions] = useState(null);
+  const [showDateRangePicker, setShowDateRangePicker] = useState(false);
+  const queryClient = useQueryClient();
 
   const [dateRange, setDateRange] = useState([
     {
@@ -32,8 +36,7 @@ const ListUsers = () => {
   const handleDateRangeChange = (ranges: any) => {
     setDateRange([ranges.selection]);
   };
-  const [filteredTransactions, setFilteredTransactions] = useState(null);
-  const [showDateRangePicker, setShowDateRangePicker] = useState(false);
+
   const toggleDateRangePicker = () => {
     setShowDateRangePicker((prevState) => !prevState);
   };
@@ -130,6 +133,59 @@ const ListUsers = () => {
       // Display error message or handle error appropriately
     }
   };
+
+  const handleBlockUser = async (id: number) => {
+    try {
+      await HTTP.post(
+        `/user-blockuser/${id}`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setAgentDetails((prevState) => {
+        if (prevState && prevState.id === id) {
+          return { ...prevState, status: 2 };
+        }
+        return prevState;
+      });
+      toast.success("Agent blocked successfully");
+      queryClient.invalidateQueries("GET_ALL_USERS_AGENT");
+    } catch (error) {
+      toast.error("Failed to block user");
+    }
+  };
+
+  const handleUnblockUser = async (id: number) => {
+    try {
+      await HTTP.post(
+        `/user-unblockuser/${id}`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setAgentDetails((prevState) => {
+        if (prevState && prevState.id === id) {
+          return { ...prevState, status: 1 };
+        }
+        return prevState;
+      });
+      toast.success("Agent unblocked successfully");
+      queryClient.invalidateQueries("GET_ALL_USERS_AGENT");
+    } catch (error) {
+      toast.error("Failed to unblock user");
+    }
+  };
+
   const columns: GridColDef[] = [
     {
       field: "id",
@@ -242,18 +298,18 @@ const ListUsers = () => {
       renderCell: (params) => (
         <div className="d-flex">
           <button
-            className="btn btn-danger"
-            // onClick={() => handleViewDatetime(params.row)}
+            className={`btn btn-${
+              params.row.status === 1 ? "danger" : "success"
+            }`}
+            onClick={() =>
+              params.row.status === 1
+                ? handleBlockUser(params.row.id)
+                : handleUnblockUser(params.row.id)
+            }
           >
-            Block
+            {params.row.status === 1 ? "Block" : "Unblock"}
           </button>
           &nbsp; &nbsp;
-          <button
-            className="btn btn-primary"
-            // onClick={() => handleViewDatetime(params.row)}
-          >
-            Bank
-          </button>
         </div>
       ),
     },

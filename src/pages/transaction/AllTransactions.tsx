@@ -68,27 +68,15 @@ const AllTransactions = () => {
     },
 
     {
-      field: "email",
-      type: "string",
-      headerName: "EMAIL",
-      width: 100,
-    },
-    {
-      field: "tell",
+      field: "customer_tell",
       headerName: "PHONE",
-      width: 100,
+      width: 150,
       type: "string",
     },
     {
       field: "ref",
       headerName: "TICKET ID",
       width: 450,
-      type: "string",
-    },
-    {
-      field: "dob",
-      headerName: "DOB",
-      width: 150,
       type: "string",
     },
 
@@ -109,6 +97,7 @@ const AllTransactions = () => {
       headerName: "AMOUNT",
       width: 130,
       type: "string",
+      valueGetter: (params) => `₦${params.value}`,
     },
     {
       field: "channel",
@@ -121,6 +110,7 @@ const AllTransactions = () => {
       headerName: "CURRENT BALANCE",
       width: 150,
       type: "string",
+      valueGetter: (params) => `₦${params.value}`,
     },
     {
       field: "created_at",

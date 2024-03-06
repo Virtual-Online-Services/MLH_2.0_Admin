@@ -11,7 +11,7 @@ import Navbar from "../../components/navbar/Navbar";
 import Footer from "../../components/footer/Footer";
 import useGetDashBoardInfo from "../../react-query/api-hooks/useGetDashBoardInfo.js";
 import ChartGames from "../../components/chartBox/ChartGames.js";
-import TopFiveTransactions from "../transaction/TopFiveTransactions.js";
+import TopFiveTransactions from "../transaction/TopFiveTransactions";
 
 const Home = () => {
   const { dashboardData, isLoadingData } = useGetDashBoardInfo();

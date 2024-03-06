@@ -1,6 +1,6 @@
 import { GridColDef } from "@mui/x-data-grid";
 import DataTable from "../../components/dataTable/DataTable";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Footer from "../../components/footer/Footer";
 import Menu from "../../components/menu/Menu";
 import Navbar from "../../components/navbar/Navbar";
@@ -18,11 +18,35 @@ const Games = () => {
     handleOpen();
   };
   const { userLottoGame, isLoadingLottoGame } = useGetLottoGames([]);
-  //   console.log(userLottoGame?.data);
   const navigate = useNavigate();
+  // const generateUniqueId = () => {
+  //   return "_" + Math.random().toString(36).substr(2, 9);
+  // };
+
+  useEffect(() => {
+    if (userLottoGame && userLottoGame.data) {
+      const gamesWithIds = userLottoGame.data.map((game, index) => ({
+        ...game,
+        id: index + 1,
+      }));
+
+      // Create a new object with updated data array
+      const updatedUserLottoGame = {
+        ...userLottoGame,
+        data: gamesWithIds,
+      };
+
+      // Update userLottoGame with the new object
+      userLottoGame.data = updatedUserLottoGame;
+    }
+  }, [userLottoGame]);
 
   const columns: GridColDef[] = [
-    // { field: "id", headerName: "ID", width: 90 },
+    {
+      field: "id",
+      headerName: "ID",
+      width: 90,
+    },
     {
       field: "name",
       type: "string",

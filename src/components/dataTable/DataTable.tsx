@@ -175,18 +175,24 @@ const DataTable = (props: Props) => {
     field:
       props.slug === "withdraw" ||
       props.slug === "single-transactions" ||
+      props.slug === "top_five_transaction" ||
+      props.slug === "transactions" ||
       props.slug === "agent-commission"
         ? ""
         : "action",
     headerName:
       props.slug === "withdraw" ||
       props.slug === "single-transactions" ||
+      props.slug === "top_five_transaction" ||
+      props.slug === "transactions" ||
       props.slug === "agent-commission"
         ? ""
         : "Action",
     width:
       props.slug === "withdraw" ||
       props.slug === "single-transactions" ||
+      props.slug === "top_five_transaction" ||
+      props.slug === "transactions" ||
       props.slug === "agent-commission"
         ? 0
         : 200,
@@ -211,6 +217,7 @@ const DataTable = (props: Props) => {
           {props.slug !== "withdraw" &&
             props.slug !== "single-transactions" &&
             props.slug !== "agent-commission" &&
+            props.slug !== "top_five_transaction" &&
             props.slug !== "transactions" && (
               <div
                 className="delete"

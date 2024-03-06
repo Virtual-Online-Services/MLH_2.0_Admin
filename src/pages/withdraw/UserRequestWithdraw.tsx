@@ -74,6 +74,7 @@ const UserRequestWithdraw = () => {
       type: "string",
       headerName: "AMOUNT",
       width: 150,
+      valueGetter: (params) => `₦${params.value}`,
     },
     {
       field: "bname",
@@ -98,12 +99,14 @@ const UserRequestWithdraw = () => {
       headerName: "PREV BALANCE",
       width: 150,
       type: "string",
+      valueGetter: (params) => `₦${params.value}`,
     },
     {
       field: "balance",
       headerName: "BALANCE",
       width: 150,
       type: "string",
+      valueGetter: (params) => `₦${params.value}`,
     },
 
     {

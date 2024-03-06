@@ -15,12 +15,18 @@ import "react-date-range/dist/theme/default.css"; // theme css file
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import SingleUser from "../../components/SingleUser/SingleUser";
+import { useQueryClient } from "@tanstack/react-query";
+
+import HTTP from "../../utils/httpClient";
 
 const Users = () => {
   const { userAllDetails, isLoadingUser } = useGetUsers([]);
   const userInfo = useSelector((state) => state.auth.userInfo);
   const token = userInfo?.token?.accessToken;
   const [userDetails, setUserDetails] = useState(null);
+  const [filteredTransactions, setFilteredTransactions] = useState(null);
+  const [showDateRangePicker, setShowDateRangePicker] = useState(false);
+  const queryClient = useQueryClient();
 
   const [dateRange, setDateRange] = useState([
     {
@@ -32,8 +38,6 @@ const Users = () => {
   const handleDateRangeChange = (ranges: any) => {
     setDateRange([ranges.selection]);
   };
-  const [filteredTransactions, setFilteredTransactions] = useState(null);
-  const [showDateRangePicker, setShowDateRangePicker] = useState(false);
   const toggleDateRangePicker = () => {
     setShowDateRangePicker((prevState) => !prevState);
   };
@@ -63,7 +67,7 @@ const Users = () => {
           if (typeof value === "string") {
             return value.toLowerCase().includes(searchUser);
           }
-          return false; // Ignore non-string values
+          return false;
         });
       }
 
@@ -130,6 +134,59 @@ const Users = () => {
       // Display error message or handle error appropriately
     }
   };
+
+  const handleBlockUser = async (id: number) => {
+    try {
+      await HTTP.post(
+        `/user-blockuser/${id}`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setUserDetails((prevState) => {
+        if (prevState && prevState.id === id) {
+          return { ...prevState, status: 2 };
+        }
+        return prevState;
+      });
+      toast.success("User blocked successfully");
+      queryClient.invalidateQueries("GET_ALL_USERS");
+    } catch (error) {
+      toast.error("Failed to block user");
+    }
+  };
+
+  const handleUnblockUser = async (id: number) => {
+    try {
+      await HTTP.post(
+        `/user-unblockuser/${id}`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setUserDetails((prevState) => {
+        if (prevState && prevState.id === id) {
+          return { ...prevState, status: 1 };
+        }
+        return prevState;
+      });
+      toast.success("User unblocked successfully");
+      queryClient.invalidateQueries("GET_ALL_USERS");
+    } catch (error) {
+      toast.error("Failed to unblock user");
+    }
+  };
+
   const columns: GridColDef[] = [
     {
       field: "id",
@@ -179,28 +236,11 @@ const Users = () => {
       width: 200,
       type: "string",
     },
-    {
-      field: "state",
-      headerName: "STATE",
-      width: 100,
-      type: "string",
-    },
-    {
-      field: "dob",
-      headerName: "DOB",
-      width: 150,
-      type: "string",
-    },
-    {
-      field: "gender",
-      headerName: "GENDER",
-      width: 100,
-      type: "string",
-    },
+
     {
       field: "type",
       headerName: "USER TYPE",
-      width: 100,
+      width: 180,
       type: "string",
     },
     {
@@ -208,12 +248,14 @@ const Users = () => {
       headerName: "WALLET",
       width: 130,
       type: "string",
+      valueGetter: (params) => `₦${params.value}`,
     },
     {
       field: "wwallet",
       headerName: "WIN WALLET",
       width: 130,
       type: "string",
+      valueGetter: (params) => `₦${params.value}`,
     },
     {
       field: "status",
@@ -232,7 +274,7 @@ const Users = () => {
     {
       field: "ref",
       headerName: "REFERRED BY",
-      width: 150,
+      width: 200,
       type: "string",
     },
 
@@ -243,18 +285,18 @@ const Users = () => {
       renderCell: (params) => (
         <div className="d-flex">
           <button
-            className="btn btn-danger"
-            // onClick={() => handleViewDatetime(params.row)}
+            className={`btn btn-${
+              params.row.status === 1 ? "danger" : "success"
+            }`}
+            onClick={() =>
+              params.row.status === 1
+                ? handleBlockUser(params.row.id)
+                : handleUnblockUser(params.row.id)
+            }
           >
-            Block
+            {params.row.status === 1 ? "Block" : "Unblock"}
           </button>
           &nbsp; &nbsp;
-          <button
-            className="btn btn-primary"
-            // onClick={() => handleViewDatetime(params.row)}
-          >
-            Bank
-          </button>
         </div>
       ),
     },

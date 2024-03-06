@@ -14,3 +14,4 @@ export { default as useGetSingleUserTransactions } from "./api-hooks/useGetSingl
 export { default as useGetSingleUserTransactions } from "./api-hooks/useGetSingleUserTransactions";
 export { default as useGetAgentUsers } from "./api-hooks/useGetAgentUsers";
 export { default as useGetSportCode } from "./api-hooks/useGetSportCode";
+export { default as useGetAllBank } from "./api-hooks/useGetAllBank";
