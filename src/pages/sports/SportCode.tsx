@@ -8,34 +8,8 @@ import BModal from "../../components/BModal/BModal";
 import { Link } from "react-router-dom";
 import UploadCode from "../../components/sports/UploadCode";
 import useGetSportCode from "../../react-query/api-hooks/useGetSportCode";
-
-const sports = [
-  {
-    id: 1,
-    name: "Transfer market",
-    operator: "Betwinner",
-    link: "https://prmbw.com/bonus-100-01/?id=19BF&lang=en&p=/user/registration/",
-  },
-  {
-    id: 2,
-    name: "Transfer market",
-    operator: "bet9ja",
-    link: "https://wlbet9ja.adsrv.eacdn.com/C.ashx?btag=a_151504b_879c_&affid=8304&siteid=151504&adid=879&c=",
-  },
-];
-
-const columns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 90 },
-  { field: "name", type: "string", headerName: "Name", width: 150 },
-  { field: "operator", type: "string", headerName: "Operator", width: 150 },
-  { field: "link", type: "string", headerName: "Link", width: 800 },
-  //   {
-  //     field: "logo",
-  //     headerName: "Logo",
-  //     width: 200,
-  //     renderCell: () => <img src="/easy.png" alt="" />,
-  //   },
-];
+import moment from "moment";
+import { Spinner } from "react-bootstrap";
 
 const SportCode = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -46,6 +20,38 @@ const SportCode = () => {
   };
 
   const { userSportCode, isLoadingCode } = useGetSportCode();
+  const formatCreatedAt = (createdAt: any) => {
+    return moment(createdAt).format("MMM Do YYYY | hh:mm:ss a");
+  };
+
+  const columns: GridColDef[] = [
+    {
+      field: "id",
+      type: "string",
+      headerName: "ID",
+      width: 120,
+    },
+    {
+      field: "code",
+      type: "string",
+      headerName: "CODE",
+      width: 250,
+    },
+    {
+      field: "stake",
+      headerName: "STAKE",
+      width: 200,
+      type: "string",
+    },
+
+    {
+      field: "created_at",
+      headerName: "DATE",
+      width: 250,
+      type: "string",
+      renderCell: (params) => <span>{formatCreatedAt(params.value)}</span>,
+    },
+  ];
 
   return (
     <div>
@@ -64,7 +70,7 @@ const SportCode = () => {
                     Dashboard
                   </Link>
                 </li>
-                <li className="breadcrumb-item active">Sport Affiliates</li>
+                <li className="breadcrumb-item active">Sport codes</li>
               </ol>
             </div>
 
@@ -78,11 +84,39 @@ const SportCode = () => {
                 </a>
               </p>
               <div className="mt-5">
-                <DataTable
-                  slug="sports-affilates"
-                  rows={sports}
-                  columns={columns}
-                />
+                {isLoadingCode ? (
+                  <div className="spinner text-center mt-5">
+                    <Spinner
+                      as="span"
+                      animation="border"
+                      size="lg"
+                      role="status"
+                      aria-hidden="true"
+                    />
+                  </div>
+                ) : userSportCode?.data?.length === 0 ? (
+                  <div className="d-flex justify-content-center text-center p-5">
+                    <div className="hidden-xs hidden-sm mx-auto">
+                      <div
+                        className="alert alert-danger text-center"
+                        role="alert"
+                      >
+                        No Record Found
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <p className="mt-4">
+                      {userSportCode?.data?.length} Records
+                    </p>
+                    <DataTable
+                      slug="sport-code"
+                      columns={columns}
+                      rows={userSportCode?.data}
+                    />
+                  </>
+                )}
               </div>
               <br />
               <br />

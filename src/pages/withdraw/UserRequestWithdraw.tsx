@@ -11,12 +11,15 @@ import { useSelector } from "react-redux";
 import { useState } from "react";
 import SingleUser from "../../components/SingleUser/SingleUser";
 import { toast } from "react-toastify";
+import HTTP from "../../utils/httpClient";
+import { useQueryClient } from "@tanstack/react-query";
 
 const UserRequestWithdraw = () => {
   const { userWithdrawDetails, isLoadingUserWithdraw } =
     useGetAllRequestWithdraw([]);
   const userInfo = useSelector((state) => state.auth.userInfo);
   const [userDetails, setUserDetails] = useState(null);
+  const queryClient = useQueryClient();
   const token = userInfo?.token?.accessToken;
   const formatCreatedAt = (createdAt: any) => {
     return moment(createdAt).format("MMM Do YYYY | hh:mm:ss a");
@@ -39,7 +42,6 @@ const UserRequestWithdraw = () => {
         const errorData = await response.json();
         if (response.status === 400) {
           toast.error("User does not Exist");
-          // Display or handle the error here
         } else {
           throw new Error(errorData.error || "Network response was not ok");
         }
@@ -47,9 +49,31 @@ const UserRequestWithdraw = () => {
 
       const data = await response.json();
       setUserDetails(data);
-    } catch (error: any) {
-      // toast.error(error.error);
-      // Display error message or handle error appropriately
+    } catch (error: any) {}
+  };
+
+  const handlePayWithMonnify = async (id: any) => {
+    try {
+      const endpoint = `/process-user-withdraw`;
+      const payload = {
+        id: id,
+        paymentgateway: "monnify",
+      };
+      const requestOptions = {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      const response = await HTTP.post(endpoint, payload, requestOptions);
+      toast.success("Withdrawal processed successfully");
+      queryClient.invalidateQueries("GET_ALL_WITHDRAW");
+      return response;
+    } catch (error) {
+      console.error("Error processing withdrawal:", error);
+      toast.error("Failed to process withdrawal");
     }
   };
 
@@ -60,11 +84,7 @@ const UserRequestWithdraw = () => {
       headerName: "USER",
       width: 130,
       renderCell: (params) => (
-        <a
-          //   to={`/user-profile/${params.row.id}`}
-          className="text-primary"
-          onClick={() => handleEdit(params.row.id)}
-        >
+        <a className="text-primary" onClick={() => handleEdit(params.row.id)}>
           {params.value}
         </a>
       ),
@@ -134,7 +154,7 @@ const UserRequestWithdraw = () => {
             <>
               <button
                 className="btn btn-success"
-                // onClick={() => handleViewDatetime(params.row)}
+                onClick={() => handlePayWithMonnify(params.row.id)}
               >
                 Pay with Monnify
               </button>

@@ -45,10 +45,10 @@ const UploadCode = ({ handleClose }) => {
         setIsLoading(false);
         toast.success(response.data.message);
         handleClose();
-        // if (response.data.message) {
-        //   // Invalidate the query cache for adverts data
-        //   queryClient.invalidateQueries("GET_LOTTO_OPERATOR");
-        // }
+        if (response.data.message) {
+          // Invalidate the query cache for adverts data
+          queryClient.invalidateQueries("GET_SPORT_CODE");
+        }
       })
       .catch((error: any) => {
         setIsLoading(false);
