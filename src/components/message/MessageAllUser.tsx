@@ -49,7 +49,7 @@ const MessageAllUser = ({ handleClose }) => {
         toast.success("Message sent successfully");
         handleClose();
         // if (response.data.message) {
-        //   // Invalidate the query cache for adverts data
+        //
         //   queryClient.invalidateQueries("GET_ADMIN_PROFILE");
         // }
       })

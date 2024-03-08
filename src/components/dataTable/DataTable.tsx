@@ -11,6 +11,8 @@ import SingleUser from "../SingleUser/SingleUser";
 import SingleAdmin from "../admin/SingleAdmin";
 import ViewResult from "../results/ViewResult";
 import AgentUser from "../agent/AgentUser";
+import ViewInstant from "../instant-game/ViewInstant";
+import ViewDetails from "../AdvertModal/ViewDetails";
 
 interface Row {
   id: number;
@@ -33,6 +35,8 @@ const DataTable = (props: Props) => {
   const [agentDetails, setAgentDetails] = useState(null);
   const [adminDetails, setAdminDetails] = useState(null);
   const [resultsDetails, setResultsDetails] = useState(null);
+  const [instantDetails, setInstantDetails] = useState(null);
+  const [advert, setAdvert] = useState(null);
   const token = userInfo?.token?.accessToken;
 
   const mutation = useMutation({
@@ -165,6 +169,26 @@ const DataTable = (props: Props) => {
           },
         });
         setResultsDetails(response.data);
+      } else if (props.slug === "instant-operator") {
+        endpoint = `/get-instantgame/${id}`;
+        const response = await HTTP.get(endpoint, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setInstantDetails(response.data);
+      } else if (props.slug === "advert") {
+        endpoint = `/get-advert/${id}`;
+        const response = await HTTP.get(endpoint, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setAdvert(response.data);
       }
     } catch (error) {
       console.error("Error fetching game details:", error);
@@ -176,6 +200,7 @@ const DataTable = (props: Props) => {
       props.slug === "withdraw" ||
       props.slug === "single-transactions" ||
       props.slug === "top_five_transaction" ||
+      props.slug === "sport-activity" ||
       props.slug === "transactions" ||
       props.slug === "agent-commission"
         ? ""
@@ -184,6 +209,7 @@ const DataTable = (props: Props) => {
       props.slug === "withdraw" ||
       props.slug === "single-transactions" ||
       props.slug === "top_five_transaction" ||
+      props.slug === "sport-activity" ||
       props.slug === "transactions" ||
       props.slug === "agent-commission"
         ? ""
@@ -192,6 +218,7 @@ const DataTable = (props: Props) => {
       props.slug === "withdraw" ||
       props.slug === "single-transactions" ||
       props.slug === "top_five_transaction" ||
+      props.slug === "sport-activity" ||
       props.slug === "transactions" ||
       props.slug === "agent-commission"
         ? 0
@@ -202,11 +229,14 @@ const DataTable = (props: Props) => {
         <div className="action">
           {(props.slug === "operator" ||
             props.slug === "game" ||
+            props.slug === "advert" ||
             props.slug === "admin_register" ||
             props.slug === "results" ||
             props.slug === "agent-users" ||
             props.slug === "sports" ||
             props.slug === "sports-affilates" ||
+            props.slug === "sport-operator" ||
+            props.slug === "instant-operator" ||
             props.slug === "users") && (
             <div className="edit" onClick={() => handleEdit(params.row.id)}>
               <img src="/view.svg" alt="" />
@@ -218,6 +248,7 @@ const DataTable = (props: Props) => {
             props.slug !== "single-transactions" &&
             props.slug !== "agent-commission" &&
             props.slug !== "top_five_transaction" &&
+            props.slug !== "sport-activity" &&
             props.slug !== "transactions" && (
               <div
                 className="delete"
@@ -265,7 +296,6 @@ const DataTable = (props: Props) => {
         disableDensitySelector
         disableColumnSelector
       />
-
       <ViewLottoModal
         operatorDetails={operatorDetails}
         setOperatorDetails={setOperatorDetails}
@@ -284,6 +314,12 @@ const DataTable = (props: Props) => {
         resultsDetails={resultsDetails}
         setResultsDetails={setResultsDetails}
       />
+      <ViewInstant
+        instantDetails={instantDetails}
+        setInstantDetails={setInstantDetails}
+      />
+      <ViewDetails advert={advert} setAdvert={setAdvert} />
+
       {/* </BModal> */}
     </div>
   );

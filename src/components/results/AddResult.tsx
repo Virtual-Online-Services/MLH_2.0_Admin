@@ -60,7 +60,6 @@ const AddResult = ({ handleClose }) => {
         toast.success(response.data.message);
         handleClose();
         if (response.data.message) {
-          // Invalidate the query cache for adverts data
           queryClient.invalidateQueries("GET_ADMIN_PROFILE");
         }
       })

@@ -3,10 +3,10 @@
 
 .menu {
   .item {
-    display: flex;
-    flex-direction: column;
     gap: 10px;
     margin-bottom: 20px;
+    overflow-y: auto;
+    position: relative;
 
     .title {
       font-size: 12px;
@@ -42,4 +42,30 @@
       }
     }
   }
+}
+
+.menu {
+  position: fixed;
+  top: 10%;
+  left: 0;
+  bottom: 0;
+  width: 13%; /* Adjust width as needed */
+  overflow-y: auto; /* Enable vertical scrolling */
+}
+
+.menu::-webkit-scrollbar {
+  width: 8px; /* Width of the scrollbar */
+}
+
+.menu::-webkit-scrollbar-track {
+  background: #ffffff; /* Color of the scrollbar track */
+}
+
+.menu::-webkit-scrollbar-thumb {
+  background: #27aae1; /* Color of the scrollbar thumb */
+  border-radius: 10px; /* Roundness of the scrollbar thumb */
+}
+
+.menu::-webkit-scrollbar-thumb:hover {
+  background: #15a9ff; /* Color of the scrollbar thumb on hover */
 }

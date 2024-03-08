@@ -107,21 +107,6 @@ const SingleAdmin = ({ adminDetails, setAdminDetails }) => {
                     />
                   </p>
 
-                  <p>
-                    <label className="fw-bolder text-dark mb-3">
-                      Password:
-                    </label>
-                    <input
-                      type="text"
-                      name="password"
-                      className="form-control mb-3"
-                      value={
-                        editedDetails.password || adminDetails.data.password
-                      }
-                      onChange={handleChange}
-                    />
-                  </p>
-
                   <div
                     className="card mb-5"
                     style={{

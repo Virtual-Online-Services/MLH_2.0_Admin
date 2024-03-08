@@ -3,9 +3,9 @@ import queryKeys from "../constants";
 import { HTTP } from "../../utils";
 import { useSelector } from "react-redux";
 
-const getAllLottoOperators = async (token) => {
+const useAllInstantOperator = async (token: any) => {
   try {
-    const res = await HTTP.get(`/get-operators`, {
+    const res = await HTTP.get(`/admin/get-instantgames`, {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -18,20 +18,20 @@ const getAllLottoOperators = async (token) => {
   }
 };
 
-const useGetLottoOperator = () => {
+const useGetInstantGamesOperator = () => {
   const userInfo = useSelector((state) => state.auth.userInfo);
   const token = userInfo?.token?.accessToken;
 
   const { data, isLoading } = useQuery({
-    queryKey: [queryKeys.GET_LOTTO_OPERATOR],
-    queryFn: () => getAllLottoOperators(token),
+    queryKey: [queryKeys.GET_INSTANT_OPERATOR],
+    queryFn: () => useAllInstantOperator(token),
   });
 
   return {
-    userLottoOperator: data?.data,
+    userInstantOperator: data?.data,
     token,
-    isLoadingLottoOperator: isLoading,
+    isLoadingInstantOperator: isLoading,
   };
 };
 
-export default useGetLottoOperator;
+export default useGetInstantGamesOperator;

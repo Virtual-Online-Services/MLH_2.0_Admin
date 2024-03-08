@@ -3,14 +3,14 @@ import "./footer.scss";
 const Footer = () => {
   return (
     <div className="footer">
-      <span>
+      {/* <span>
         <img
           src="https://www.mylottohub.com/megzy/images/logo.png"
           alt=""
           height="40"
         />
       </span>
-      <span>© MyLottoHub</span>
+      <span>© MyLottoHub</span> */}
     </div>
   );
 };

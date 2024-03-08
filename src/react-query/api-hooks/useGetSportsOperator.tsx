@@ -3,9 +3,9 @@ import queryKeys from "../constants";
 import { HTTP } from "../../utils";
 import { useSelector } from "react-redux";
 
-const getAllLottoOperators = async (token) => {
+const useAllSportsOperator = async (token) => {
   try {
-    const res = await HTTP.get(`/get-operators`, {
+    const res = await HTTP.get(`/get-sport-operators`, {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -18,20 +18,20 @@ const getAllLottoOperators = async (token) => {
   }
 };
 
-const useGetLottoOperator = () => {
+const useGetSportsOperator = () => {
   const userInfo = useSelector((state) => state.auth.userInfo);
   const token = userInfo?.token?.accessToken;
 
   const { data, isLoading } = useQuery({
-    queryKey: [queryKeys.GET_LOTTO_OPERATOR],
-    queryFn: () => getAllLottoOperators(token),
+    queryKey: [queryKeys.GET_SPORT_OPERATOR],
+    queryFn: () => useAllSportsOperator(token),
   });
 
   return {
-    userLottoOperator: data?.data,
+    userSportOperator: data?.data,
     token,
-    isLoadingLottoOperator: isLoading,
+    isLoadingSportOperator: isLoading,
   };
 };
 
-export default useGetLottoOperator;
+export default useGetSportsOperator;

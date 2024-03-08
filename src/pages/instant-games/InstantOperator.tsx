@@ -6,15 +6,17 @@ import Menu from "../../components/menu/Menu";
 import Navbar from "../../components/navbar/Navbar";
 import BModal from "../../components/BModal/BModal";
 import { Link } from "react-router-dom";
-import UploadOperator from "../../components/sports/UploadOperator";
-import useGetSportsOperator from "../../react-query/api-hooks/useGetSportsOperator";
+
 import { Spinner } from "react-bootstrap";
+import useGetInstantGamesOperator from "../../react-query/api-hooks/useGetInstantGamesOperator";
+import UploadInstant from "../../components/instant-game/UploadInstant";
 
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 90 },
   { field: "name", type: "string", headerName: "Operator", width: 150 },
+  { field: "link", type: "string", headerName: "Link", width: 650 },
   {
-    field: "logo",
+    field: "pix",
     headerName: "Logo",
     width: 200,
     renderCell: (params) => {
@@ -23,16 +25,15 @@ const columns: GridColDef[] = [
   },
 ];
 
-const SportOperators = () => {
+const InstantOperator = () => {
   const [isOpen, setIsOpen] = useState(false);
   const handleClose = () => setIsOpen(false);
   const handleOpen = () => setIsOpen(true);
   const handleAdvert = () => {
     handleOpen();
   };
-  const { userSportOperator, isLoadingSportOperator } = useGetSportsOperator(
-    []
-  );
+  const { userInstantOperator, isLoadingInstantOperator } =
+    useGetInstantGamesOperator([]);
 
   return (
     <div>
@@ -44,14 +45,16 @@ const SportOperators = () => {
           </div>
           <div className="container">
             <div className="page-title">
-              <h4 className="mb-0">Sport Operators </h4>
+              <h4 className="mb-0">Instant Games Operators </h4>
               <ol className="breadcrumb mb-0 pl-0 pt-1 pb-0">
                 <li className="breadcrumb-item">
                   <Link to="/home" className="default-color">
                     Dashboard
                   </Link>
                 </li>
-                <li className="breadcrumb-item active">Sport Operators</li>
+                <li className="breadcrumb-item active">
+                  Instant Games Operators
+                </li>
               </ol>
             </div>
 
@@ -65,8 +68,8 @@ const SportOperators = () => {
                 </a>
               </p>
 
-              <p>{userSportOperator?.data?.length} Records</p>
-              {isLoadingSportOperator ? (
+              <p>{userInstantOperator?.data?.length} Records</p>
+              {isLoadingInstantOperator ? (
                 <div className="spinner text-center mt-5">
                   <Spinner
                     as="span"
@@ -76,7 +79,7 @@ const SportOperators = () => {
                     aria-hidden="true"
                   />
                 </div>
-              ) : userSportOperator?.data?.length === 0 ? (
+              ) : userInstantOperator?.data?.length === 0 ? (
                 <div className="d-flex justify-content-center text-center p-5">
                   <div className="hidden-xs hidden-sm mx-auto">
                     <div
@@ -90,9 +93,9 @@ const SportOperators = () => {
               ) : (
                 <>
                   <DataTable
-                    slug="sport-operator"
+                    slug="instant-operator"
                     columns={columns}
-                    rows={userSportOperator?.data}
+                    rows={userInstantOperator?.data}
                   />
                 </>
               )}
@@ -110,11 +113,11 @@ const SportOperators = () => {
           onHide={handleClose}
           size="md"
         >
-          <UploadOperator handleClose={handleClose} />
+          <UploadInstant handleClose={handleClose} />
         </BModal>
       </div>
     </div>
   );
 };
 
-export default SportOperators;
+export default InstantOperator;

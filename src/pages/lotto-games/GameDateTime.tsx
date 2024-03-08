@@ -20,17 +20,21 @@ const GameDateTime = () => {
   //     handleOpen();
   //   };
   const { userLottoGame, isLoadingLottoGame } = useGetLottoGames([]);
+  const rowsWithIds = userLottoGame?.data?.map((row: any, index: any) => ({
+    ...row,
+    id: index,
+  }));
 
   useEffect(() => {
-    if (userLottoGame?.data) {
-      const selectedGame = userLottoGame?.data?.find(
+    if (rowsWithIds) {
+      const selectedGame = rowsWithIds?.find(
         (game: any) => game.id === parseInt(id)
       );
       //   console.log("Selected game:", selectedGame);
 
       setGame(selectedGame);
     }
-  }, [userLottoGame?.data, id]);
+  }, [rowsWithIds, id]);
 
   //   console.log(game);
 

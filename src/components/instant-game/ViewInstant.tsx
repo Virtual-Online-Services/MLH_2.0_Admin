@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
-const ViewGame = ({ gameDetails, setGameDetails }) => {
+const ViewInstant = ({ instantDetails, setInstantDetails }) => {
   const [editedDetails, setEditedDetails] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const userInfo = useSelector((state) => state.auth.userInfo);
@@ -24,7 +24,7 @@ const ViewGame = ({ gameDetails, setGameDetails }) => {
     setIsLoading(true);
     try {
       const response = await HTTP.post(
-        `/operator/${gameDetails.data.id}`,
+        `/instantgame/${instantDetails.data.id}`,
         editedDetails,
         {
           headers: {
@@ -35,10 +35,10 @@ const ViewGame = ({ gameDetails, setGameDetails }) => {
         }
       );
       toast.success(response.data.status);
-      setGameDetails(response.data);
-      setGameDetails(null);
+      setInstantDetails(response.data);
+      setInstantDetails(null);
       if (response.data.status) {
-        queryClient.invalidateQueries("GET_LOTTO_GAME");
+        queryClient.invalidateQueries("GET_INSTANT_OPERATOR");
       }
     } catch (error) {
       console.error("Error editing operator:", error);
@@ -51,15 +51,17 @@ const ViewGame = ({ gameDetails, setGameDetails }) => {
   return (
     <div>
       <Modal
-        show={gameDetails !== null}
-        onHide={() => setGameDetails(null)}
+        show={instantDetails !== null}
+        onHide={() => setInstantDetails(null)}
         centered
       >
         <Modal.Header closeButton>
-          <Modal.Title className="fw-bolder text-dark">Edit Game</Modal.Title>
+          <Modal.Title className="fw-bolder text-dark">
+            Edit Instant Operator
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {gameDetails && (
+          {instantDetails && (
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
                 <label
@@ -73,21 +75,35 @@ const ViewGame = ({ gameDetails, setGameDetails }) => {
                   className="form-control"
                   id="name"
                   name="name"
-                  value={editedDetails.name || gameDetails.data.name}
+                  value={editedDetails.name || instantDetails.data.name}
                   onChange={handleChange}
+                  required
                 />
               </div>
+
               <div className="mb-3">
-                <label htmlFor="del" className="form-label fw-bolder text-dark">
-                  Operator
+                <label
+                  htmlFor="name"
+                  className="form-label fw-bolder text-dark"
+                >
+                  Link
                 </label>
                 <input
                   type="text"
                   className="form-control"
-                  id="operator"
-                  name="operator"
-                  value={editedDetails.operator || gameDetails.data.operator}
+                  id="link"
+                  name="link"
+                  value={editedDetails.link || instantDetails.data.link}
                   onChange={handleChange}
+                />
+              </div>
+
+              <div className="mb-3">
+                <input
+                  type="file"
+                  className="form-control mb-2 p-3"
+                  id="logo"
+                  name="logo"
                 />
               </div>
 
@@ -106,4 +122,4 @@ const ViewGame = ({ gameDetails, setGameDetails }) => {
   );
 };
 
-export default ViewGame;
+export default ViewInstant;

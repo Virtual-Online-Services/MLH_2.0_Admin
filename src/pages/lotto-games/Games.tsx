@@ -19,34 +19,8 @@ const Games = () => {
   };
   const { userLottoGame, isLoadingLottoGame } = useGetLottoGames([]);
   const navigate = useNavigate();
-  // const generateUniqueId = () => {
-  //   return "_" + Math.random().toString(36).substr(2, 9);
-  // };
-
-  useEffect(() => {
-    if (userLottoGame && userLottoGame.data) {
-      const gamesWithIds = userLottoGame.data.map((game, index) => ({
-        ...game,
-        id: index + 1,
-      }));
-
-      // Create a new object with updated data array
-      const updatedUserLottoGame = {
-        ...userLottoGame,
-        data: gamesWithIds,
-      };
-
-      // Update userLottoGame with the new object
-      userLottoGame.data = updatedUserLottoGame;
-    }
-  }, [userLottoGame]);
 
   const columns: GridColDef[] = [
-    {
-      field: "id",
-      headerName: "ID",
-      width: 90,
-    },
     {
       field: "name",
       type: "string",
@@ -74,9 +48,14 @@ const Games = () => {
     },
   ];
 
-  const handleViewDatetime = (row) => {
+  const handleViewDatetime = (row: any) => {
     navigate(`/game-datetime/${row.id}`);
   };
+
+  const rowsWithIds = userLottoGame?.data?.map((row: any, index: any) => ({
+    ...row,
+    id: index, // Use index as the id
+  }));
 
   return (
     <div>
@@ -109,7 +88,6 @@ const Games = () => {
                 </a>
               </p>
               <p>{userLottoGame?.data?.length} Records</p>
-              {/* <DataTable slug="users" columns={columns} rows={formattedData} /> */}
               {isLoadingLottoGame ? (
                 <div className="spinner text-center mt-5">
                   <Spinner
@@ -133,11 +111,7 @@ const Games = () => {
                 </div>
               ) : (
                 <>
-                  <DataTable
-                    slug="game"
-                    columns={columns}
-                    rows={userLottoGame?.data}
-                  />
+                  <DataTable slug="game" columns={columns} rows={rowsWithIds} />
                 </>
               )}
 

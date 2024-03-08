@@ -19,6 +19,8 @@ import ListUsers from "../pages/agent/ListUsers";
 import SportOperators from "../pages/sports/SportOperators";
 import SportAffilates from "../pages/sports/SportAffilates";
 import SportCode from "../pages/sports/SportCode";
+import SportActivity from "../pages/sports/SportActivity";
+import InstantOperator from "../pages/instant-games/InstantOperator";
 
 export const routes = [
   {
@@ -145,6 +147,18 @@ export const routes = [
     id: 21,
     path: "/sport-codes",
     element: <SportCode />,
+    protected: true,
+  },
+  {
+    id: 22,
+    path: "/sport-activity",
+    element: <SportActivity />,
+    protected: true,
+  },
+  {
+    id: 23,
+    path: "/instant-games-operator",
+    element: <InstantOperator />,
     protected: true,
   },
 ];

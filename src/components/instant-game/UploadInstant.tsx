@@ -9,10 +9,13 @@ import HTTP from "../../utils/httpClient";
 import { useQueryClient } from "@tanstack/react-query";
 
 const schema = yup.object().shape({
-  code: yup.string().required("This is a required field"),
+  name: yup.string().required("This is a required field"),
+  //   del: yup.string().required("This is a required field"),
+  link: yup.string().required("This is a required field"),
+  logo: yup.mixed().required("This is a required field"),
 });
 
-const UploadCode = ({ handleClose }) => {
+const UploadInstant = ({ handleClose }) => {
   const {
     register,
     handleSubmit,
@@ -34,19 +37,22 @@ const UploadCode = ({ handleClose }) => {
   };
   const queryClient = useQueryClient();
 
-  const submitForm = (data) => {
+  const submitForm = (data: any) => {
     setIsLoading(true);
 
     const formData = new FormData();
-    formData.append("code", data.code);
+    formData.append("name", data.name);
+    formData.append("link", data.link);
+    // formData.append("play", data.play);
+    formData.append("logo", data.logo[0]);
 
-    HTTP.post("/add-sports-bet", formData, config)
+    HTTP.post("/add-instantgame", formData, config)
       .then((response: any) => {
         setIsLoading(false);
         toast.success(response.data.message);
         handleClose();
         if (response.data.message) {
-          queryClient.invalidateQueries("GET_SPORT_CODE");
+          queryClient.invalidateQueries("GET_INSTANT_OPERATOR");
         }
       })
       .catch((error: any) => {
@@ -71,7 +77,9 @@ const UploadCode = ({ handleClose }) => {
         <div>
           <div className="container">
             <span>
-              <strong className="text-dark">Upload Betting Code</strong>
+              <strong className="text-dark">
+                Upload Instant Operator Details
+              </strong>
             </span>
             <br />
 
@@ -84,14 +92,46 @@ const UploadCode = ({ handleClose }) => {
                 <input
                   type="text"
                   className="form-control mb-2 p-3"
-                  placeholder="Enter Code"
-                  {...register("code", {
+                  placeholder="Name"
+                  {...register("name", {
                     required: "Required",
                   })}
                 />
-                {errors.code && (
+                {errors.name && (
                   <p className="text-danger text-capitalize">
-                    {errors.code.message}
+                    {errors.name.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="mb-3">
+                <input
+                  type="text"
+                  className="form-control mb-2 p-3"
+                  placeholder="Link"
+                  {...register("link", {
+                    required: "Required",
+                  })}
+                />
+                {errors.link && (
+                  <p className="text-danger text-capitalize">
+                    {errors.link.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="mb-3">
+                <input
+                  type="file"
+                  className="form-control mb-2 p-3"
+                  {...register("logo", {
+                    required: "Required",
+                  })}
+                  name="logo"
+                />
+                {errors.logo && (
+                  <p className="text-danger text-capitalize">
+                    {errors.logo.message}
                   </p>
                 )}
               </div>
@@ -111,7 +151,7 @@ const UploadCode = ({ handleClose }) => {
                     aria-hidden="true"
                   />
                 ) : (
-                  " Upload"
+                  " Proceed"
                 )}
               </Button>
             </form>
@@ -122,4 +162,4 @@ const UploadCode = ({ handleClose }) => {
   );
 };
 
-export default UploadCode;
+export default UploadInstant;

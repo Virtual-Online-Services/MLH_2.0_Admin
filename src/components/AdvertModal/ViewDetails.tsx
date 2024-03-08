@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
-const EditOperatorModal = ({ operatorDetails, setOperatorDetails }) => {
+const ViewDetails = ({ advert, setAdvert }) => {
   const [editedDetails, setEditedDetails] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const userInfo = useSelector((state) => state.auth.userInfo);
@@ -18,13 +18,30 @@ const EditOperatorModal = ({ operatorDetails, setOperatorDetails }) => {
       [name]: value,
     }));
   };
+  const getCurrentDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    let month = today.getMonth() + 1;
+    let day = today.getDate();
+
+    month = month < 10 ? `0${month}` : month;
+    day = day < 10 ? `0${day}` : day;
+
+    return `${year}-${month}-${day}`;
+  };
+  const isPastDate = (dateString: any) => {
+    const selectedDate = new Date(dateString);
+    const currentDate = new Date();
+    return selectedDate < currentDate;
+  };
+
   const queryClient = useQueryClient();
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setIsLoading(true);
     try {
       const response = await HTTP.post(
-        `/operator/${operatorDetails.data.id}`,
+        `/advert/${advert.data.id}`,
         editedDetails,
         {
           headers: {
@@ -35,10 +52,10 @@ const EditOperatorModal = ({ operatorDetails, setOperatorDetails }) => {
         }
       );
       toast.success(response.data.status);
-      setOperatorDetails(response.data);
-      setOperatorDetails(null);
+      setAdvert(response.data);
+      setAdvert(null);
       if (response.data.status) {
-        queryClient.invalidateQueries("GET_LOTTO_OPERATOR");
+        queryClient.invalidateQueries("GET_USER_ADVERT");
       }
     } catch (error) {
       console.error("Error editing operator:", error);
@@ -50,18 +67,12 @@ const EditOperatorModal = ({ operatorDetails, setOperatorDetails }) => {
 
   return (
     <div>
-      <Modal
-        show={operatorDetails !== null}
-        onHide={() => setOperatorDetails(null)}
-        centered
-      >
+      <Modal show={advert !== null} onHide={() => setAdvert(null)} centered>
         <Modal.Header closeButton>
-          <Modal.Title className="fw-bolder text-dark">
-            Edit Operator
-          </Modal.Title>
+          <Modal.Title className="fw-bolder text-dark">Edit Advert</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {operatorDetails && (
+          {advert && (
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
                 <label
@@ -75,43 +86,69 @@ const EditOperatorModal = ({ operatorDetails, setOperatorDetails }) => {
                   className="form-control"
                   id="name"
                   name="name"
-                  value={editedDetails.name || operatorDetails.data.name}
+                  value={editedDetails.name || advert.data.name}
                   onChange={handleChange}
                 />
               </div>
 
               <div className="mb-3">
-                <label htmlFor="del" className="form-label fw-bolder text-dark">
-                  Temporary Delete
-                </label>
-                <select
-                  className="form-select"
-                  id="del"
-                  name="del"
-                  value={editedDetails.del || operatorDetails.data.del}
-                  onChange={handleChange}
+                <label
+                  htmlFor="company"
+                  className="form-label fw-bolder text-dark"
                 >
-                  <option value="Y">Yes</option>
-                  <option value="N">No</option>
-                </select>
+                  Company Name
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="company"
+                  name="company"
+                  value={editedDetails.company || advert.data.company}
+                  onChange={handleChange}
+                />
               </div>
               <div className="mb-3">
                 <label
-                  htmlFor="play"
+                  htmlFor="company"
                   className="form-label fw-bolder text-dark"
                 >
-                  Enable Play
+                  URL
                 </label>
-                <select
-                  className="form-select"
-                  id="play"
-                  name="play"
-                  value={editedDetails.play || operatorDetails.data.play}
+                <input
+                  type="text"
+                  className="form-control"
+                  id="link"
+                  name="link"
+                  value={editedDetails.link || advert.data.link}
                   onChange={handleChange}
-                >
-                  <option value="Y">Yes</option>
-                  <option value="N">No</option>
-                </select>
+                />
+              </div>
+              <div className="mb-3 w-100">
+                <input
+                  type="date"
+                  className="form-control mb-2 p-3"
+                  placeholder="Start Date"
+                  min={getCurrentDate()}
+                  value={editedDetails.start_date || advert.data.start_date}
+                />
+              </div>
+              <div className="mb-3">
+                <input
+                  type="date"
+                  className="form-control mb-2 p-3"
+                  placeholder="End Date"
+                  min={getCurrentDate()}
+                  value={editedDetails.end_date || advert.data.end_date}
+                />
+              </div>
+
+              <div className="mb-3">
+                <input
+                  type="file"
+                  className="form-control mb-2 p-3"
+                  id="logo"
+                  name="logo"
+                />
               </div>
 
               <Button variant="primary" type="submit" disabled={isLoading}>
@@ -129,4 +166,4 @@ const EditOperatorModal = ({ operatorDetails, setOperatorDetails }) => {
   );
 };
 
-export default EditOperatorModal;
+export default ViewDetails;

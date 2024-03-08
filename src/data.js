@@ -165,7 +165,7 @@ export const menu = [
       {
         id: 1,
         title: "Operators",
-        url: "#",
+        url: "/instant-games-operator",
         icon: "fa fa-android",
       },
       {
