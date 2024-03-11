@@ -13,6 +13,7 @@ import ViewResult from "../results/ViewResult";
 import AgentUser from "../agent/AgentUser";
 import ViewInstant from "../instant-game/ViewInstant";
 import ViewDetails from "../AdvertModal/ViewDetails";
+import ViewSportDetails from "../sports/ViewSportDetails";
 
 interface Row {
   id: number;
@@ -37,6 +38,7 @@ const DataTable = (props: Props) => {
   const [resultsDetails, setResultsDetails] = useState(null);
   const [instantDetails, setInstantDetails] = useState(null);
   const [advert, setAdvert] = useState(null);
+  const [sport, setSport] = useState(null);
   const token = userInfo?.token?.accessToken;
 
   const mutation = useMutation({
@@ -49,6 +51,8 @@ const DataTable = (props: Props) => {
         endpoint = `/delete/operator/${id}`;
       } else if (props.slug === "games") {
         endpoint = `/delete/game/${id}`;
+      } else if (props.slug === "sport-operator") {
+        endpoint = `/delete/sport-operator/${id}`;
       }
       return HTTP.post(
         endpoint,
@@ -189,6 +193,16 @@ const DataTable = (props: Props) => {
           },
         });
         setAdvert(response.data);
+      } else if (props.slug === "sport-operator") {
+        endpoint = `/get-sport-operator/${id}`;
+        const response = await HTTP.get(endpoint, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setSport(response.data);
       }
     } catch (error) {
       console.error("Error fetching game details:", error);
@@ -319,6 +333,7 @@ const DataTable = (props: Props) => {
         setInstantDetails={setInstantDetails}
       />
       <ViewDetails advert={advert} setAdvert={setAdvert} />
+      <ViewSportDetails sport={sport} setSport={setSport} />
 
       {/* </BModal> */}
     </div>
