@@ -5,13 +5,16 @@ import { useSelector } from "react-redux";
 
 const getInfo = async (token) => {
   try {
-    const res = await HTTP.get(`/dashboard`, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const res = await HTTP.get(
+      `https://api.mylottohub.com/v1/admin-dashboard`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return res;
   } catch (error) {
     return error;

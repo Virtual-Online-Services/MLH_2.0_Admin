@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 
 const getAllUsers = async (token) => {
   try {
-    const res = await HTTP.get(`/admin/get-users`, {
+    const res = await HTTP.get(`/admin-get-users`, {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",

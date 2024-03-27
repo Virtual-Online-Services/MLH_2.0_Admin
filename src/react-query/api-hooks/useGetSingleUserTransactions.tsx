@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 
 const getSingleUserTransactions = async (userid, token) => {
   try {
-    const res = await HTTP.get(`/get-usertransactions/${userid}`, {
+    const res = await HTTP.get(`/user-get-transactions/${userid}`, {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
