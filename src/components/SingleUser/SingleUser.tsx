@@ -19,7 +19,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
         return;
       }
 
-      const endpoint = `/user-get-transactions/${userDetails.data.id}`;
+      const endpoint = `/get-usertransactions/${userDetails.data.id}`;
       try {
         const response = await HTTP.get(endpoint, {
           headers: {

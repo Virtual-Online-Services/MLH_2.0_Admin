@@ -58,13 +58,13 @@ const AllTransactions = () => {
       field: "user",
       type: "string",
       headerName: "USER ID",
-      width: 80,
+      width: 150,
     },
     {
       field: "username",
       type: "string",
       headerName: "USERNAME",
-      width: 150,
+      width: 200,
     },
 
     {
@@ -76,7 +76,7 @@ const AllTransactions = () => {
     {
       field: "ref",
       headerName: "TICKET ID",
-      width: 450,
+      width: 250,
       type: "string",
     },
 
@@ -89,7 +89,7 @@ const AllTransactions = () => {
     {
       field: "description",
       headerName: "DESCRIPTION",
-      width: 750,
+      width: 350,
       type: "string",
     },
     {
@@ -244,7 +244,9 @@ const AllTransactions = () => {
                     <DataTable
                       slug="transactions"
                       columns={columns}
-                      rows={filteredTransactions || userTransactions?.data}
+                      rows={
+                        filteredTransactions || userTransactions?.data?.data
+                      }
                     />
                   </>
                 )}

@@ -186,6 +186,7 @@ const Users = () => {
       toast.error("Failed to unblock user");
     }
   };
+  console.log(userAllDetails);
 
   const columns: GridColDef[] = [
     {
@@ -194,11 +195,7 @@ const Users = () => {
       headerName: "USER ID",
       width: 80,
       renderCell: (params) => (
-        <a
-          //   to={`/user-profile/${params.row.id}`}
-          className="text-primary"
-          onClick={() => handleEdit(params.row.id)}
-        >
+        <a className="text-primary" onClick={() => handleEdit(params.row.id)}>
           {params.value}
         </a>
       ),
@@ -267,16 +264,16 @@ const Users = () => {
     {
       field: "created_at",
       headerName: "SIGNUP DATE",
-      width: 200,
+      width: 250,
       type: "string",
       renderCell: (params) => <span>{formatCreatedAt(params.value)}</span>,
     },
-    {
-      field: "ref",
-      headerName: "REFERRED BY",
-      width: 200,
-      type: "string",
-    },
+    // {
+    //   field: "ref",
+    //   headerName: "REFERRED BY",
+    //   width: 200,
+    //   type: "string",
+    // },
 
     {
       field: "user_action",
@@ -426,13 +423,13 @@ const Users = () => {
                       </div>
                     </div>
                     <p className="mt-4">
-                      {userAllDetails?.data?.length} Records
+                      {userAllDetails?.data?.total} Records
                     </p>
                     <DataTable
                       slug="users"
                       columns={columns}
                       // rows={userDetails?.data}
-                      rows={filteredTransactions || userAllDetails?.data}
+                      rows={filteredTransactions || userAllDetails?.data?.data}
                     />
                   </>
                 )}

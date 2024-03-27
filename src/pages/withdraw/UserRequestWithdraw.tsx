@@ -72,7 +72,6 @@ const UserRequestWithdraw = () => {
       queryClient.invalidateQueries("GET_ALL_WITHDRAW");
       return response;
     } catch (error) {
-      console.error("Error processing withdrawal:", error);
       toast.error("Failed to process withdrawal");
     }
   };
@@ -84,7 +83,7 @@ const UserRequestWithdraw = () => {
       headerName: "USER",
       width: 130,
       renderCell: (params) => (
-        <a className="text-primary" onClick={() => handleEdit(params.row.id)}>
+        <a className="text-primary" onClick={() => handleEdit(params.row.user)}>
           {params.value}
         </a>
       ),
