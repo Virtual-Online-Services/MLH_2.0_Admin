@@ -2,7 +2,6 @@ import { GridColDef } from "@mui/x-data-grid";
 import DataTable from "../../components/dataTable/DataTable";
 import moment from "moment";
 import { Modal } from "react-bootstrap";
-// import useGetSingleUserTransactions from "../../react-query/api-hooks/useGetSingleUserTransactions";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import HTTP from "../../utils/httpClient";
@@ -77,7 +76,10 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
   };
 
   const formatCreatedAt = (createdAt: any) => {
-    return moment(createdAt).format("MMM Do YYYY | hh:mm:ss a");
+    // return moment(createdAt).format("MMM Do YYYY|hh:mm:ss a");
+    return moment(createdAt, "YYYYMMDDHHmmss").format(
+      "Do MMM YYYY (hh:mm:ss a)"
+    );
   };
   const columns: GridColDef[] = [
     {
@@ -95,7 +97,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
     {
       field: "description",
       headerName: "DESCRIPTION",
-      width: 750,
+      width: 450,
       type: "string",
     },
     {
@@ -117,7 +119,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
       type: "string",
     },
     {
-      field: "created_at",
+      field: "date",
       headerName: "DATE",
       width: 250,
       type: "string",
@@ -131,7 +133,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
         show={userDetails !== null}
         onHide={() => setUserDetails(null)}
         centered
-        size="lg"
+        size="xl"
       >
         <Modal.Header closeButton>
           <Modal.Title className="fw-bolder text-dark">
