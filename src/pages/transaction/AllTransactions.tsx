@@ -13,12 +13,16 @@ import "react-date-range/dist/theme/default.css"; // theme css file
 
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
+import SingleUser from "../../components/SingleUser/SingleUser";
 
 const AllTransactions = () => {
   const { userTransactions, isLoadingTransaction } = useGetAllUserTransactions(
     []
   );
-
+  const [userDetails, setUserDetails] = useState(null);
+  const userInfo = useSelector((state) => state.auth.userInfo);
+  const token = userInfo?.token?.accessToken;
   const [dateRange, setDateRange] = useState([
     {
       startDate: new Date(),
@@ -53,12 +57,52 @@ const AllTransactions = () => {
   const formatCreatedAt = (createdAt: any) => {
     return moment(createdAt).format("MMM Do YYYY | hh:mm:ss a");
   };
+
+  const handleEdit = async (id: number) => {
+    try {
+      const endpoint = `https://sandbox.mylottohub.com/v1/admin/get-user/${id}`;
+      const requestOptions = {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      const response = await fetch(endpoint, requestOptions);
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (response.status === 400) {
+          toast.error("User does not Exist");
+          // Display or handle the error here
+        } else {
+          throw new Error(errorData.error || "Network response was not ok");
+        }
+      }
+
+      const data = await response.json();
+      setUserDetails(data);
+    } catch (error: any) {
+      // toast.error(error.error);
+      // Display error message or handle error appropriately
+    }
+  };
   const columns: GridColDef[] = [
     {
       field: "user",
       type: "string",
       headerName: "USER ID",
       width: 150,
+      renderCell: (params) => (
+        <a
+          className="text-primary"
+          style={{ cursor: "pointer" }}
+          onClick={() => handleEdit(params.row.user)}
+        >
+          {params.value}
+        </a>
+      ),
     },
     {
       field: "username",
@@ -114,7 +158,7 @@ const AllTransactions = () => {
     },
     {
       field: "created_at",
-      headerName: "SIGNUP DATE",
+      headerName: "DATE",
       width: 200,
       type: "string",
       renderCell: (params) => <span>{formatCreatedAt(params.value)}</span>,
@@ -244,9 +288,7 @@ const AllTransactions = () => {
                     <DataTable
                       slug="transactions"
                       columns={columns}
-                      rows={
-                        filteredTransactions || userTransactions?.data?.data
-                      }
+                      rows={filteredTransactions || userTransactions?.data}
                     />
                   </>
                 )}
@@ -256,6 +298,11 @@ const AllTransactions = () => {
               </div>
             </div>
           </div>
+          <SingleUser
+            userDetails={userDetails}
+            setUserDetails={setUserDetails}
+          />
+
           <Footer />
         </div>
       </div>

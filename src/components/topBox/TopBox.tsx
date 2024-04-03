@@ -3,8 +3,8 @@ import { topDealUsers } from "../../data.js";
 import useGetDashBoardInfo from "../../react-query/api-hooks/useGetDashBoardInfo.js";
 
 const TopBox = () => {
-  // const { dashboardData, isLoadingData } = useGetDashBoardInfo();
-  // console.log(dashboardData);
+  const { dashboardData, isLoadingData } = useGetDashBoardInfo();
+  console.log(dashboardData);
 
   return (
     <div className="topBox">

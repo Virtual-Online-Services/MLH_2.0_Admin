@@ -25,6 +25,7 @@ const UploadCode = ({ handleClose }) => {
   const token = userInfo?.token?.accessToken;
 
   const [isLoading, setIsLoading] = useState(false);
+  const [datetime, setDatetime] = useState("");
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -39,6 +40,7 @@ const UploadCode = ({ handleClose }) => {
 
     const formData = new FormData();
     formData.append("code", data.code);
+    formData.append("date", datetime);
 
     HTTP.post("/add-sports-bet", formData, config)
       .then((response: any) => {
@@ -63,6 +65,16 @@ const UploadCode = ({ handleClose }) => {
           toast.error("An error occurred.");
         }
       });
+  };
+
+  const handleChange = (e) => {
+    const selectedDatetime = new Date(e.target.value);
+    const formattedDatetime = selectedDatetime
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
+
+    setDatetime(formattedDatetime);
   };
 
   return (
@@ -94,6 +106,15 @@ const UploadCode = ({ handleClose }) => {
                     {errors.code.message}
                   </p>
                 )}
+              </div>
+
+              <div className="mb-3">
+                <input
+                  type="datetime-local"
+                  className="form-control mb-2 p-3"
+                  value={datetime}
+                  onChange={handleChange}
+                />
               </div>
 
               <Button

@@ -68,7 +68,7 @@ const TopFiveTransactions = () => {
       field: "date",
       type: "string",
       headerName: "DATE",
-      width: 100,
+      width: 200,
     },
   ];
 

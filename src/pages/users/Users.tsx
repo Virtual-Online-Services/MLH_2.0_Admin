@@ -106,7 +106,7 @@ const Users = () => {
 
   const handleEdit = async (id: number) => {
     try {
-      const endpoint = `https://api.mylottohub.com/v1/admin/get-user/${id}`;
+      const endpoint = `https://sandbox.mylottohub.com/v1/admin/get-user/${id}`;
       const requestOptions = {
         method: "GET",
         headers: {
@@ -186,7 +186,6 @@ const Users = () => {
       toast.error("Failed to unblock user");
     }
   };
-  console.log(userAllDetails);
 
   const columns: GridColDef[] = [
     {
@@ -195,7 +194,11 @@ const Users = () => {
       headerName: "USER ID",
       width: 80,
       renderCell: (params) => (
-        <a className="text-primary" onClick={() => handleEdit(params.row.id)}>
+        <a
+          className="text-primary"
+          style={{ cursor: "pointer" }}
+          onClick={() => handleEdit(params.row.id)}
+        >
           {params.value}
         </a>
       ),
@@ -209,6 +212,7 @@ const Users = () => {
         <a
           //   to={`/user-profile/${params.row.id}`}
           className="text-primary"
+          style={{ cursor: "pointer" }}
           onClick={() => handleEdit(params.row.id)}
         >
           {params.value}
@@ -429,7 +433,7 @@ const Users = () => {
                       slug="users"
                       columns={columns}
                       // rows={userDetails?.data}
-                      rows={filteredTransactions || userAllDetails?.data?.data}
+                      rows={filteredTransactions || userAllDetails?.data}
                     />
                   </>
                 )}

@@ -257,9 +257,9 @@ const DataTable = (props: Props) => {
             </div>
           )}
 
-          {/* Render delete action only if props.slug is not "withdraw" */}
           {props.slug !== "withdraw" &&
             props.slug !== "single-transactions" &&
+            props.slug !== "users" &&
             props.slug !== "agent-commission" &&
             props.slug !== "top_five_transaction" &&
             props.slug !== "sport-activity" &&
@@ -285,7 +285,7 @@ const DataTable = (props: Props) => {
         initialState={{
           pagination: {
             paginationModel: {
-              pageSize: 10,
+              pageSize: 50,
             },
           },
         }}

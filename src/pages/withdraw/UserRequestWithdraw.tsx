@@ -19,6 +19,7 @@ const UserRequestWithdraw = () => {
     useGetAllRequestWithdraw([]);
   const userInfo = useSelector((state) => state.auth.userInfo);
   const [userDetails, setUserDetails] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(null);
   const queryClient = useQueryClient();
   const token = userInfo?.token?.accessToken;
   const formatCreatedAt = (createdAt: any) => {
@@ -27,7 +28,7 @@ const UserRequestWithdraw = () => {
 
   const handleEdit = async (id: number) => {
     try {
-      const endpoint = `https://api.mylottohub.com/v1/admin/get-user/${id}`;
+      const endpoint = `https://sandbox.mylottohub.com/v1/admin/get-user/${id}`;
       const requestOptions = {
         method: "GET",
         headers: {
@@ -53,29 +54,58 @@ const UserRequestWithdraw = () => {
   };
 
   const handlePayWithMonnify = async (id: any) => {
-    try {
-      const endpoint = `/process-user-withdraw`;
-      const payload = {
-        id: id,
-        paymentgateway: "monnify",
-      };
-      const requestOptions = {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      };
+    toast.warn(
+      <>
+        Are you sure you want to process this withdrawal?
+        <br />
+        <button
+          onClick={async () => {
+            setIsProcessing(id);
+            try {
+              const endpoint = `/process-user-withdraw`;
+              const payload = {
+                id: id,
+                paymentgateway: "monnify",
+              };
+              const requestOptions = {
+                headers: {
+                  "Content-Type": "application/json",
+                  Accept: "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+              };
 
-      const response = await HTTP.post(endpoint, payload, requestOptions);
-      toast.success("Withdrawal processed successfully");
-      queryClient.invalidateQueries("GET_ALL_WITHDRAW");
-      return response;
-    } catch (error) {
-      toast.error("Failed to process withdrawal");
-    }
+              const response = await HTTP.post(
+                endpoint,
+                payload,
+                requestOptions
+              );
+              toast.success("Withdrawal processed successfully");
+              queryClient.invalidateQueries("GET_ALL_WITHDRAW");
+              // Close the toast
+              toast.dismiss();
+              return response;
+            } catch (error) {
+              toast.error("Failed to process withdrawal");
+              setIsProcessing(null);
+            }
+          }}
+          className="btn btn-success w-100 mt-4"
+        >
+          Confirm
+        </button>
+      </>,
+      {
+        position: "top-center",
+        autoClose: false,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      }
+    );
   };
-
   const columns: GridColDef[] = [
     {
       field: "username",
@@ -83,7 +113,11 @@ const UserRequestWithdraw = () => {
       headerName: "USER",
       width: 130,
       renderCell: (params) => (
-        <a className="text-primary" onClick={() => handleEdit(params.row.user)}>
+        <a
+          className="text-primary"
+          style={{ cursor: "pointer" }}
+          onClick={() => handleEdit(params.row.user)}
+        >
           {params.value}
         </a>
       ),
@@ -154,8 +188,18 @@ const UserRequestWithdraw = () => {
               <button
                 className="btn btn-success"
                 onClick={() => handlePayWithMonnify(params.row.id)}
+                disabled={isProcessing === params.row.id}
               >
-                Pay with Monnify
+                {/* {isProcessing ? (
+                  <Spinner animation="border" size="sm" role="status" />
+                ) : (
+                  "Pay with Monnify"
+                )} */}
+                {isProcessing === params.row.id ? (
+                  <Spinner animation="border" size="sm" role="status" />
+                ) : (
+                  "Pay with Monnify"
+                )}
               </button>
               &nbsp; &nbsp;
               <button

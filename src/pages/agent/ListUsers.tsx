@@ -105,7 +105,7 @@ const ListUsers = () => {
 
   const handleEdit = async (id: number) => {
     try {
-      const endpoint = `https://api.mylottohub.com/v1/get-agent/${id}`;
+      const endpoint = `https://sandbox.mylottohub.com/v1/get-agent/${id}`;
       const requestOptions = {
         method: "GET",
         headers: {
