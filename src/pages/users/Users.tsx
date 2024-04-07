@@ -46,7 +46,6 @@ const Users = () => {
     const searchUserInput = document.getElementById("searchUser");
     const selectedStatusInput = document.getElementById("status");
 
-    // Check if the input elements are found
     if (!searchUserInput || !selectedStatusInput) {
       toast.error("Search input or status input not found");
       return;
@@ -55,13 +54,11 @@ const Users = () => {
     const searchUser = searchUserInput.value.toLowerCase(); // Convert to lowercase
     const selectedStatus = selectedStatusInput.value;
 
-    const filtered = userAllDetails?.data.filter((record: any) => {
-      // Default filter conditions
+    const filtered = userAllDetails?.data?.data?.filter((record: any) => {
       let isMatchingSearch = true;
       let isMatchingStatus = true;
       let isWithinDateRange = true;
 
-      // Filtering by search user
       if (searchUser !== "") {
         isMatchingSearch = Object.values(record).some((value: any) => {
           if (typeof value === "string") {
@@ -71,13 +68,11 @@ const Users = () => {
         });
       }
 
-      // Filtering by status
       if (selectedStatus !== "") {
         isMatchingStatus =
           selectedStatus === "" || selectedStatus === record.status.toString();
       }
 
-      // Filtering by date range only if the date range picker is shown
       if (showDateRangePicker) {
         const createdAt = new Date(record.created_at);
         const startDate = dateRange[0].startDate;
@@ -106,7 +101,7 @@ const Users = () => {
 
   const handleEdit = async (id: number) => {
     try {
-      const endpoint = `https://sandbox.mylottohub.com/v1/admin/get-user/${id}`;
+      const endpoint = `https://api.mylottohub.com/v1/admin/get-user/${id}`;
       const requestOptions = {
         method: "GET",
         headers: {
@@ -433,7 +428,7 @@ const Users = () => {
                       slug="users"
                       columns={columns}
                       // rows={userDetails?.data}
-                      rows={filteredTransactions || userAllDetails?.data}
+                      rows={filteredTransactions || userAllDetails?.data?.data}
                     />
                   </>
                 )}

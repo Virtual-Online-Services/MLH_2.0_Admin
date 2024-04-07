@@ -137,7 +137,7 @@ const AgentUser = ({ agentDetails, setAgentDetails }) => {
             User Information
           </Modal.Title>
 
-          <button className="btn btn-primary">Reset Password</button>
+          {/* <button className="btn btn-primary">Reset Password</button> */}
         </Modal.Header>
         <Modal.Body>
           {agentDetails && (

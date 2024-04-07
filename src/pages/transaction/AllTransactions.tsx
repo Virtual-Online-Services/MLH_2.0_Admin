@@ -40,12 +40,14 @@ const AllTransactions = () => {
     setShowDateRangePicker((prevState) => !prevState);
   };
   const handleFilter = () => {
-    const filtered = userTransactions?.data.filter((transaction: any) => {
-      const createdAt = new Date(transaction.created_at);
-      const startDate = dateRange[0].startDate;
-      const endDate = dateRange[0].endDate;
-      return createdAt >= startDate && createdAt <= endDate;
-    });
+    const filtered = userTransactions?.data?.data?.filter(
+      (transaction: any) => {
+        const createdAt = new Date(transaction.created_at);
+        const startDate = dateRange[0].startDate;
+        const endDate = dateRange[0].endDate;
+        return createdAt >= startDate && createdAt <= endDate;
+      }
+    );
     setFilteredTransactions(filtered);
     if (filtered && filtered.length > 0) {
       toast.success(`${filtered.length} record(s) found!`);
@@ -60,7 +62,7 @@ const AllTransactions = () => {
 
   const handleEdit = async (id: number) => {
     try {
-      const endpoint = `https://sandbox.mylottohub.com/v1/admin/get-user/${id}`;
+      const endpoint = `https://api.mylottohub.com/v1/admin/get-user/${id}`;
       const requestOptions = {
         method: "GET",
         headers: {
@@ -282,13 +284,15 @@ const AllTransactions = () => {
                       </div>
                     </div>
                     <p className="mt-4">
-                      {userTransactions?.data?.length} Records
+                      {userTransactions?.data?.data?.length} Records
                     </p>
 
                     <DataTable
                       slug="transactions"
                       columns={columns}
-                      rows={filteredTransactions || userTransactions?.data}
+                      rows={
+                        filteredTransactions || userTransactions?.data?.data
+                      }
                     />
                   </>
                 )}

@@ -28,7 +28,7 @@ const UserRequestWithdraw = () => {
 
   const handleEdit = async (id: number) => {
     try {
-      const endpoint = `https://sandbox.mylottohub.com/v1/admin/get-user/${id}`;
+      const endpoint = `https://api.mylottohub.com/v1/admin/get-user/${id}`;
       const requestOptions = {
         method: "GET",
         headers: {

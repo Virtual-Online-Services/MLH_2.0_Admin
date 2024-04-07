@@ -27,7 +27,13 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
             Authorization: `Bearer ${token}`,
           },
         });
-        setUserTransaction(response.data.data);
+
+        const sortedTransactions = response.data.data.sort(
+          (a, b) =>
+            moment(b.date, "YYYYMMDDHHmmss").valueOf() -
+            moment(a.date, "YYYYMMDDHHmmss").valueOf()
+        );
+        setUserTransaction(sortedTransactions);
       } catch (error) {
         console.error("Error fetching user transactions:");
       }
@@ -105,6 +111,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
       headerName: "AMOUNT",
       width: 130,
       type: "string",
+      valueGetter: (params) => `₦${params.value}`,
     },
     {
       field: "channel",
@@ -117,6 +124,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
       headerName: "CURRENT BALANCE",
       width: 150,
       type: "string",
+      valueGetter: (params) => `₦${params.value}`,
     },
     {
       field: "date",
@@ -140,7 +148,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
             User Information
           </Modal.Title>
 
-          <button className="btn btn-primary">Reset Password</button>
+          {/* <button className="btn btn-primary">Reset Password</button> */}
         </Modal.Header>
         <Modal.Body>
           {userDetails && (
@@ -418,7 +426,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                         }}
                       >
                         <span className="fw-bolder text-dark">
-                          5/90 Mania Wallet Balance:
+                          5/90 Wallet Balance:
                         </span>{" "}
                         <span className="text-dark">
                           {userBonus ? `₦${userBonus["590_bonus_wallet"]}` : ""}

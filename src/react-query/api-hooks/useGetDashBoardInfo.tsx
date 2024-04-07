@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 const getInfo = async (token) => {
   try {
     const res = await HTTP.get(
-      `https://sandbox.mylottohub.com/v1/admin-dashboard`,
+      `https://api.mylottohub.com/v1/admin-dashboard`,
       {
         headers: {
           "Content-Type": "application/json",

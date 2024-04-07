@@ -4,7 +4,7 @@ import useGetDashBoardInfo from "../../react-query/api-hooks/useGetDashBoardInfo
 
 const TopBox = () => {
   const { dashboardData, isLoadingData } = useGetDashBoardInfo();
-  console.log(dashboardData);
+  // console.log(dashboardData);
 
   return (
     <div className="topBox">
