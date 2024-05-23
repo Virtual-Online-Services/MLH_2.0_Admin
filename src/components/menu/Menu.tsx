@@ -12,7 +12,6 @@ const MenuItem = ({ item }) => {
   const handleItemClick = () => {
     setIsActive(!isActive);
   };
-  // console.log(item.listItems[1]?.subItems);
 
   return (
     <div
@@ -23,7 +22,7 @@ const MenuItem = ({ item }) => {
       {item?.listItems &&
         item.listItems.map((listItem) => (
           <Link to={listItem?.url} className="listItem" key={listItem?.id}>
-            <i className={`${listItem?.icon}`}></i>
+            <i className={listItem?.icon}></i>
             <span className="listItemTitle mt-1">{listItem?.title}</span>
           </Link>
         ))}
@@ -31,7 +30,7 @@ const MenuItem = ({ item }) => {
         <div className="subItems">
           {item.listItems[1]?.subItems.map((subItem) => (
             <Link to={subItem.url} className="listItem" key={subItem.id}>
-              <i className={`${subItem.icon}`}></i>
+              <i className={subItem?.icon}></i>
               <span className="listItemTitle mt-1">{subItem.title}</span>
             </Link>
           ))}

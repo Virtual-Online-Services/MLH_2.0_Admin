@@ -20,6 +20,7 @@ const UserRequestWithdraw = () => {
   const userInfo = useSelector((state) => state.auth.userInfo);
   const [userDetails, setUserDetails] = useState(null);
   const [isProcessing, setIsProcessing] = useState(null);
+  const [isCancel, setIsCancel] = useState(null);
   const queryClient = useQueryClient();
   const token = userInfo?.token?.accessToken;
   const formatCreatedAt = (createdAt: any) => {
@@ -83,7 +84,6 @@ const UserRequestWithdraw = () => {
               toast.success("Withdrawal processed successfully");
               queryClient.invalidateQueries("GET_ALL_WITHDRAW");
               // Close the toast
-              toast.dismiss();
               return response;
             } catch (error) {
               toast.error("Failed to process withdrawal");
@@ -106,6 +106,59 @@ const UserRequestWithdraw = () => {
       }
     );
   };
+  const handlePayWithCancel = async (id: any) => {
+    toast.warn(
+      <>
+        Are you sure you want to cancel this withdrawal?
+        <br />
+        <button
+          onClick={async () => {
+            setIsCancel(id);
+            try {
+              const endpoint = `/process-user-withdraw`;
+              const payload = {
+                id: id,
+                action: "cancel",
+              };
+              const requestOptions = {
+                headers: {
+                  "Content-Type": "application/json",
+                  Accept: "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+              };
+
+              const response = await HTTP.post(
+                endpoint,
+                payload,
+                requestOptions
+              );
+              toast.success("Withdrawal canceled successfully");
+              queryClient.invalidateQueries("GET_ALL_WITHDRAW");
+              // Close the toast
+              return response;
+            } catch (error) {
+              toast.error("Failed to process withdrawal");
+              setIsCancel(null);
+            }
+          }}
+          className="btn btn-success w-100 mt-4"
+        >
+          Confirm
+        </button>
+      </>,
+      {
+        position: "top-center",
+        autoClose: false,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      }
+    );
+  };
+
   const columns: GridColDef[] = [
     {
       field: "username",
@@ -190,11 +243,6 @@ const UserRequestWithdraw = () => {
                 onClick={() => handlePayWithMonnify(params.row.id)}
                 disabled={isProcessing === params.row.id}
               >
-                {/* {isProcessing ? (
-                  <Spinner animation="border" size="sm" role="status" />
-                ) : (
-                  "Pay with Monnify"
-                )} */}
                 {isProcessing === params.row.id ? (
                   <Spinner animation="border" size="sm" role="status" />
                 ) : (
@@ -212,8 +260,14 @@ const UserRequestWithdraw = () => {
               <button
                 className="btn btn-danger"
                 // onClick={() => handleViewDatetime(params.row)}
+                onClick={() => handlePayWithCancel(params.row.id)}
+                disabled={isCancel === params.row.id}
               >
-                Cancel
+                {isCancel === params.row.id ? (
+                  <Spinner animation="border" size="sm" role="status" />
+                ) : (
+                  "Cancel"
+                )}
               </button>
             </>
           )}

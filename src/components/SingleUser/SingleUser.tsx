@@ -1,16 +1,62 @@
 import { GridColDef } from "@mui/x-data-grid";
 import DataTable from "../../components/dataTable/DataTable";
 import moment from "moment";
-import { Modal } from "react-bootstrap";
+import { Button, Modal, Spinner } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import HTTP from "../../utils/httpClient";
+import { toast } from "react-toastify";
+import useGetAllBank from "../../react-query/api-hooks/useGetAllBank";
 
 const SingleUser = ({ userDetails, setUserDetails }) => {
   const [userTransaction, setUserTransaction] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [loadingBonus, setLoadingBonus] = useState(false);
+  const { allBanks } = useGetAllBank();
   const [userBonus, setUserBonus] = useState([]);
   const userInfo = useSelector((state) => state.auth.userInfo);
   const token = userInfo?.token?.accessToken;
+  const [bankName, setBankName] = useState(userDetails?.data?.bname || "");
+  const [accountNo, setAccountNo] = useState(userDetails?.data?.accno || "");
+  const [loadingBank, setLoadingBank] = useState(false);
+
+  const handleBankNameChange = (e: any) => {
+    setBankName(e.target.value);
+  };
+
+  const handleAccountNoChange = (e: any) => {
+    setAccountNo(e.target.value);
+  };
+
+  const handleSubmitBankDetails = async (e: any) => {
+    e.preventDefault();
+    setLoadingBank(true);
+
+    try {
+      const response = await HTTP.post(
+        `/edit-bank-details/${userDetails.data.id}`,
+        {
+          bank_name: bankName,
+          account_no: accountNo,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response) {
+        toast.success("Bank details updated successfully");
+      }
+    } catch (error: any) {
+      toast.error(error.response.data.error || "Error updating bank details");
+    } finally {
+      setLoadingBank(false);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -134,6 +180,78 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
       renderCell: (params) => <span>{formatCreatedAt(params.value)}</span>,
     },
   ];
+
+  const onSubmitTransfer = async (e: any) => {
+    setLoading(true);
+    e.preventDefault();
+
+    const amountTransfer = e.target.amountTransfer.value;
+    const amountRef = e.target.amountRef.value;
+
+    try {
+      const response = await HTTP.post(
+        "/user-transferuser",
+        {
+          amount: amountTransfer,
+          id: userDetails?.data?.id,
+          posting: "wallet",
+          ref: amountRef,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response) {
+        toast.success("Funds transferred successfully");
+      }
+    } catch (error) {
+      toast.error(error.response.data.msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onSubmitBonus = async (e: any) => {
+    setLoadingBonus(true);
+    e.preventDefault();
+
+    const amountBonus = e.target.amountBonus.value;
+
+    try {
+      const response = await HTTP.post(
+        "/user-transferuser",
+        {
+          amount: amountBonus,
+          id: userDetails?.data?.id,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response) {
+        toast.success("Bonus Funds transferred successfully");
+      }
+    } catch (error) {
+      toast.error(error.response.data.msg);
+    } finally {
+      setLoadingBonus(false);
+    }
+  };
+  const formattedDate = moment
+    .utc(
+      userDetails?.data?.date || userDetails?.data?.created_at,
+      "YYYY-MM-DD HH:mm:ss"
+    )
+    .local()
+    .format("Do MMM YYYY | h:mm:ssA");
 
   return (
     <div>
@@ -343,7 +461,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                         }}
                       >
                         <span className="fw-bolder text-dark">
-                          Wallet Balance:
+                          Deposit Balance:
                         </span>{" "}
                         <span className="text-dark">
                           ₦{userDetails?.data?.wallet}
@@ -364,19 +482,6 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                         </span>
                       </p>
                       <hr style={{ backgroundColor: "black" }} />
-                      {/* <p
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <span className="fw-bolder text-dark">
-                          Bonus Wallet Balance:
-                        </span>{" "}
-                        <span className="text-dark">
-                          ₦{userDetails?.data?.bwallet}
-                        </span>
-                      </p> */}
                       <p
                         style={{
                           display: "flex",
@@ -384,7 +489,21 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                         }}
                       >
                         <span className="fw-bolder text-dark">
-                          Green Lotto Wallet Balance:
+                          Bonus Balance:
+                        </span>{" "}
+                        <span className="text-dark">
+                          ₦{userBonus?.bonus_wallet}
+                        </span>
+                      </p>
+                      <hr style={{ backgroundColor: "black" }} />
+                      <p
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <span className="fw-bolder text-dark">
+                          Green Lotto Bonus Balance:
                         </span>{" "}
                         <span className="text-dark">
                           ₦{userBonus?.green_lotto_bonus_wallet}
@@ -398,7 +517,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                         }}
                       >
                         <span className="fw-bolder text-dark">
-                          Set Lotto Wallet Balance:
+                          Set Lotto Bonus Balance:
                         </span>{" "}
                         <span className="text-dark">
                           ₦{userBonus?.lotto_nigeria_bonus_wallet}
@@ -412,7 +531,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                         }}
                       >
                         <span className="fw-bolder text-dark">
-                          Lotto Mania Wallet Balance:
+                          Lotto Mania Bonus Balance:
                         </span>{" "}
                         <span className="text-dark">
                           ₦{userBonus?.lottomania_bonus_wallet}
@@ -426,7 +545,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                         }}
                       >
                         <span className="fw-bolder text-dark">
-                          5/90 Wallet Balance:
+                          5/90 Bonus Balance:
                         </span>{" "}
                         <span className="text-dark">
                           {userBonus ? `₦${userBonus["590_bonus_wallet"]}` : ""}
@@ -456,9 +575,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                         <span className="fw-bolder text-dark">
                           Signup Date:
                         </span>{" "}
-                        <span className="text-dark">
-                          {userDetails?.data?.date}
-                        </span>
+                        <span className="text-dark">{formattedDate}</span>
                       </p>
                       <hr style={{ backgroundColor: "black" }} />
                       <p
@@ -556,21 +673,49 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                       <label className="form-label text-dark fa-1x">
                         Transfer to user wallet
                       </label>
-                      <form className="row g-2 mt-1">
-                        <div className="col-auto">
+                      <form
+                        onSubmit={onSubmitTransfer}
+                        className="row g-2 mt-1"
+                      >
+                        <small className="text-dark">
+                          The Reference Field is optionally{" "}
+                        </small>
+                        <div className="col-auto d-flex">
                           <input
                             type="text"
                             className="form-control"
                             placeholder="Amount"
+                            id="amountTransfer"
+                            name="amountTransfer"
+                            required
+                          />
+                          &nbsp;&nbsp;&nbsp;
+                          <input
+                            type="text"
+                            className="form-control"
+                            id="amountRef"
+                            name="amountRef"
+                            placeholder="Reference Number"
                           />
                         </div>
                         <div className="col-auto">
-                          <button
+                          <Button
                             type="submit"
-                            className="btn btn-primary mb-3"
+                            className="btn btn-primary mb-3 h-100"
+                            disabled={loading}
                           >
-                            Transfer
-                          </button>
+                            {loading ? (
+                              <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                              />
+                            ) : (
+                              " Transfer"
+                            )}
+                          </Button>
                         </div>
                       </form>
                     </div>
@@ -578,21 +723,35 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                       <label className="form-label text-dark fa-1x">
                         Transfer to user bonus wallet
                       </label>
-                      <form className="row g-2 mt-1">
+                      <form onSubmit={onSubmitBonus} className="row g-2 mt-1">
                         <div className="col-auto">
                           <input
                             type="text"
                             className="form-control"
                             placeholder="Amount"
+                            id="amountBonus"
+                            name="amountBonus"
+                            required
                           />
                         </div>
                         <div className="col-auto">
-                          <button
+                          <Button
                             type="submit"
                             className="btn btn-primary mb-3"
+                            disabled={loadingBonus}
                           >
-                            Transfer
-                          </button>
+                            {loadingBonus ? (
+                              <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                              />
+                            ) : (
+                              " Transfer"
+                            )}
+                          </Button>
                         </div>
                       </form>
                     </div>
@@ -612,200 +771,53 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                     className="p-3 mb-5 mt-3"
                     // style={{ background: "#f5f7f8" }}
                   >
-                    <form className="row g-2 mt-1 w-50">
+                    <form
+                      onSubmit={handleSubmitBankDetails}
+                      className="row g-2 mt-1 w-50"
+                    >
                       <div className="form-group mb-3">
-                        <select name="bank" required="" class="form-control">
-                          <option value="" selected="selected">
+                        <select
+                          name="bank"
+                          required=""
+                          className="form-control"
+                          value={bankName}
+                          onChange={handleBankNameChange}
+                        >
+                          <option value="" disabled>
                             Select Bank
                           </option>
-                          <option value="24">
-                            9mobile 9Payment Service Bank
-                          </option>
-                          <option value="25">Abbey Mortgage Bank</option>
-                          <option value="26">Above Only MFB</option>
-                          <option value="27">Abulesoro MFB</option>
-                          <option value="1">Access Bank</option>
-                          <option value="28">Accion Microfinance Bank</option>
-                          <option value="29">
-                            Ahmadu Bello University Microfinance Bank
-                          </option>
-                          <option value="30">Airtel Smartcash PSB</option>
-                          <option value="31">AKU Microfinance Bank</option>
-                          <option value="32">ALAT by WEMA</option>
-                          <option value="33">Amegy Microfinance Bank</option>
-                          <option value="34">Amju Unique MFB</option>
-                          <option value="35">
-                            AMPERSAND MICROFINANCE BANK
-                          </option>
-                          <option value="36">Aramoko MFB</option>
-                          <option value="37">ASO Savings and Loans</option>
-                          <option value="38">Astrapolaris MFB LTD</option>
-                          <option value="39">Bainescredit MFB</option>
-                          <option value="40">
-                            Banc Corp Microfinance Bank
-                          </option>
-                          <option value="41">Bowen Microfinance Bank</option>
-                          <option value="42">
-                            Branch International Financial Services Limited
-                          </option>
-                          <option value="43">Carbon</option>
-                          <option value="44">CASHCONNECT MFB</option>
-                          <option value="45">CEMCS Microfinance Bank</option>
-                          <option value="46">
-                            Chanelle Microfinance Bank Limited
-                          </option>
-                          <option value="47">Chikum Microfinance bank</option>
-                          <option value="2">Citibank</option>
-                          <option value="48">Consumer Microfinance Bank</option>
-                          <option value="49">Corestep MFB</option>
-                          <option value="50">Coronation Merchant Bank</option>
-                          <option value="51">County Finance Limited</option>
-                          <option value="52">Crescent MFB</option>
-                          <option value="3">Diamond Bank</option>
-                          <option value="53">Dot Microfinance Bank</option>
-                          <option value="5">Ecobank Nigeria</option>
-                          <option value="54">Ekimogun MFB</option>
-                          <option value="55">Ekondo Microfinance Bank</option>
-                          <option value="56">Eyowo</option>
-                          <option value="57">
-                            Fairmoney Microfinance Bank
-                          </option>
-                          <option value="6">Fidelity Bank Nigeria</option>
-                          <option value="58">Firmus MFB</option>
-                          <option value="7">First Bank of Nigeria</option>
-                          <option value="8">First City Monument Bank</option>
-                          <option value="59">
-                            FirstTrust Mortgage Bank Nigeria
-                          </option>
-                          <option value="60">FLOURISH MFB</option>
-                          <option value="61">FSDH Merchant Bank Limited</option>
-                          <option value="62">Gateway Mortgage Bank LTD</option>
-                          <option value="63">Globus Bank</option>
-                          <option value="64">GoMoney</option>
-                          <option value="65">Goodnews Microfinance Bank</option>
-                          <option value="66">Greenwich Merchant Bank</option>
-                          <option value="9">Guaranty Trust Bank</option>
-                          <option value="67">Hackman Microfinance Bank</option>
-                          <option value="68">Hasal Microfinance Bank</option>
-                          <option value="10">Heritage Bank Plc</option>
-                          <option value="69">HopePSB</option>
-                          <option value="70">Ibile Microfinance Bank</option>
-                          <option value="71">Ikoyi Osun MFB</option>
-                          <option value="72">
-                            Ilaro Poly Microfinance Bank
-                          </option>
-                          <option value="73">Imowo MFB</option>
-                          <option value="74">Infinity MFB</option>
-                          <option value="11">Jaiz Bank</option>
-                          <option value="75">Kadpoly MFB</option>
-                          <option value="12">Keystone Bank Limited</option>
-                          <option value="76">Kredi Money MFB LTD</option>
-                          <option value="77">Kuda Bank</option>
-                          <option value="78">
-                            Lagos Building Investment Company Plc.
-                          </option>
-                          <option value="79">Links MFB</option>
-                          <option value="80">Living Trust Mortgage Bank</option>
-                          <option value="81">Lotus Bank</option>
-                          <option value="82">Mayfair MFB</option>
-                          <option value="83">Mint MFB</option>
-                          <option value="84">Moniepoint MFB</option>
-                          <option value="85">MTN Momo PSB</option>
-                          <option value="86">
-                            OPay Digital Services Limited (OPay)
-                          </option>
-                          <option value="87">Optimus Bank Limited</option>
-                          <option value="88">Paga</option>
-                          <option value="89">PalmPay</option>
-                          <option value="90">Parallex Bank</option>
-                          <option value="91">Parkway - ReadyCash</option>
-                          <option value="92">Peace Microfinance Bank</option>
-                          <option value="93">Personal Trust MFB</option>
-                          <option value="94">
-                            Petra Mircofinance Bank Plc
-                          </option>
-                          <option value="95">Platinum Mortgage Bank</option>
-                          <option value="14">Polaris Bank</option>
-                          <option value="96">Polyunwana MFB</option>
-                          <option value="97">PremiumTrust Bank</option>
-                          <option value="13">Providus Bank Plc</option>
-                          <option value="98">QuickFund MFB</option>
-                          <option value="99">Rand Merchant Bank</option>
-                          <option value="100">Refuge Mortgage Bank</option>
-                          <option value="101">
-                            Rephidim Microfinance Bank
-                          </option>
-                          <option value="102">
-                            Rigo Microfinance Bank Limited
-                          </option>
-                          <option value="103">
-                            ROCKSHIELD MICROFINANCE BANK
-                          </option>
-                          <option value="104">Rubies MFB</option>
-                          <option value="105">Safe Haven MFB</option>
-                          <option value="106">
-                            Safe Haven Microfinance Bank Limited
-                          </option>
-                          <option value="107">SAGE GREY FINANCE LIMITED</option>
-                          <option value="108">Shield MFB</option>
-                          <option value="109">Solid Allianze MFB</option>
-                          <option value="110">Solid Rock MFB</option>
-                          <option value="111">Sparkle Microfinance Bank</option>
-                          <option value="15">
-                            Stanbic IBTC Bank Nigeria Limited
-                          </option>
-                          <option value="16">Standard Chartered Bank</option>
-                          <option value="112">Stellas MFB</option>
-                          <option value="17">Sterling Bank</option>
-                          <option value="18">
-                            Suntrust Bank Nigeria Limited
-                          </option>
-                          <option value="113">Supreme MFB</option>
-                          <option value="114">TAJ Bank</option>
-                          <option value="115">Tanadi Microfinance Bank</option>
-                          <option value="116">Tangerine Money</option>
-                          <option value="117">TCF MFB</option>
-                          <option value="118">Titan Bank</option>
-                          <option value="119">Titan Paystack</option>
-                          <option value="120">
-                            U&amp;C Microfinance Bank Ltd (U AND C MFB)
-                          </option>
-                          <option value="121">Uhuru MFB</option>
-                          <option value="122">
-                            Unaab Microfinance Bank Limited
-                          </option>
-                          <option value="123">Unical MFB</option>
-                          <option value="124">Unilag Microfinance Bank</option>
-                          <option value="19">Union Bank of Nigeria</option>
-                          <option value="20">United Bank for Africa</option>
-                          <option value="21">Unity Bank Plc</option>
-                          <option value="125">
-                            VFD Microfinance Bank Limited
-                          </option>
-                          <option value="126">Waya Microfinance Bank</option>
-                          <option value="22">Wema Bank</option>
-                          <option value="23">Zenith Bank</option>
+                          {allBanks.map((bank) => (
+                            <option key={bank.id} value={bank.name}>
+                              {bank.name}
+                            </option>
+                          ))}
                         </select>
                       </div>
                       <div className="mb-3">
-                        <div className="col-auto mb-2">
-                          <input
-                            type="tel"
-                            className="form-control"
-                            placeholder="   Account Number"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="mb-2">
                         <div className="col-auto">
                           <input
                             type="tel"
                             className="form-control"
-                            placeholder="  Account Name"
+                            placeholder="Account Number"
+                            value={accountNo}
+                            onChange={handleAccountNoChange}
                           />
                         </div>
-                        <button className="btn btn-primary mt-3">Save</button>
+                      </div>
+                      <div className="mb-2">
+                        <button type="submit" className="btn btn-primary">
+                          {loadingBank ? (
+                            <Spinner
+                              as="span"
+                              animation="border"
+                              size="sm"
+                              role="status"
+                              aria-hidden="true"
+                            />
+                          ) : (
+                            "Update"
+                          )}
+                        </button>
                       </div>
                     </form>
                   </div>

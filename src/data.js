@@ -98,7 +98,7 @@ export const menu = [
       {
         id: 9,
         title: "Bonus",
-        url: "#",
+        url: "/bonus",
         icon: "fa fa-gift",
       },
     ],

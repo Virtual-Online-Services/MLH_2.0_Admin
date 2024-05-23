@@ -1,16 +1,62 @@
 import { GridColDef } from "@mui/x-data-grid";
 import DataTable from "../../components/dataTable/DataTable";
 import moment from "moment";
-import { Modal } from "react-bootstrap";
+import { Button, Modal, Spinner } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import HTTP from "../../utils/httpClient";
+import { toast } from "react-toastify";
+import useGetAllBank from "../../react-query/api-hooks/useGetAllBank";
 
 const AgentUser = ({ agentDetails, setAgentDetails }) => {
   const [userTransaction, setUserTransaction] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [agentBonus, setAgentBonus] = useState([]);
+  const { allBanks } = useGetAllBank();
   const userInfo = useSelector((state) => state.auth.userInfo);
   const token = userInfo?.token?.accessToken;
+  const [bankName, setBankName] = useState(agentDetails?.data?.bname || "");
+  const [accountNo, setAccountNo] = useState(agentDetails?.data?.accno || "");
+  const [loadingBank, setLoadingBank] = useState(false);
+
+  const handleBankNameChange = (e: any) => {
+    setBankName(e.target.value);
+  };
+
+  const handleAccountNoChange = (e: any) => {
+    setAccountNo(e.target.value);
+  };
+
+  const handleSubmitBankDetails = async (e: any) => {
+    e.preventDefault();
+    setLoadingBank(true);
+
+    try {
+      const response = await HTTP.post(
+        `/edit-bank-details/${agentDetails.data.id}`,
+        {
+          bank_name: bankName,
+          account_no: accountNo,
+          user_type: "Agent",
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response) {
+        toast.success("Bank details updated successfully");
+      }
+    } catch (error: any) {
+      toast.error(error.response.data.error || "Error updating bank details");
+    } finally {
+      setLoadingBank(false);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -124,20 +170,52 @@ const AgentUser = ({ agentDetails, setAgentDetails }) => {
     },
   ];
 
+  const onSubmitTransfer = async (e: any) => {
+    setLoading(true);
+    e.preventDefault();
+
+    const amountTransfer = e.target.amountTransfer.value;
+    const amountRef = e.target.amountRef.value;
+
+    try {
+      const response = await HTTP.post(
+        "/agent-transferagent",
+        {
+          amount: amountTransfer,
+          id: agentDetails?.data?.id,
+          posting: "wallet",
+          ref: amountRef,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response) {
+        toast.success("Funds transferred successfully");
+      }
+    } catch (error) {
+      toast.error(error.response.data.msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div>
       <Modal
         show={agentDetails !== null}
         onHide={() => setAgentDetails(null)}
         centered
-        size="lg"
+        size="xl"
       >
         <Modal.Header closeButton>
           <Modal.Title className="fw-bolder text-dark">
-            User Information
+            Agent User Information
           </Modal.Title>
-
-          {/* <button className="btn btn-primary">Reset Password</button> */}
         </Modal.Header>
         <Modal.Body>
           {agentDetails && (
@@ -187,6 +265,20 @@ const AgentUser = ({ agentDetails, setAgentDetails }) => {
                     Transfer
                   </button>
                 </li>
+                <li className="nav-item" role="presentation">
+                  <button
+                    className="nav-link"
+                    id="bank-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#bank-tab-pane"
+                    type="button"
+                    role="tab"
+                    aria-controls="bank-tab-pane"
+                    aria-selected="false"
+                  >
+                    Edit User Bank Details
+                  </button>
+                </li>
               </ul>
               <div className="tab-content" id="myTabContent">
                 <div
@@ -221,7 +313,8 @@ const AgentUser = ({ agentDetails, setAgentDetails }) => {
                       >
                         <span className="fw-bolder text-dark">Name:</span>
                         <span className="text-dark">
-                          {agentDetails?.data?.name}
+                          {agentDetails?.data?.first_name}{" "}
+                          {agentDetails?.data?.last_name}
                         </span>
                       </p>
                       <hr style={{ backgroundColor: "black" }} />
@@ -318,7 +411,7 @@ const AgentUser = ({ agentDetails, setAgentDetails }) => {
                         }}
                       >
                         <span className="fw-bolder text-dark">
-                          Wallet Balance:
+                          Deposit Balance:
                         </span>{" "}
                         <span className="text-dark">
                           ₦{agentDetails?.data?.wallet}
@@ -339,6 +432,7 @@ const AgentUser = ({ agentDetails, setAgentDetails }) => {
                         </span>
                       </p>
                       <hr style={{ backgroundColor: "black" }} />
+
                       <p
                         style={{
                           display: "flex",
@@ -346,7 +440,7 @@ const AgentUser = ({ agentDetails, setAgentDetails }) => {
                         }}
                       >
                         <span className="fw-bolder text-dark">
-                          Green Lotto Wallet Balance:
+                          Green Lotto Bonus Balance:
                         </span>{" "}
                         <span className="text-dark">
                           ₦{agentBonus?.green_lotto_bonus_wallet}
@@ -360,7 +454,7 @@ const AgentUser = ({ agentDetails, setAgentDetails }) => {
                         }}
                       >
                         <span className="fw-bolder text-dark">
-                          Set Lotto Wallet Balance:
+                          Set Lotto Bonus Balance:
                         </span>{" "}
                         <span className="text-dark">
                           ₦{agentBonus?.lotto_nigeria_bonus_wallet}
@@ -374,7 +468,7 @@ const AgentUser = ({ agentDetails, setAgentDetails }) => {
                         }}
                       >
                         <span className="fw-bolder text-dark">
-                          Lotto Mania Wallet Balance:
+                          Lotto Mania Bonus Balance:
                         </span>{" "}
                         <span className="text-dark">
                           ₦{agentBonus?.lottomania_bonus_wallet}
@@ -388,7 +482,7 @@ const AgentUser = ({ agentDetails, setAgentDetails }) => {
                         }}
                       >
                         <span className="fw-bolder text-dark">
-                          5/90 Mania Wallet Balance:
+                          5/90 Mania Bonus Balance:
                         </span>{" "}
                         <span className="text-dark">
                           {agentBonus
@@ -520,46 +614,117 @@ const AgentUser = ({ agentDetails, setAgentDetails }) => {
                       <label className="form-label text-dark fa-1x">
                         Transfer to user wallet
                       </label>
-                      <form className="row g-2 mt-1">
-                        <div className="col-auto">
+                      <form
+                        onSubmit={onSubmitTransfer}
+                        className="row g-2 mt-1"
+                      >
+                        <small className="text-dark">
+                          The Reference Field is optionally{" "}
+                        </small>
+                        <div className="col-auto d-flex">
                           <input
                             type="text"
                             className="form-control"
                             placeholder="Amount"
+                            id="amountTransfer"
+                            name="amountTransfer"
+                            required
                           />
-                        </div>
-                        <div className="col-auto">
-                          <button
-                            type="submit"
-                            className="btn btn-primary mb-3"
-                          >
-                            Transfer
-                          </button>
-                        </div>
-                      </form>
-                    </div>
-                    <div className="mb-3">
-                      <label className="form-label text-dark fa-1x">
-                        Transfer to user bonus wallet
-                      </label>
-                      <form className="row g-2 mt-1">
-                        <div className="col-auto">
+                          &nbsp;&nbsp;&nbsp;
                           <input
                             type="text"
                             className="form-control"
-                            placeholder="Amount"
+                            id="amountRef"
+                            name="amountRef"
+                            placeholder="Reference Number"
                           />
                         </div>
                         <div className="col-auto">
-                          <button
+                          <Button
                             type="submit"
-                            className="btn btn-primary mb-3"
+                            className="btn btn-primary mb-3 h-100"
+                            disabled={loading}
                           >
-                            Transfer
-                          </button>
+                            {loading ? (
+                              <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                              />
+                            ) : (
+                              " Transfer"
+                            )}
+                          </Button>
                         </div>
                       </form>
                     </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="tab-content" id="myTabContent">
+                <div
+                  className="tab-pane fade show"
+                  id="bank-tab-pane"
+                  role="tabpanel"
+                  aria-labelledby="bank-tab"
+                  tabIndex="0"
+                >
+                  <div
+                    className="p-3 mb-5 mt-3"
+                    // style={{ background: "#f5f7f8" }}
+                  >
+                    <form
+                      onSubmit={handleSubmitBankDetails}
+                      className="row g-2 mt-1 w-50"
+                    >
+                      <div className="form-group mb-3">
+                        <select
+                          name="bank"
+                          required=""
+                          className="form-control"
+                          value={bankName}
+                          onChange={handleBankNameChange}
+                        >
+                          <option value="" disabled>
+                            Select Bank
+                          </option>
+                          {allBanks.map((bank) => (
+                            <option key={bank.id} value={bank.name}>
+                              {bank.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="mb-3">
+                        <div className="col-auto">
+                          <input
+                            type="tel"
+                            className="form-control"
+                            placeholder="Account Number"
+                            value={accountNo}
+                            onChange={handleAccountNoChange}
+                          />
+                        </div>
+                      </div>
+                      <div className="mb-2">
+                        <button type="submit" className="btn btn-primary">
+                          {loadingBank ? (
+                            <Spinner
+                              as="span"
+                              animation="border"
+                              size="sm"
+                              role="status"
+                              aria-hidden="true"
+                            />
+                          ) : (
+                            "Update"
+                          )}
+                        </button>
+                      </div>
+                    </form>
                   </div>
                 </div>
               </div>

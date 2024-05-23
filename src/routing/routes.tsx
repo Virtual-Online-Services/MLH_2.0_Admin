@@ -21,6 +21,8 @@ import SportAffilates from "../pages/sports/SportAffilates";
 import SportCode from "../pages/sports/SportCode";
 import SportActivity from "../pages/sports/SportActivity";
 import InstantOperator from "../pages/instant-games/InstantOperator";
+import Bonus from "../pages/bonus/bonus";
+import SetBonus from "../pages/bonus/SetBonus";
 
 export const routes = [
   {
@@ -159,6 +161,18 @@ export const routes = [
     id: 23,
     path: "/instant-games-operator",
     element: <InstantOperator />,
+    protected: true,
+  },
+  {
+    id: 24,
+    path: "/bonus",
+    element: <Bonus />,
+    protected: true,
+  },
+  {
+    id: 25,
+    path: "/lotto-bonus",
+    element: <SetBonus />,
     protected: true,
   },
 ];

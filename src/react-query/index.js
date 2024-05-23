@@ -11,10 +11,11 @@ export { default as useGetAllAgentTransactions } from "./api-hooks/useGetAllAgen
 export { default as useGetAdmin } from "./api-hooks/useGetAdmin";
 export { default as useGetResults } from "./api-hooks/useGetResults";
 export { default as useGetSingleUserTransactions } from "./api-hooks/useGetSingleUserTransactions";
-export { default as useGetSingleUserTransactions } from "./api-hooks/useGetSingleUserTransactions";
 export { default as useGetAgentUsers } from "./api-hooks/useGetAgentUsers";
 export { default as useGetSportCode } from "./api-hooks/useGetSportCode";
 export { default as useGetAllBank } from "./api-hooks/useGetAllBank";
 export { default as useGetSportsOperator } from "./api-hooks/useGetSportsOperator";
 export { default as useGetSportActivty } from "./api-hooks/useGetSportActivty";
 export { default as useGetInstantGamesOperator } from "./api-hooks/useGetInstantGamesOperator";
+export { default as useGetBonus } from "./api-hooks/useGetBonus";
+export { default as useGetLottoBonus } from "./api-hooks/useGetLottoBonus";

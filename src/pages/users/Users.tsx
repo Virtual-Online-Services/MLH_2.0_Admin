@@ -1,32 +1,75 @@
-import { GridColDef } from "@mui/x-data-grid";
-import DataTable from "../../components/dataTable/DataTable";
 import "./users.scss";
 import Navbar from "../../components/navbar/Navbar";
 import Menu from "../../components/menu/Menu";
 import { Link } from "react-router-dom";
 import { Spinner } from "react-bootstrap";
-import useGetUsers from "../../react-query/api-hooks/useGetUsers";
+// import useGetUsers from "../../react-query/api-hooks/useGetUsers";
 import Footer from "../../components/footer/Footer";
 import moment from "moment";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DateRangePicker } from "react-date-range";
 import "react-date-range/dist/styles.css"; // main style file
 import "react-date-range/dist/theme/default.css"; // theme css file
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import SingleUser from "../../components/SingleUser/SingleUser";
-import { useQueryClient } from "@tanstack/react-query";
+// import { useQueryClient } from "@tanstack/react-query";
 
 import HTTP from "../../utils/httpClient";
+interface User {
+  id: number;
+  username: string;
+  status: number;
+}
 
 const Users = () => {
-  const { userAllDetails, isLoadingUser } = useGetUsers([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [users, setUsers] = useState<User[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const userInfo = useSelector((state) => state.auth.userInfo);
   const token = userInfo?.token?.accessToken;
   const [userDetails, setUserDetails] = useState(null);
   const [filteredTransactions, setFilteredTransactions] = useState(null);
   const [showDateRangePicker, setShowDateRangePicker] = useState(false);
-  const queryClient = useQueryClient();
+
+  const configHeaders = {
+    headers: {
+      "content-type": "application/json",
+      accept: "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+  const fetchData = () => {
+    setIsLoading(true);
+    HTTP.get(`/admin-get-users?page=${currentPage}`, {
+      ...configHeaders,
+    })
+      .then((response: any) => {
+        setUsers(response.data.data);
+      })
+      .catch((error) => {
+        // console.log(error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  const fetchDataTransact = (page: any) => {
+    setCurrentPage(page);
+  };
+
+  const renderPaginationLabel = (label: any) => {
+    switch (label) {
+      case "&laquo; Previous":
+        return "Previous";
+      case "Next &raquo;":
+        return "Next";
+      default:
+        return label;
+    }
+  };
 
   const [dateRange, setDateRange] = useState([
     {
@@ -51,52 +94,55 @@ const Users = () => {
       return;
     }
 
-    const searchUser = searchUserInput.value.toLowerCase(); // Convert to lowercase
-    const selectedStatus = selectedStatusInput.value;
+    const searchUser = searchUserInput?.value.trim();
+    const selectedStatus = selectedStatusInput?.value;
+    let queryParams = "";
 
-    const filtered = userAllDetails?.data?.data?.filter((record: any) => {
-      let isMatchingSearch = true;
-      let isMatchingStatus = true;
-      let isWithinDateRange = true;
-
-      if (searchUser !== "") {
-        isMatchingSearch = Object.values(record).some((value: any) => {
-          if (typeof value === "string") {
-            return value.toLowerCase().includes(searchUser);
-          }
-          return false;
-        });
-      }
-
-      if (selectedStatus !== "") {
-        isMatchingStatus =
-          selectedStatus === "" || selectedStatus === record.status.toString();
-      }
-
-      if (showDateRangePicker) {
-        const createdAt = new Date(record.created_at);
-        const startDate = dateRange[0].startDate;
-        const endDate = dateRange[0].endDate;
-        isWithinDateRange = createdAt >= startDate && createdAt <= endDate;
-      }
-
-      return isMatchingSearch && isMatchingStatus && isWithinDateRange;
-    });
-
-    setFilteredTransactions(filtered);
-
-    if (filtered && filtered.length > 0) {
-      toast.success(`${filtered.length} record(s) found`);
-    } else {
-      toast.error("No records found");
+    if (searchUser !== "") {
+      queryParams += `&search=${searchUser}`;
     }
+
+    if (selectedStatus !== "") {
+      queryParams += `&status=${selectedStatus}`;
+    }
+
+    if (showDateRangePicker) {
+      const startDate = moment(dateRange[0].startDate).format("YYYY-MM-DD");
+      const endDate = moment(dateRange[0].endDate).format("YYYY-MM-DD");
+      queryParams += `&start_date=${startDate}&end_date=${endDate}`;
+    }
+
+    // Reset current page to 1 when filtering
+    setCurrentPage(1);
+
+    setIsLoading(true);
+    HTTP.get(`/admin-get-users?page=${currentPage}${queryParams}`, {
+      ...configHeaders,
+    })
+      .then((response: any) => {
+        const filteredData = response.data.data;
+
+        setFilteredTransactions(filteredData || []);
+        // Display toast with the number of records found
+        const numberOfRecords = filteredData ? filteredData.length : 0;
+        if (numberOfRecords) {
+          toast.success(`Found ${numberOfRecords} records`);
+        }
+
+        if (!searchUser && !selectedStatus && !showDateRangePicker) {
+          setFilteredTransactions(null);
+        }
+      })
+      .catch((error: any) => {
+        // Handle error
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   const getStatusText = (status: any) => {
     return status === 1 ? "Active" : "Inactive";
-  };
-  const formatCreatedAt = (createdAt: any) => {
-    return moment(createdAt).format("MMM Do YYYY | hh:mm:ss a");
   };
 
   const handleEdit = async (id: number) => {
@@ -124,10 +170,7 @@ const Users = () => {
 
       const data = await response.json();
       setUserDetails(data);
-    } catch (error: any) {
-      // toast.error(error.error);
-      // Display error message or handle error appropriately
-    }
+    } catch (error: any) {}
   };
 
   const handleBlockUser = async (id: number) => {
@@ -143,14 +186,10 @@ const Users = () => {
           },
         }
       );
-      setUserDetails((prevState) => {
-        if (prevState && prevState.id === id) {
-          return { ...prevState, status: 2 };
-        }
-        return prevState;
-      });
+
       toast.success("User blocked successfully");
-      queryClient.invalidateQueries("GET_ALL_USERS");
+
+      fetchData();
     } catch (error) {
       toast.error("Failed to block user");
     }
@@ -169,135 +208,15 @@ const Users = () => {
           },
         }
       );
-      setUserDetails((prevState) => {
-        if (prevState && prevState.id === id) {
-          return { ...prevState, status: 1 };
-        }
-        return prevState;
-      });
       toast.success("User unblocked successfully");
-      queryClient.invalidateQueries("GET_ALL_USERS");
+      fetchData();
     } catch (error) {
       toast.error("Failed to unblock user");
     }
   };
-
-  const columns: GridColDef[] = [
-    {
-      field: "id",
-      type: "string",
-      headerName: "USER ID",
-      width: 80,
-      renderCell: (params) => (
-        <a
-          className="text-primary"
-          style={{ cursor: "pointer" }}
-          onClick={() => handleEdit(params.row.id)}
-        >
-          {params.value}
-        </a>
-      ),
-    },
-    {
-      field: "username",
-      type: "string",
-      headerName: "USERNAME",
-      width: 150,
-      renderCell: (params) => (
-        <a
-          //   to={`/user-profile/${params.row.id}`}
-          className="text-primary"
-          style={{ cursor: "pointer" }}
-          onClick={() => handleEdit(params.row.id)}
-        >
-          {params.value}
-        </a>
-      ),
-    },
-    {
-      field: "name",
-      type: "string",
-      headerName: "NAME",
-      width: 200,
-    },
-    {
-      field: "email",
-      type: "string",
-      headerName: "EMAIL",
-      width: 200,
-    },
-    {
-      field: "tell",
-      headerName: "PHONE",
-      width: 200,
-      type: "string",
-    },
-
-    {
-      field: "type",
-      headerName: "USER TYPE",
-      width: 180,
-      type: "string",
-    },
-    {
-      field: "wallet",
-      headerName: "WALLET",
-      width: 130,
-      type: "string",
-      valueGetter: (params) => `₦${params.value}`,
-    },
-    {
-      field: "wwallet",
-      headerName: "WIN WALLET",
-      width: 130,
-      type: "string",
-      valueGetter: (params) => `₦${params.value}`,
-    },
-    {
-      field: "status",
-      headerName: "STATUS",
-      width: 80,
-      type: "string",
-      renderCell: (params) => <span>{getStatusText(params.value)}</span>,
-    },
-    {
-      field: "created_at",
-      headerName: "SIGNUP DATE",
-      width: 250,
-      type: "string",
-      renderCell: (params) => <span>{formatCreatedAt(params.value)}</span>,
-    },
-    // {
-    //   field: "ref",
-    //   headerName: "REFERRED BY",
-    //   width: 200,
-    //   type: "string",
-    // },
-
-    {
-      field: "user_action",
-      headerName: "MODIFY",
-      width: 200,
-      renderCell: (params) => (
-        <div className="d-flex">
-          <button
-            className={`btn btn-${
-              params.row.status === 1 ? "danger" : "success"
-            }`}
-            onClick={() =>
-              params.row.status === 1
-                ? handleBlockUser(params.row.id)
-                : handleUnblockUser(params.row.id)
-            }
-          >
-            {params.row.status === 1 ? "Block" : "Unblock"}
-          </button>
-          &nbsp; &nbsp;
-        </div>
-      ),
-    },
-  ];
-
+  useEffect(() => {
+    fetchData();
+  }, [currentPage]);
   return (
     <>
       <div>
@@ -321,7 +240,7 @@ const Users = () => {
               </div>
 
               <div>
-                {isLoadingUser ? (
+                {isLoading ? (
                   <div className="spinner text-center mt-5">
                     <Spinner
                       as="span"
@@ -331,7 +250,7 @@ const Users = () => {
                       aria-hidden="true"
                     />
                   </div>
-                ) : userAllDetails?.data?.length === 0 ? (
+                ) : users?.data?.length === 0 ? (
                   <div className="d-flex justify-content-center text-center p-5">
                     <div className="hidden-xs hidden-sm mx-auto">
                       <div
@@ -421,15 +340,125 @@ const Users = () => {
                         </form>
                       </div>
                     </div>
-                    <p className="mt-4">
-                      {userAllDetails?.data?.total} Records
-                    </p>
-                    <DataTable
-                      slug="users"
-                      columns={columns}
-                      // rows={userDetails?.data}
-                      rows={filteredTransactions || userAllDetails?.data?.data}
-                    />
+                    <p className="mt-4">{users?.total} Records</p>
+
+                    <div>
+                      <div className="table-responsive card shadow">
+                        <table className="table table-express app__transaction-web table-hover mt-4">
+                          <tbody>
+                            <tr>
+                              <th className="fw-bolder">USER ID</th>
+                              <th className="fw-bolder">USERNAME</th>
+                              <th className="fw-bolder">NAME</th>
+                              <th className="fw-bolder">EMAIL</th>
+                              <th className="fw-bolder">USER TYPE</th>
+                              <th className="fw-bolder">WALLET</th>
+                              <th className="fw-bolder">WIN WALLET</th>
+                              <th className="fw-bolder">STATUS</th>
+                              <th className="fw-bolder">SIGNUP DATE</th>
+                              <th className="fw-bolder">MODIFY</th>
+                            </tr>
+                          </tbody>
+
+                          <tbody>
+                            <>
+                              {(filteredTransactions || users?.data)
+                                ?.sort(
+                                  (a: any, b: any) =>
+                                    new Date(b?.created_at) -
+                                    new Date(a?.created_at)
+                                )
+                                .map((record: any, index: any) => {
+                                  const formattedDate = moment
+                                    .utc(
+                                      record?.date || record?.created_at,
+                                      "YYYY-MM-DD HH:mm:ss"
+                                    )
+                                    .local()
+                                    .format("Do MMM YYYY | h:mm:ssA");
+
+                                  return (
+                                    <tr key={index}>
+                                      <td
+                                        className="text-primary"
+                                        style={{ cursor: "pointer" }}
+                                        onClick={() => handleEdit(record?.id)}
+                                      >
+                                        {record?.id}
+                                      </td>
+                                      <td
+                                        className="text-primary"
+                                        style={{ cursor: "pointer" }}
+                                        onClick={() => handleEdit(record?.id)}
+                                      >
+                                        {record?.username}
+                                      </td>
+                                      <td>{record?.name}</td>
+                                      <td>{record?.email}</td>
+                                      <td>{record?.type}</td>
+                                      <td>₦{record?.wallet}</td>
+                                      <td>₦{record?.wwallet}</td>
+                                      <td>{getStatusText(record?.status)}</td>
+                                      <td>{formattedDate}</td>
+                                      <td>
+                                        {" "}
+                                        <div className="d-flex">
+                                          <button
+                                            className={`btn btn-${
+                                              record?.status === 1
+                                                ? "danger"
+                                                : "success"
+                                            }`}
+                                            onClick={() =>
+                                              record?.status === 1
+                                                ? handleBlockUser(record?.id)
+                                                : handleUnblockUser(record?.id)
+                                            }
+                                          >
+                                            {record?.status === 1
+                                              ? "Block"
+                                              : "Unblock"}
+                                          </button>
+                                          &nbsp; &nbsp;
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                            </>
+                          </tbody>
+                        </table>
+
+                        <nav aria-label="Page navigation example">
+                          <ul className="pagination">
+                            {users?.links?.map((link: any, index: any) => {
+                              return (
+                                <>
+                                  <div key={index}>
+                                    <li
+                                      className={`page-item ${
+                                        link?.active ? "active" : ""
+                                      }`}
+                                    >
+                                      <a
+                                        className="page-link"
+                                        href={link?.url}
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          fetchDataTransact(link?.label);
+                                        }}
+                                      >
+                                        {renderPaginationLabel(link?.label)}
+                                      </a>
+                                    </li>
+                                  </div>
+                                </>
+                              );
+                            })}
+                          </ul>
+                        </nav>
+                      </div>
+                    </div>
                   </>
                 )}
 
