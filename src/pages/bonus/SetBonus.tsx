@@ -22,6 +22,9 @@ const SetBonus = () => {
   const formatDate = (timestamp: any) => {
     return moment(timestamp).format("Do MMM YYYY");
   };
+  const formatEndDate = (timestamp: any) => {
+    return moment(timestamp).format("Do MMM YYYY");
+  };
   const columns: GridColDef[] = [
     {
       field: "id",
@@ -95,10 +98,16 @@ const SetBonus = () => {
       valueFormatter: (params) => `₦${params.value} `,
     },
     {
-      field: "created_at",
+      field: "updated_at",
       headerName: "DATE CREATED",
       width: 200,
       valueFormatter: (params) => formatDate(params.value),
+    },
+    {
+      field: "end_date",
+      headerName: "END DATE",
+      width: 200,
+      valueFormatter: (params) => formatEndDate(params.value),
     },
   ];
 

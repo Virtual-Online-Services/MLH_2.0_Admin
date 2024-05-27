@@ -40,7 +40,7 @@ const LottoBonusModal = ({ handleClose }) => {
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
-      "Content-Type": "multipart/form-data",
+      "Content-Type": "application/json",
       Accept: "application/json",
     },
   };
@@ -109,25 +109,33 @@ const LottoBonusModal = ({ handleClose }) => {
   const submitForm = (data) => {
     setIsLoading(true);
 
-    const formData = new FormData();
+    const payload = {};
+
+    const appendString = (key, value) => {
+      if (value) {
+        payload[key] = String(value);
+      }
+    };
 
     if (data.bonus_type === "1" || data.bonus_type === "2") {
-      formData.append("operator", data.operator);
-      formData.append("bonus_type", data.bonus_type);
-      formData.append("stake", data.stake);
-      formData.append("percentage", data.percentage);
-      formData.append("duration", data.duration);
-      formData.append("wallet", data.wallet);
-      formData.append("game", data.game);
-    } else if (data.bonus_type === "3" || data.bonus_type === "4") {
-      formData.append("bonus_type", data.bonus_type);
-      formData.append("stake", data.stake);
-      formData.append("duration", data.duration);
-      formData.append("wallet", data.wallet);
-      formData.append("bonus_amount", data.bonus_amount);
+      appendString("bonus_type", data.bonus_type);
+      appendString("operator", data.operator);
+      appendString("stake", data.stake);
+      appendString("duration", data.duration);
+      appendString("percentage", data.percentage);
+      appendString("wallet", data.wallet);
+      appendString("game", data.game);
     }
 
-    HTTP.post("/lotto-bonus", formData, config)
+    if (data.bonus_type === "3" || data.bonus_type === "4") {
+      appendString("bonus_type", data.bonus_type);
+      appendString("bonus_amount", data.bonus_amount);
+      appendString("duration", data.duration);
+      appendString("wallet", data.wallet);
+      appendString("stake", data.stake);
+    }
+
+    HTTP.post("/lotto-bonus", JSON.stringify(payload), config)
       .then((response: any) => {
         setIsLoading(false);
         toast.success("Lotto Bonus updated successfully");
@@ -141,7 +149,7 @@ const LottoBonusModal = ({ handleClose }) => {
         setIsLoading(false);
 
         if (error) {
-          toast.error(error.data.error);
+          toast.error(error.response.data.error);
         } else {
           toast.error("An error occurred.");
         }
@@ -158,11 +166,7 @@ const LottoBonusModal = ({ handleClose }) => {
             </span>
             <br />
 
-            <form
-              className="mt-4"
-              encType="multipart/form-data"
-              onSubmit={handleSubmit(submitForm)}
-            >
+            <form className="mt-4" onSubmit={handleSubmit(submitForm)}>
               <div className="mb-3">
                 <select
                   className="form-control mb-2 p-3"
@@ -199,11 +203,7 @@ const LottoBonusModal = ({ handleClose }) => {
                       <option value="27">Baba Ijebu</option>
                       <option value="45">Lottomania</option>
                       <option value="57">Set Lotto</option>
-                      {/* <option value="42">Golden Chance</option> */}
                     </select>
-                    {/* <p className="text-danger text-capitalize">
-                      This field is optional
-                    </p> */}
                   </div>
                   <div className="mb-3">
                     <input
@@ -213,10 +213,6 @@ const LottoBonusModal = ({ handleClose }) => {
                       placeholder="Stake"
                       {...register("stake")}
                     />
-
-                    {/* <p className="text-danger text-capitalize">
-                      This field is optional
-                    </p> */}
                   </div>
                   <div className="mb-3">
                     <input
@@ -226,20 +222,18 @@ const LottoBonusModal = ({ handleClose }) => {
                       placeholder="Percentage"
                       {...register("percentage")}
                     />
-                    {/* <p className="text-danger text-capitalize">
-                      This field is optional
-                    </p> */}
                   </div>
                   <div className="mb-3">
-                    <input
-                      type="text"
+                    <select
                       className="form-control mb-2 p-3"
-                      placeholder="Duration"
                       {...register("duration")}
-                    />
-                    {/* <p className="text-danger text-capitalize">
-                      This field is optional
-                    </p> */}
+                    >
+                      <option value="">Select Duration</option>
+                      <option value="24hrs">24hrs</option>
+                      <option value="48hrs">48hrs</option>
+                      <option value="1 week">1 week</option>
+                      <option value="1 month">1 month</option>
+                    </select>
                   </div>
                   <div className="mb-3">
                     <input
@@ -249,9 +243,6 @@ const LottoBonusModal = ({ handleClose }) => {
                       placeholder="Wallet"
                       {...register("wallet")}
                     />
-                    {/* <p className="text-danger text-capitalize">
-                      This field is optional
-                    </p> */}
                   </div>
                   <div className="mb-3">
                     <select
@@ -265,9 +256,6 @@ const LottoBonusModal = ({ handleClose }) => {
                         </option>
                       ))}
                     </select>
-                    {/* <p className="text-danger text-capitalize">
-                      This field is optional
-                    </p> */}
                   </div>
                 </>
               )}
@@ -290,12 +278,16 @@ const LottoBonusModal = ({ handleClose }) => {
                   </div>
 
                   <div className="mb-3">
-                    <input
-                      type="text"
+                    <select
                       className="form-control mb-2 p-3"
-                      placeholder="Duration"
                       {...register("duration")}
-                    />
+                    >
+                      <option value="">Select Duration</option>
+                      <option value="24hrs">24hrs</option>
+                      <option value="48hrs">48hrs</option>
+                      <option value="1 week">1 week</option>
+                      <option value="1 month">1 month</option>
+                    </select>
                     {errors.duration && (
                       <p className="text-danger text-capitalize">
                         {errors.duration.message}
