@@ -10,7 +10,6 @@ import { useQueryClient } from "@tanstack/react-query";
 
 const schema = yup.object().shape({
   name: yup.string().required("This is a required field"),
-  //   del: yup.string().required("This is a required field"),
   link: yup.string().required("This is a required field"),
   logo: yup.mixed().required("This is a required field"),
 });
@@ -31,131 +30,131 @@ const UploadInstant = ({ handleClose }) => {
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
-      "Content-Type": "multipart/form-data",
+      "Content-Type": "application/json",
       Accept: "application/json",
     },
   };
   const queryClient = useQueryClient();
 
-  const submitForm = (data: any) => {
+  const convertFileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  const submitForm = async (data) => {
     setIsLoading(true);
 
-    const formData = new FormData();
-    formData.append("name", data.name);
-    formData.append("link", data.link);
-    // formData.append("play", data.play);
-    formData.append("logo", data.logo[0]);
+    try {
+      const base64Logo = await convertFileToBase64(data.logo[0]);
 
-    HTTP.post("/add-instantgame", formData, config)
-      .then((response: any) => {
-        setIsLoading(false);
-        toast.success(response.data.message);
-        handleClose();
-        if (response.data.message) {
-          queryClient.invalidateQueries("GET_INSTANT_OPERATOR");
-        }
-      })
-      .catch((error: any) => {
-        setIsLoading(false);
+      const payload = {
+        name: data.name,
+        link: data.link,
+        logo: base64Logo, // Send the base64 string
+      };
 
-        if (
-          error.response &&
-          error.response.data &&
-          error.response.data.errors
-        ) {
-          const bannerError = error.response.data.errors.logo[0];
-          toast.error(bannerError);
-        } else {
-          toast.error("An error occurred.");
-        }
-      });
+      const response = await HTTP.post("/add-instantgame", payload, config);
+      setIsLoading(false);
+      toast.success(response.data.message);
+      handleClose();
+      if (response.data.message) {
+        queryClient.invalidateQueries("GET_INSTANT_OPERATOR");
+      }
+    } catch (error) {
+      setIsLoading(false);
+
+      if (error.response && error.response.data && error.response.data.errors) {
+        const bannerError = error.response.data.errors.logo[0];
+        toast.error(bannerError);
+      } else {
+        toast.error("An error occurred.");
+      }
+    }
   };
 
   return (
     <div>
       <div>
-        <div>
-          <div className="container">
-            <span>
-              <strong className="text-dark">
-                Upload Instant Operator Details
-              </strong>
-            </span>
-            <br />
+        <div className="container">
+          <span>
+            <strong className="text-dark">
+              Upload Instant Operator Details
+            </strong>
+          </span>
+          <br />
 
-            <form
-              className="mt-4"
-              encType="multipart/form-data"
-              onSubmit={handleSubmit(submitForm)}
+          <form className="mt-4" onSubmit={handleSubmit(submitForm)}>
+            <div className="mb-3">
+              <input
+                type="text"
+                className="form-control mb-2 p-3"
+                placeholder="Name"
+                {...register("name", {
+                  required: "Required",
+                })}
+              />
+              {errors.name && (
+                <p className="text-danger text-capitalize">
+                  {errors.name.message}
+                </p>
+              )}
+            </div>
+
+            <div className="mb-3">
+              <input
+                type="text"
+                className="form-control mb-2 p-3"
+                placeholder="Link"
+                {...register("link", {
+                  required: "Required",
+                })}
+              />
+              {errors.link && (
+                <p className="text-danger text-capitalize">
+                  {errors.link.message}
+                </p>
+              )}
+            </div>
+
+            <div className="mb-3">
+              <input
+                type="file"
+                className="form-control mb-2 p-3"
+                {...register("logo", {
+                  required: "Required",
+                })}
+                name="logo"
+              />
+              {errors.logo && (
+                <p className="text-danger text-capitalize">
+                  {errors.logo.message}
+                </p>
+              )}
+            </div>
+
+            <Button
+              type="submit"
+              className="w-100 p-3"
+              style={{ background: "#27AAE1" }}
+              disabled={isLoading}
             >
-              <div className="mb-3">
-                <input
-                  type="text"
-                  className="form-control mb-2 p-3"
-                  placeholder="Name"
-                  {...register("name", {
-                    required: "Required",
-                  })}
+              {isLoading ? (
+                <Spinner
+                  as="span"
+                  animation="border"
+                  size="lg"
+                  role="status"
+                  aria-hidden="true"
                 />
-                {errors.name && (
-                  <p className="text-danger text-capitalize">
-                    {errors.name.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="mb-3">
-                <input
-                  type="text"
-                  className="form-control mb-2 p-3"
-                  placeholder="Link"
-                  {...register("link", {
-                    required: "Required",
-                  })}
-                />
-                {errors.link && (
-                  <p className="text-danger text-capitalize">
-                    {errors.link.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="mb-3">
-                <input
-                  type="file"
-                  className="form-control mb-2 p-3"
-                  {...register("logo", {
-                    required: "Required",
-                  })}
-                  name="logo"
-                />
-                {errors.logo && (
-                  <p className="text-danger text-capitalize">
-                    {errors.logo.message}
-                  </p>
-                )}
-              </div>
-
-              <Button
-                type="submit"
-                className="w-100 p-3"
-                style={{ background: "#27AAE1" }}
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <Spinner
-                    as="span"
-                    animation="border"
-                    size="lg"
-                    role="status"
-                    aria-hidden="true"
-                  />
-                ) : (
-                  " Proceed"
-                )}
-              </Button>
-            </form>
-          </div>
+              ) : (
+                " Proceed"
+              )}
+            </Button>
+          </form>
         </div>
       </div>
     </div>

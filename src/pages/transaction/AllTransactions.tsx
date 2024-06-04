@@ -321,8 +321,8 @@ const AllTransactions = () => {
                                 .map((record: any, index: any) => {
                                   const formattedDate = moment
                                     .utc(
-                                      record?.date || record?.created_at,
-                                      "YYYY-MM-DD HH:mm:ss"
+                                      record?.drawDate || record?.drawDate,
+                                      "DD-MM-YYYY HH:mm"
                                     )
                                     .local()
                                     .format("Do MMM YYYY | h:mm:ssA");

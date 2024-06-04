@@ -214,7 +214,9 @@ const AgentUser = ({ agentDetails, setAgentDetails }) => {
       >
         <Modal.Header closeButton>
           <Modal.Title className="fw-bolder text-dark">
-            Agent User Information
+            {/* Agent User Information */}
+            {agentDetails?.data?.first_name} {agentDetails?.data?.last_name}{" "}
+            Information
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -411,7 +413,7 @@ const AgentUser = ({ agentDetails, setAgentDetails }) => {
                         }}
                       >
                         <span className="fw-bolder text-dark">
-                          Deposit Balance:
+                          Deposit Wallet Balance:
                         </span>{" "}
                         <span className="text-dark">
                           ₦{agentDetails?.data?.wallet}
@@ -433,64 +435,6 @@ const AgentUser = ({ agentDetails, setAgentDetails }) => {
                       </p>
                       <hr style={{ backgroundColor: "black" }} />
 
-                      <p
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <span className="fw-bolder text-dark">
-                          Green Lotto Bonus Balance:
-                        </span>{" "}
-                        <span className="text-dark">
-                          ₦{agentBonus?.green_lotto_bonus_wallet}
-                        </span>
-                      </p>
-                      <hr style={{ backgroundColor: "black" }} />
-                      <p
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <span className="fw-bolder text-dark">
-                          Set Lotto Bonus Balance:
-                        </span>{" "}
-                        <span className="text-dark">
-                          ₦{agentBonus?.lotto_nigeria_bonus_wallet}
-                        </span>
-                      </p>
-                      <hr style={{ backgroundColor: "black" }} />
-                      <p
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <span className="fw-bolder text-dark">
-                          Lotto Mania Bonus Balance:
-                        </span>{" "}
-                        <span className="text-dark">
-                          ₦{agentBonus?.lottomania_bonus_wallet}
-                        </span>
-                      </p>
-                      <hr style={{ backgroundColor: "black" }} />
-                      <p
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <span className="fw-bolder text-dark">
-                          5/90 Mania Bonus Balance:
-                        </span>{" "}
-                        <span className="text-dark">
-                          {agentBonus
-                            ? `₦${agentBonus["590_bonus_wallet"]}`
-                            : ""}
-                        </span>
-                      </p>
-                      <hr style={{ backgroundColor: "black" }} />
                       <p
                         style={{
                           display: "flex",

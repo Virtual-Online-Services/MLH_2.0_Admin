@@ -23,6 +23,7 @@ import SportActivity from "../pages/sports/SportActivity";
 import InstantOperator from "../pages/instant-games/InstantOperator";
 import Bonus from "../pages/bonus/bonus";
 import SetBonus from "../pages/bonus/SetBonus";
+import PlayHistory from "../pages/play-history/PlayHistory";
 
 export const routes = [
   {
@@ -173,6 +174,12 @@ export const routes = [
     id: 25,
     path: "/lotto-bonus",
     element: <SetBonus />,
+    protected: true,
+  },
+  {
+    id: 25,
+    path: "/play-history",
+    element: <PlayHistory />,
     protected: true,
   },
 ];

@@ -92,7 +92,7 @@ export const menu = [
       {
         id: 8,
         title: "Play History",
-        url: "#",
+        url: "/play-history",
         icon: "fa fa-play-circle-o",
       },
       {

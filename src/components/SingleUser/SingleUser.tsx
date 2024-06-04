@@ -263,7 +263,8 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
       >
         <Modal.Header closeButton>
           <Modal.Title className="fw-bolder text-dark">
-            User Information
+            {/* User Information */}
+            {userDetails?.data?.name} Information
           </Modal.Title>
 
           {/* <button className="btn btn-primary">Reset Password</button> */}
