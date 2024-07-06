@@ -11,7 +11,7 @@ import { useQueryClient } from "@tanstack/react-query";
 const schema = yup.object().shape({
   name: yup.string().required("This is a required field"),
   link: yup.string().required("This is a required field"),
-  logo: yup.mixed().required("This is a required field"),
+  pix: yup.mixed().required("This is a required field"),
 });
 
 const UploadInstant = ({ handleClose }) => {
@@ -49,15 +49,19 @@ const UploadInstant = ({ handleClose }) => {
     setIsLoading(true);
 
     try {
-      const base64Logo = await convertFileToBase64(data.logo[0]);
+      const base64Logo = await convertFileToBase64(data.pix[0]);
 
       const payload = {
         name: data.name,
         link: data.link,
-        logo: base64Logo, // Send the base64 string
+        pix: base64Logo, // Send the base64 string
       };
 
-      const response = await HTTP.post("/add-instantgame", payload, config);
+      const response = await HTTP.post(
+        "/add-instantgame-operator",
+        payload,
+        config
+      );
       setIsLoading(false);
       toast.success(response.data.message);
       handleClose();
@@ -68,7 +72,7 @@ const UploadInstant = ({ handleClose }) => {
       setIsLoading(false);
 
       if (error.response && error.response.data && error.response.data.errors) {
-        const bannerError = error.response.data.errors.logo[0];
+        const bannerError = error.response.data.errors.pix[0];
         toast.error(bannerError);
       } else {
         toast.error("An error occurred.");
@@ -124,14 +128,14 @@ const UploadInstant = ({ handleClose }) => {
               <input
                 type="file"
                 className="form-control mb-2 p-3"
-                {...register("logo", {
+                {...register("pix", {
                   required: "Required",
                 })}
-                name="logo"
+                name="pix"
               />
-              {errors.logo && (
+              {errors.pix && (
                 <p className="text-danger text-capitalize">
-                  {errors.logo.message}
+                  {errors.pix.message}
                 </p>
               )}
             </div>

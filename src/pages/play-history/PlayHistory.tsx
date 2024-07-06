@@ -6,18 +6,20 @@ import HTTP from "../../utils/httpClient";
 import Footer from "../../components/footer/Footer";
 import Menu from "../../components/menu/Menu";
 import Navbar from "../../components/navbar/Navbar";
-import { Spinner } from "react-bootstrap";
+import { Button, Modal, Spinner } from "react-bootstrap";
 import SingleUser from "../../components/SingleUser/SingleUser";
 import moment from "moment";
+import { FaEye } from "react-icons/fa";
 // import moment from "moment";
 
 const PlayHistory = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [history, setHistory] = useState([]);
-  const [selectedOperator, setSelectedOperator] = useState("");
+  const [selectedOperator, setSelectedOperator] = useState(26);
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredTransactions, setFilteredTransactions] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
   const userInfo = useSelector((state) => state.auth.userInfo);
   const token = userInfo?.token?.accessToken;
 
@@ -139,6 +141,13 @@ const PlayHistory = () => {
       setUserDetails(data);
     } catch (error: any) {}
   };
+  const handleViewTransaction = (transaction) => {
+    setSelectedTransaction(transaction);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedTransaction(null);
+  };
 
   const transactionsToRender = filteredTransactions?.data || history?.data;
 
@@ -245,6 +254,7 @@ const PlayHistory = () => {
                         <th>Game Type</th>
                         <th>Draw Date</th>
                         <th>Status</th>
+                        <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -261,7 +271,7 @@ const PlayHistory = () => {
                             <td>{item?.username}</td>
 
                             <td>{operatorMap[selectedOperator]}</td>
-                            <td>{item?.amount}</td>
+                            <td>₦{item?.amount}</td>
                             <td>
                               {selectedOperator == "26" ||
                               selectedOperator == "45"
@@ -304,6 +314,14 @@ const PlayHistory = () => {
                                 : ""}
                             </td>
                             <td>{item?.status}</td>
+                            <td>
+                              <Button
+                                variant="light"
+                                onClick={() => handleViewTransaction(item)}
+                              >
+                                <FaEye />
+                              </Button>
+                            </td>
                           </tr>
                         );
                       })}
@@ -344,6 +362,59 @@ const PlayHistory = () => {
           </div>
         </div>
         <SingleUser userDetails={userDetails} setUserDetails={setUserDetails} />
+        {selectedTransaction && (
+          <Modal size="md" centered show={true} onHide={handleCloseModal}>
+            <Modal.Header closeButton>
+              <Modal.Title>{operatorMap[selectedOperator]} Details</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p>User ID: {selectedTransaction?.user}</p>
+              <p>Username: {selectedTransaction?.username}</p>
+              <p>Operator: {operatorMap[selectedOperator]}</p>
+              <p>Stake: ₦{selectedTransaction?.amount}</p>
+              <p>Number Played: {selectedTransaction?.num}</p>
+              <p>Lines: {selectedTransaction?.line}</p>
+              <p>
+                Game:{" "}
+                {selectedOperator == "26" || selectedOperator == "45"
+                  ? selectedTransaction?.GameName
+                  : selectedOperator == "28" || selectedOperator == "43"
+                  ? selectedTransaction?.drawname
+                  : selectedOperator == "57"
+                  ? selectedTransaction?.drawAlias
+                  : ""}
+              </p>
+              <p>
+                Ticket Id:{" "}
+                {selectedOperator == "26" || selectedOperator == "45"
+                  ? selectedTransaction?.TSN
+                  : selectedOperator == "28" || selectedOperator == "43"
+                  ? selectedTransaction?.TikcetId
+                  : selectedOperator == "57"
+                  ? selectedTransaction?.wagerID
+                  : ""}
+              </p>
+              <p>Game Type: {selectedTransaction?.mgametype}</p>
+              <p>
+                Draw Date:{" "}
+                {selectedOperator == "26" || selectedOperator == "45"
+                  ? moment(selectedTransaction?.DrawTime).format(
+                      "DD MMM, YYYY h:mma"
+                    )
+                  : selectedOperator == "28" || selectedOperator == "43"
+                  ? moment(selectedTransaction?.drawdate).format(
+                      "DD MMM, YYYY h:mma"
+                    )
+                  : selectedOperator == "57"
+                  ? moment(selectedTransaction?.drawDate).format(
+                      "DD MMM, YYYY h:mma"
+                    )
+                  : ""}
+              </p>
+              <p>Status: {selectedTransaction?.status}</p>
+            </Modal.Body>
+          </Modal>
+        )}
         <Footer />
       </div>
     </div>
