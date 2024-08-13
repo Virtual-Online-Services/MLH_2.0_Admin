@@ -131,6 +131,7 @@ const LottoBonusModal = ({ handleClose }) => {
       appendString("bonus_type", data.bonus_type);
       appendString("bonus_amount", data.bonus_amount);
       appendString("duration", data.duration);
+      appendString("percentage", data.percentage);
       appendString("wallet", data.wallet);
       appendString("stake", data.stake);
     }
@@ -275,6 +276,15 @@ const LottoBonusModal = ({ handleClose }) => {
                         {errors.stake.message}
                       </p>
                     )}
+                  </div>
+                  <div className="mb-3">
+                    <input
+                      type="number"
+                      min={1}
+                      className="form-control mb-2 p-3"
+                      placeholder="Percentage"
+                      {...register("percentage")}
+                    />
                   </div>
 
                   <div className="mb-3">

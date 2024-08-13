@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 
 const SingleAdmin = ({ adminDetails, setAdminDetails }) => {
   const [editedDetails, setEditedDetails] = useState({});
+  const [selectedPermissions, setSelectedPermissions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const userInfo = useSelector((state) => state.auth.userInfo);
   const token = userInfo?.token?.accessToken;
@@ -20,13 +21,27 @@ const SingleAdmin = ({ adminDetails, setAdminDetails }) => {
     }));
   };
 
+  const handlePermissionChange = (e) => {
+    const { value, checked } = e.target;
+    setSelectedPermissions((prevPermissions) => {
+      if (checked) {
+        return [...new Set([...prevPermissions, value])]; // Add value only if it's not already in the array
+      } else {
+        return prevPermissions.filter((perm) => perm !== value); // Remove value if unchecked
+      }
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     try {
       const response = await HTTP.post(
         `/update-admin/${adminDetails.data.id}`,
-        editedDetails,
+        {
+          ...editedDetails,
+          perm: selectedPermissions, // Ensure unique permissions are sent
+        },
         {
           headers: {
             "Content-Type": "application/json",
@@ -35,9 +50,9 @@ const SingleAdmin = ({ adminDetails, setAdminDetails }) => {
           },
         }
       );
-      toast.success(response.status);
+      toast.success(response.data.status);
       setAdminDetails(null);
-      // Invalidate the query cache for admin details
+
       queryClient.invalidateQueries("GET_ADMIN_DETAILS");
     } catch (error) {
       console.error("Error editing admin:", error);
@@ -47,6 +62,7 @@ const SingleAdmin = ({ adminDetails, setAdminDetails }) => {
       setIsLoading(false);
     }
   };
+
   const permissions = [
     { value: "advert", label: "Adverts" },
     { value: "operator", label: "Operators" },
@@ -57,11 +73,10 @@ const SingleAdmin = ({ adminDetails, setAdminDetails }) => {
     { value: "user_action", label: "User action" },
     { value: "transaction", label: "Transactions" },
     { value: "wwallet", label: "Withdrawals" },
-    { value: "pin", label: "Pins" },
     { value: "message", label: "Message" },
-    { value: "sport", label: "Sport" },
-    { value: "instantgame", label: "Instant Game" },
-    { value: "casinogame", label: "Casino Game" },
+    { value: "operator", label: "Sport" },
+    { value: "game", label: "Instant Games" },
+    { value: "game", label: "Casino Games" },
     { value: "forecast", label: "Pro-Forecast" },
   ];
 
@@ -88,7 +103,7 @@ const SingleAdmin = ({ adminDetails, setAdminDetails }) => {
                       type="text"
                       name="name"
                       className="form-control mb-3"
-                      value={editedDetails.name || adminDetails.data.name}
+                      value={editedDetails?.name || adminDetails?.data.name}
                       onChange={handleChange}
                     />
                   </p>
@@ -101,8 +116,18 @@ const SingleAdmin = ({ adminDetails, setAdminDetails }) => {
                       name="username"
                       className="form-control mb-3"
                       value={
-                        editedDetails.username || adminDetails.data.username
+                        editedDetails?.username || adminDetails?.data?.username
                       }
+                      onChange={handleChange}
+                    />
+                  </p>
+                  <p>
+                    <label className="fw-bolder text-dark mb-3">Email:</label>
+                    <input
+                      type="text"
+                      name="email"
+                      className="form-control mb-3"
+                      value={editedDetails?.email || adminDetails?.data?.email}
                       onChange={handleChange}
                     />
                   </p>
@@ -123,7 +148,7 @@ const SingleAdmin = ({ adminDetails, setAdminDetails }) => {
                     </div>
                     {permissions.map((permission, index) => (
                       <div
-                        key={permission.value}
+                        key={permission.value + index}
                         className="col-3 p-2"
                         style={{ flex: "0 0 25%" }}
                       >
@@ -132,10 +157,11 @@ const SingleAdmin = ({ adminDetails, setAdminDetails }) => {
                             <input
                               type="checkbox"
                               name="perm[]"
-                              value={
-                                editedDetails.perm || adminDetails.data.perm
-                              }
-                              onChange={handleChange}
+                              value={permission.value}
+                              checked={selectedPermissions.includes(
+                                permission.value
+                              )}
+                              onChange={handlePermissionChange}
                             />
                             {permission.label}
                           </label>

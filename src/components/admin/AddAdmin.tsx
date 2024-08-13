@@ -99,7 +99,7 @@ const AddAdmin = ({ handleClose }) => {
         <div>
           <div className="container">
             <span>
-              <strong className="text-dark">Upload Admin Details</strong>
+              <strong className="text-dark">Create Admin</strong>
             </span>
             <br />
 

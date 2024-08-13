@@ -173,9 +173,9 @@ const PlayHistory = () => {
             </div>
 
             <div>
-              <div className="mb-3">
+              <div className="mb-3 position-relative">
                 <select
-                  className="form-control w-25 mb-2 mt-4"
+                  className="form-select w-25 mb-2 mt-4"
                   value={selectedOperator}
                   onChange={(e) => setSelectedOperator(e.target.value)}
                 >
@@ -187,6 +187,10 @@ const PlayHistory = () => {
                   <option value="45">Lottomania</option>
                   <option value="57">Set Lotto</option>
                 </select>
+                <i
+                  className="bi bi-chevron-down position-absolute"
+                  style={{ right: "16px", top: "calc(50% - 0.5em)" }}
+                ></i>
               </div>
             </div>
 
@@ -372,6 +376,7 @@ const PlayHistory = () => {
               <p>Username: {selectedTransaction?.username}</p>
               <p>Operator: {operatorMap[selectedOperator]}</p>
               <p>Stake: ₦{selectedTransaction?.amount}</p>
+              <p>Amount Won: ₦{selectedTransaction?.WinAmount}</p>
               <p>Number Played: {selectedTransaction?.num}</p>
               <p>Lines: {selectedTransaction?.line}</p>
               <p>

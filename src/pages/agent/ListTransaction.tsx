@@ -28,6 +28,7 @@ const ListTransaction = () => {
   const [agentDetails, setAgentDetails] = useState(null);
   const [filteredTransactions, setFilteredTransactions] = useState(null);
   const [showDateRangePicker, setShowDateRangePicker] = useState(false);
+  const [showExportButton, setShowExportButton] = useState(false);
 
   const configHeaders = {
     headers: {
@@ -85,28 +86,27 @@ const ListTransaction = () => {
   const handleFilter = () => {
     const searchUserInput = document.getElementById("searchUser");
     const selectedStatusInput = document.getElementById("status");
+    const selectedDateRange = document.getElementById("searchDateRange");
 
-    if (!searchUserInput || !selectedStatusInput) {
+    if (!searchUserInput || !selectedStatusInput || !selectedDateRange) {
       toast.error("Search input or status input not found");
       return;
     }
 
     const searchUser = searchUserInput?.value.trim();
     const selectedStatus = selectedStatusInput?.value;
+    const selectedDate = selectedDateRange?.value;
     let queryParams = "";
 
     if (searchUser !== "") {
       queryParams += `&search=${searchUser}`;
-    }
-
-    if (selectedStatus !== "") {
-      queryParams += `&status=${selectedStatus}`;
-    }
-
-    if (showDateRangePicker) {
+    } else if (selectedStatus !== "") {
+      queryParams += `&search=${selectedStatus}`;
+    } else if (selectedDate !== "") {
       const startDate = moment(dateRange[0].startDate).format("YYYY-MM-DD");
       const endDate = moment(dateRange[0].endDate).format("YYYY-MM-DD");
       queryParams += `&start_date=${startDate}&end_date=${endDate}`;
+      // queryParams += `&search=${selectedDate}`;
     }
 
     // Reset current page to 1 when filtering
@@ -121,17 +121,24 @@ const ListTransaction = () => {
 
         setFilteredTransactions(filteredData || []);
         // Display toast with the number of records found
-        const numberOfRecords = filteredData ? filteredData.length : 0;
-        if (numberOfRecords) {
-          toast.success(`Found ${numberOfRecords} records`);
+        // const numberOfRecords = filteredData ? filteredData.length : 0;
+        if (response) {
+          toast.success(`Found ${response.data.data.total} records`);
         }
 
+        // if (!searchUser && !selectedStatus && !showDateRangePicker) {
+        //   setFilteredTransactions(null);
+        // }
         if (!searchUser && !selectedStatus && !showDateRangePicker) {
           setFilteredTransactions(null);
+          setShowExportButton(false);
+        } else {
+          setShowExportButton(true);
         }
       })
       .catch((error: any) => {
         // Handle error
+        setFilteredTransactions([]);
       })
       .finally(() => {
         setIsLoading(false);
@@ -165,10 +172,68 @@ const ListTransaction = () => {
       setAgentDetails(data);
     } catch (error: any) {}
   };
+
+  const exportToExcel = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Get the search user input element
+    const searchUserInput = document.getElementById(
+      "searchUser"
+    ) as HTMLInputElement | null;
+
+    // Get the selected status input element
+    const selectedStatusInput = document.getElementById(
+      "status"
+    ) as HTMLSelectElement | null;
+
+    if (!searchUserInput || !selectedStatusInput) {
+      toast.error("Search input or status input not found");
+      return;
+    }
+
+    const searchUser = searchUserInput.value.trim();
+    const selectedStatus = selectedStatusInput.value;
+
+    let queryParams = [];
+
+    // Construct the query parameters
+    if (searchUser !== "") {
+      queryParams.push(`search=${encodeURIComponent(searchUser)}`);
+    }
+
+    if (selectedStatus !== "") {
+      queryParams.push(`status=${encodeURIComponent(selectedStatus)}`);
+    }
+
+    if (dateRange && dateRange[0]) {
+      const startDate = moment(dateRange[0].startDate).format("YYYY-MM-DD");
+      const endDate = moment(dateRange[0].endDate).format("YYYY-MM-DD");
+      queryParams.push(`start_date=${startDate}`);
+      queryParams.push(`end_date=${endDate}`);
+    }
+
+    // If no filters are applied, prevent export and show error
+    if (queryParams.length === 0) {
+      toast.error("Please enter at least one filter to export.");
+      return;
+    }
+
+    const queryString = queryParams.join("&");
+    const exportUrl = `https://api.mylottohub.com/v1/admin/export-user-get-transactions?${queryString}`;
+
+    try {
+      // Open the request in a new tab
+      window.open(exportUrl, "_blank");
+      toast.success("Exported Successfully");
+    } catch (error: any) {
+      toast.error(error.message || "Error exporting transactions.");
+    }
+  };
+
   useEffect(() => {
     fetchData();
   }, [currentPage]);
-
+  const transactionData = filteredTransactions?.data || transactions?.data;
   return (
     <>
       <div>
@@ -228,7 +293,7 @@ const ListTransaction = () => {
                         Filter
                       </div>
                       <div className="card-body">
-                        <form method="post" action="">
+                        {/* <form method="post" action="">
                           <table cellPadding="5" width="100%">
                             <tbody>
                               <tr>
@@ -266,17 +331,26 @@ const ListTransaction = () => {
                                       className="text-center btn btn-light mt-2"
                                     >
                                       {showDateRangePicker
-                                        ? "Hide Date Range"
+                                        ? "Hide"
                                         : "Select Date Range"}
                                     </p>
                                   </div>
-                                  {showDateRangePicker && (
+                                  {/* {showDateRangePicker && (
                                     <DateRangePicker
                                       onChange={handleDateRangeChange}
                                       moveRangeOnFirstSelection={false}
                                       ranges={dateRange}
                                     />
-                                  )}
+                                  )} 
+                                  <span id="searchDateRange">
+                                    {showDateRangePicker && (
+                                      <DateRangePicker
+                                        onChange={handleDateRangeChange}
+                                        moveRangeOnFirstSelection={false}
+                                        ranges={dateRange}
+                                      />
+                                    )}
+                                  </span>
                                 </td>
                                 &nbsp;
                               </tr>
@@ -289,6 +363,86 @@ const ListTransaction = () => {
                                   Filter
                                 </button>
                               </>
+                            </tbody>
+                          </table>
+                        </form> */}
+                        <form method="post" action="">
+                          <table cellPadding="5" width="100%">
+                            <tbody>
+                              <tr>
+                                <td width="30%">
+                                  <input
+                                    type="text"
+                                    name="user"
+                                    id="searchUser"
+                                    placeholder="Search User"
+                                    className="form-control"
+                                  />
+                                </td>
+                                &nbsp;
+                                <td>
+                                  <select
+                                    name="status"
+                                    className="form-select"
+                                    id="status"
+                                  >
+                                    <option value="">Select User Status</option>
+                                    <option value="1">Active</option>
+                                    <option value="2">Blocked</option>
+                                    <option value="0">Inactive</option>
+                                    <option value="3">Not Verified</option>
+                                  </select>
+                                </td>
+                                &nbsp;
+                                <td width="30%">
+                                  <div
+                                    onClick={toggleDateRangePicker}
+                                    className="mt-1"
+                                  >
+                                    <p
+                                      style={{ cursor: "pointer" }}
+                                      className="text-center btn btn-light mt-2"
+                                    >
+                                      {showDateRangePicker
+                                        ? "Hide"
+                                        : "Select Date Range"}
+                                    </p>
+                                  </div>
+
+                                  <span id="searchDateRange">
+                                    {showDateRangePicker && (
+                                      <DateRangePicker
+                                        onChange={handleDateRangeChange}
+                                        moveRangeOnFirstSelection={false}
+                                        ranges={dateRange}
+                                      />
+                                    )}
+                                  </span>
+                                </td>
+                                &nbsp; &nbsp;
+                                <td>
+                                  <button
+                                    className="btn btn-primary"
+                                    onClick={handleFilter}
+                                  >
+                                    Filter
+                                  </button>
+                                </td>
+                                &nbsp;
+                                <td>
+                                  <button
+                                    className="btn btn-primary"
+                                    onClick={exportToExcel}
+                                    style={{
+                                      display: showExportButton
+                                        ? "block"
+                                        : "none",
+                                    }}
+                                  >
+                                    Export
+                                  </button>
+                                </td>
+                              </tr>
                             </tbody>
                           </table>
                         </form>
@@ -315,7 +469,7 @@ const ListTransaction = () => {
 
                           <tbody>
                             <>
-                              {(filteredTransactions || transactions?.data)
+                              {transactionData
                                 ?.sort(
                                   (a: any, b: any) =>
                                     new Date(b?.created_at) -

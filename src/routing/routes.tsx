@@ -24,6 +24,7 @@ import InstantOperator from "../pages/instant-games/InstantOperator";
 import Bonus from "../pages/bonus/bonus";
 import SetBonus from "../pages/bonus/SetBonus";
 import PlayHistory from "../pages/play-history/PlayHistory";
+import ListWithdraw from "../pages/agent/ListWithdraw";
 
 export const routes = [
   {
@@ -177,9 +178,15 @@ export const routes = [
     protected: true,
   },
   {
-    id: 25,
+    id: 26,
     path: "/play-history",
     element: <PlayHistory />,
+    protected: true,
+  },
+  {
+    id: 27,
+    path: "/agent-withdraw",
+    element: <ListWithdraw />,
     protected: true,
   },
 ];

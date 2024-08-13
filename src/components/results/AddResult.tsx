@@ -78,23 +78,7 @@ const AddResult = ({ handleClose }) => {
         }
       });
   };
-  const permissions = [
-    { value: "advert", label: "Adverts" },
-    { value: "operator", label: "Operators" },
-    { value: "game", label: "Games" },
-    { value: "result", label: "Results" },
-    { value: "product", label: "Products" },
-    { value: "user", label: "Users" },
-    { value: "user_action", label: "User action" },
-    { value: "transaction", label: "Transactions" },
-    { value: "wwallet", label: "Withdrawals" },
-    { value: "pin", label: "Pins" },
-    { value: "message", label: "Message" },
-    { value: "sport", label: "Sport" },
-    { value: "instantgame", label: "Instant Game" },
-    { value: "casinogame", label: "Casino Game" },
-    { value: "forecast", label: "Pro-Forecast" },
-  ];
+  
 
   return (
     <div>
@@ -290,15 +274,13 @@ const AddResult = ({ handleClose }) => {
               <div className="form-group mt-4 mb-4">
                 <label className="control-label text-dark">DateTime()</label>
                 <div
-                  className="input-group date form_datetime"
-                  data-date-format="yyyy-mm-dd hh:ii:ss"
-                  data-link-field="dtp_input1"
+                  className="input-group"
+                 
                 >
                   <input
                     className="form-control"
-                    type="text"
+                    type="date"
                     value=""
-                    readOnly=""
                     name="datetime"
                   />
                 </div>

@@ -14,6 +14,7 @@ import AgentUser from "../agent/AgentUser";
 import ViewInstant from "../instant-game/ViewInstant";
 import ViewDetails from "../AdvertModal/ViewDetails";
 import ViewSportDetails from "../sports/ViewSportDetails";
+import ViewSportsBet from "../sports/ViewSportsBet";
 
 interface Row {
   id: number;
@@ -32,6 +33,7 @@ const DataTable = (props: Props) => {
   const userInfo = useSelector((state) => state.auth.userInfo);
   const [operatorDetails, setOperatorDetails] = useState(null);
   const [gameDetails, setGameDetails] = useState(null);
+  const [sportsDetails, setSportDetails] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
   const [agentDetails, setAgentDetails] = useState(null);
   const [adminDetails, setAdminDetails] = useState(null);
@@ -53,6 +55,8 @@ const DataTable = (props: Props) => {
         endpoint = `/delete/game/${id}`;
       } else if (props.slug === "sport-operator") {
         endpoint = `/delete/sport-operator/${id}`;
+      } else if (props.slug === "sport-code") {
+        endpoint = `/delete-sports-code/${id}`;
       }
       return HTTP.post(
         endpoint,
@@ -106,14 +110,17 @@ const DataTable = (props: Props) => {
     // Perform deletion if confirmed
     mutation.mutate(id);
   };
-  const handleEdit = async (id: number) => {
+
+  const handleSportCodeEdit = async (code: string) => {
     try {
       let endpoint: string;
-      if (props.slug === "operator") {
-        endpoint = `/get-operator/${id}`;
+      if (props.slug === "sport-code") {
+        endpoint = `/get-sports-code`;
         const response = await HTTP.post(
           endpoint,
-
+          {
+            code,
+          },
           {
             headers: {
               "Content-Type": "application/json",
@@ -122,6 +129,25 @@ const DataTable = (props: Props) => {
             },
           }
         );
+        setSportDetails(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching game details:", error);
+      // Handle error
+    }
+  };
+  const handleEdit = async (id: number) => {
+    try {
+      let endpoint: string;
+      if (props.slug === "operator") {
+        endpoint = `/get-operator/${id}`;
+        const response = await HTTP.post(endpoint, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setOperatorDetails(response.data); // Set operator details
       } else if (props.slug === "game") {
         endpoint = `/get-game/${id}`;
@@ -212,6 +238,7 @@ const DataTable = (props: Props) => {
   const actionColumn: GridColDef = {
     field:
       props.slug === "withdraw" ||
+      props.slug === "withdraw-agent" ||
       props.slug === "single-transactions" ||
       props.slug === "top_five_transaction" ||
       props.slug === "sport-activity" ||
@@ -221,6 +248,7 @@ const DataTable = (props: Props) => {
         : "action",
     headerName:
       props.slug === "withdraw" ||
+      props.slug === "withdraw-agent" ||
       props.slug === "single-transactions" ||
       props.slug === "top_five_transaction" ||
       props.slug === "sport-activity" ||
@@ -230,6 +258,7 @@ const DataTable = (props: Props) => {
         : "Action",
     width:
       props.slug === "withdraw" ||
+      props.slug === "withdraw-agent" ||
       props.slug === "single-transactions" ||
       props.slug === "top_five_transaction" ||
       props.slug === "sport-activity" ||
@@ -241,6 +270,22 @@ const DataTable = (props: Props) => {
     renderCell: (params) => {
       return (
         <div className="action">
+          {/* {(props.slug === "operator" ||
+            props.slug === "game" ||
+            props.slug === "advert" ||
+            props.slug === "admin_register" ||
+            props.slug === "results" ||
+            props.slug === "agent-users" ||
+            props.slug === "sports" ||
+            props.slug === "sports-affilates" ||
+            props.slug === "sport-operator" ||
+            props.slug === "instant-operator" ||
+            props.slug === "sport-code" ||
+            props.slug === "users") && (
+            <div className="edit" onClick={() => handleEdit(params.row.id)}>
+              <img src="/view.svg" alt="" />
+            </div>
+          )} */}
           {(props.slug === "operator" ||
             props.slug === "game" ||
             props.slug === "advert" ||
@@ -251,13 +296,24 @@ const DataTable = (props: Props) => {
             props.slug === "sports-affilates" ||
             props.slug === "sport-operator" ||
             props.slug === "instant-operator" ||
+            props.slug === "sport-code" ||
             props.slug === "users") && (
-            <div className="edit" onClick={() => handleEdit(params.row.id)}>
+            <div
+              className="edit"
+              onClick={() => {
+                if (props.slug === "sport-code") {
+                  handleSportCodeEdit(params.row.code); // Call the new function with code
+                } else {
+                  handleEdit(params.row.id); // Call the original function with id
+                }
+              }}
+            >
               <img src="/view.svg" alt="" />
             </div>
           )}
 
           {props.slug !== "withdraw" &&
+            props.slug !== "withdraw-agent" &&
             props.slug !== "single-transactions" &&
             props.slug !== "users" &&
             props.slug !== "agent-commission" &&
@@ -315,6 +371,10 @@ const DataTable = (props: Props) => {
         setOperatorDetails={setOperatorDetails}
       />
       <ViewGame gameDetails={gameDetails} setGameDetails={setGameDetails} />
+      <ViewSportsBet
+        sportsDetails={sportsDetails}
+        setSportDetails={setSportDetails}
+      />
       <SingleUser userDetails={userDetails} setUserDetails={setUserDetails} />
       <AgentUser
         agentDetails={agentDetails}

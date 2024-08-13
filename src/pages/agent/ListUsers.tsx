@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import HTTP from "../../utils/httpClient";
 import AgentUser from "../../components/agent/AgentUser";
+import * as XLSX from "xlsx";
 interface User {
   id: number;
   username: string;
@@ -27,6 +28,7 @@ const ListUsers = () => {
   const [agentDetails, setAgentDetails] = useState(null);
   const [filteredTransactions, setFilteredTransactions] = useState(null);
   const [showDateRangePicker, setShowDateRangePicker] = useState(false);
+  const [isExportAvailable, setIsExportAvailable] = useState(false);
   const configHeaders = {
     headers: {
       "content-type": "application/json",
@@ -121,11 +123,16 @@ const ListUsers = () => {
         // Display toast with the number of records found
         const numberOfRecords = filteredData ? filteredData.length : 0;
         if (numberOfRecords) {
+          setIsExportAvailable(true);
           toast.success(`Found ${numberOfRecords} records`);
+        } else {
+          setIsExportAvailable(false);
+          toast.error("No records found");
         }
 
         if (!searchUser && !selectedStatus && !showDateRangePicker) {
           setFilteredTransactions(null);
+          setIsExportAvailable(false);
         }
       })
       .catch((error: any) => {
@@ -215,6 +222,38 @@ const ListUsers = () => {
   useEffect(() => {
     fetchData();
   }, [currentPage]);
+  const handleExport = () => {
+    const dataToExport = filteredTransactions || users?.data;
+
+    if (!dataToExport || dataToExport.length === 0) {
+      toast.error("No data available for export.");
+      return;
+    }
+
+    // Prepare the data for the worksheet
+    const formattedData = dataToExport.map((record: any) => ({
+      "User ID": record?.id,
+      Username: record?.username,
+      Name: record?.name,
+      "Email/Phone Number": record?.email || record?.tell,
+      "User Type": record?.type,
+      Wallet: `₦${record?.wallet}`,
+      "Win Wallet": `₦${record?.wwallet}`,
+      Status: getStatusText(record?.status),
+      "Signup Date": moment
+        .utc(record?.date || record?.created_at, "YYYY-MM-DD HH:mm:ss")
+        .local()
+        .format("Do MMM YYYY | h:mm:ssA"),
+    }));
+
+    // Create a new workbook and add a worksheet
+    const worksheet = XLSX.utils.json_to_sheet(formattedData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
+
+    // Generate an Excel file and trigger download
+    XLSX.writeFile(workbook, "filtered_users.xlsx");
+  };
 
   return (
     <>
@@ -290,7 +329,7 @@ const ListUsers = () => {
                                 <td>
                                   <select
                                     name="status"
-                                    className="form-control"
+                                    className="form-select"
                                     id="status"
                                   >
                                     <option value="">Select User Status</option>
@@ -325,7 +364,7 @@ const ListUsers = () => {
                                 </td>
                                 &nbsp;
                               </tr>
-                              <>
+                              <div className="d-flex">
                                 <button
                                   type="button"
                                   className="btn btn-primary w-100 mt-3"
@@ -333,7 +372,17 @@ const ListUsers = () => {
                                 >
                                   Filter
                                 </button>
-                              </>
+                                &nbsp;&nbsp;&nbsp;
+                                {isExportAvailable && (
+                                  <button
+                                    type="button"
+                                    className="btn btn-secondary w-100 mt-3"
+                                    onClick={handleExport}
+                                  >
+                                    Export
+                                  </button>
+                                )}
+                              </div>
                             </tbody>
                           </table>
                         </form>

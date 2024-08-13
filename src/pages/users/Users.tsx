@@ -14,6 +14,7 @@ import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import SingleUser from "../../components/SingleUser/SingleUser";
 // import { useQueryClient } from "@tanstack/react-query";
+import * as XLSX from "xlsx";
 
 import HTTP from "../../utils/httpClient";
 interface User {
@@ -31,6 +32,7 @@ const Users = () => {
   const [userDetails, setUserDetails] = useState(null);
   const [filteredTransactions, setFilteredTransactions] = useState(null);
   const [showDateRangePicker, setShowDateRangePicker] = useState(false);
+  const [isExportAvailable, setIsExportAvailable] = useState(false); // New state variable
 
   const configHeaders = {
     headers: {
@@ -123,18 +125,23 @@ const Users = () => {
         const filteredData = response.data.data;
 
         setFilteredTransactions(filteredData || []);
-        // Display toast with the number of records found
-        const numberOfRecords = filteredData ? filteredData.length : 0;
-        if (numberOfRecords) {
-          toast.success(`Found ${numberOfRecords} records`);
+
+        // Check if filtered data is available and update the export availability state
+        if (filteredData && filteredData.length > 0) {
+          setIsExportAvailable(true);
+          toast.success(`Found ${filteredData.length} records`);
+        } else {
+          setIsExportAvailable(false);
+          toast.error("No records found");
         }
 
         if (!searchUser && !selectedStatus && !showDateRangePicker) {
           setFilteredTransactions(null);
+          setIsExportAvailable(false);
         }
       })
       .catch((error: any) => {
-        // Handle error
+        toast.error("Failed to filter users");
       })
       .finally(() => {
         setIsLoading(false);
@@ -214,6 +221,40 @@ const Users = () => {
       toast.error("Failed to unblock user");
     }
   };
+
+  const handleExport = () => {
+    const dataToExport = filteredTransactions || users?.data;
+
+    if (!dataToExport || dataToExport.length === 0) {
+      toast.error("No data available for export.");
+      return;
+    }
+
+    // Prepare the data for the worksheet
+    const formattedData = dataToExport.map((record: any) => ({
+      "User ID": record?.id,
+      Username: record?.username,
+      Name: record?.name,
+      "Email/Phone Number": record?.email || record?.tell,
+      "User Type": record?.type,
+      Wallet: `₦${record?.wallet}`,
+      "Win Wallet": `₦${record?.wwallet}`,
+      Status: getStatusText(record?.status),
+      "Signup Date": moment
+        .utc(record?.date || record?.created_at, "YYYY-MM-DD HH:mm:ss")
+        .local()
+        .format("Do MMM YYYY | h:mm:ssA"),
+    }));
+
+    // Create a new workbook and add a worksheet
+    const worksheet = XLSX.utils.json_to_sheet(formattedData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
+
+    // Generate an Excel file and trigger download
+    XLSX.writeFile(workbook, "filtered_users.xlsx");
+  };
+
   useEffect(() => {
     fetchData();
   }, [currentPage]);
@@ -291,7 +332,7 @@ const Users = () => {
                                 <td>
                                   <select
                                     name="status"
-                                    className="form-control"
+                                    className="form-select"
                                     id="status"
                                   >
                                     <option value="">Select User Status</option>
@@ -326,7 +367,7 @@ const Users = () => {
                                 </td>
                                 &nbsp;
                               </tr>
-                              <>
+                              <div className="d-flex">
                                 <button
                                   type="button"
                                   className="btn btn-primary w-100 mt-3"
@@ -334,7 +375,17 @@ const Users = () => {
                                 >
                                   Filter
                                 </button>
-                              </>
+                                &nbsp;&nbsp;&nbsp;
+                                {isExportAvailable && (
+                                  <button
+                                    type="button"
+                                    className="btn btn-secondary w-100 mt-3"
+                                    onClick={handleExport}
+                                  >
+                                    Export
+                                  </button>
+                                )}
+                              </div>
                             </tbody>
                           </table>
                         </form>
@@ -350,7 +401,7 @@ const Users = () => {
                               <th className="fw-bolder">USER ID</th>
                               <th className="fw-bolder">USERNAME</th>
                               <th className="fw-bolder">NAME</th>
-                              <th className="fw-bolder">EMAIL</th>
+                              <th className="fw-bolder">EMAIL/PHONE NUMBER</th>
                               <th className="fw-bolder">USER TYPE</th>
                               <th className="fw-bolder">WALLET</th>
                               <th className="fw-bolder">WIN WALLET</th>
@@ -394,7 +445,7 @@ const Users = () => {
                                         {record?.username}
                                       </td>
                                       <td>{record?.name}</td>
-                                      <td>{record?.email}</td>
+                                      <td>{record?.email || record?.tell}</td>
                                       <td>{record?.type}</td>
                                       <td>₦{record?.wallet}</td>
                                       <td>₦{record?.wwallet}</td>

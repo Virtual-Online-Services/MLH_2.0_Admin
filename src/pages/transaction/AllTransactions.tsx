@@ -26,8 +26,11 @@ const AllTransactions = () => {
   const userInfo = useSelector((state) => state.auth.userInfo);
   const token = userInfo?.token?.accessToken;
   const [userDetails, setUserDetails] = useState(null);
-  const [filteredTransactions, setFilteredTransactions] = useState(null);
+  const [filteredTransactions, setFilteredTransactions] = useState<
+    User[] | null
+  >(null);
   const [showDateRangePicker, setShowDateRangePicker] = useState(false);
+  const [showExportButton, setShowExportButton] = useState(false);
 
   const configHeaders = {
     headers: {
@@ -46,7 +49,7 @@ const AllTransactions = () => {
         setTransactions(response.data.data);
       })
       .catch((error) => {
-        // console.log(error);
+        // Handle error here if needed
       })
       .finally(() => {
         setIsLoading(false);
@@ -75,9 +78,11 @@ const AllTransactions = () => {
       key: "selection",
     },
   ]);
+
   const handleDateRangeChange = (ranges: any) => {
     setDateRange([ranges.selection]);
   };
+
   const toggleDateRangePicker = () => {
     setShowDateRangePicker((prevState) => !prevState);
   };
@@ -85,28 +90,27 @@ const AllTransactions = () => {
   const handleFilter = () => {
     const searchUserInput = document.getElementById("searchUser");
     const selectedStatusInput = document.getElementById("status");
+    const selectedDateRange = document.getElementById("searchDateRange");
 
-    if (!searchUserInput || !selectedStatusInput) {
+    if (!searchUserInput || !selectedStatusInput || !selectedDateRange) {
       toast.error("Search input or status input not found");
       return;
     }
 
-    const searchUser = searchUserInput?.value.trim();
-    const selectedStatus = selectedStatusInput?.value;
+    const searchUser = searchUserInput.value.trim();
+    const selectedStatus = selectedStatusInput.value;
+    const selectedDate = selectedDateRange.value;
     let queryParams = "";
 
     if (searchUser !== "") {
       queryParams += `&search=${searchUser}`;
-    }
-
-    if (selectedStatus !== "") {
-      queryParams += `&status=${selectedStatus}`;
-    }
-
-    if (showDateRangePicker) {
+    } else if (selectedStatus !== "") {
+      queryParams += `&search=${selectedStatus}`;
+    } else if (selectedDate !== "") {
       const startDate = moment(dateRange[0].startDate).format("YYYY-MM-DD");
       const endDate = moment(dateRange[0].endDate).format("YYYY-MM-DD");
       queryParams += `&start_date=${startDate}&end_date=${endDate}`;
+      // queryParams += `&search=${selectedDate}`;
     }
 
     // Reset current page to 1 when filtering
@@ -118,25 +122,30 @@ const AllTransactions = () => {
     })
       .then((response: any) => {
         const filteredData = response.data.data;
-
         setFilteredTransactions(filteredData || []);
+
         // Display toast with the number of records found
-        const numberOfRecords = filteredData ? filteredData.length : 0;
-        if (numberOfRecords) {
-          toast.success(`Found ${numberOfRecords} records`);
+        if (response) {
+          toast.success(`Found ${response.data.data.total} records`);
         }
 
         if (!searchUser && !selectedStatus && !showDateRangePicker) {
           setFilteredTransactions(null);
+          setShowExportButton(false);
+        } else {
+          setShowExportButton(true);
         }
       })
       .catch((error: any) => {
         // Handle error
+        setFilteredTransactions([]);
       })
       .finally(() => {
         setIsLoading(false);
       });
   };
+
+  const transactionData = filteredTransactions?.data || transactions?.data;
 
   const handleEdit = async (id: number) => {
     try {
@@ -155,7 +164,6 @@ const AllTransactions = () => {
         const errorData = await response.json();
         if (response.status === 400) {
           toast.error("User does not Exist");
-          // Display or handle the error here
         } else {
           throw new Error(errorData.error || "Network response was not ok");
         }
@@ -163,11 +171,80 @@ const AllTransactions = () => {
 
       const data = await response.json();
       setUserDetails(data);
-    } catch (error: any) {}
+    } catch (error: any) {
+      // Handle fetch error here if needed
+    }
   };
+
+  const exportToExcel = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Get the search user input element
+    const searchUserInput = document.getElementById(
+      "searchUser"
+    ) as HTMLInputElement | null;
+
+    // Get the selected status input element
+    const selectedStatusInput = document.getElementById(
+      "status"
+    ) as HTMLSelectElement | null;
+
+    if (!searchUserInput || !selectedStatusInput) {
+      toast.error("Search input or status input not found");
+      return;
+    }
+
+    const searchUser = searchUserInput.value.trim();
+    const selectedStatus = selectedStatusInput.value;
+
+    let queryParams: string[] = [];
+
+    // Construct the query parameters
+    if (searchUser !== "") {
+      queryParams.push(`search=${encodeURIComponent(searchUser)}`);
+    } else if (selectedStatus !== "") {
+      queryParams.push(`status=${encodeURIComponent(selectedStatus)}`);
+    } else if (dateRange && dateRange[0]) {
+      const startDate = moment(dateRange[0].startDate).format("YYYY-MM-DD");
+      const endDate = moment(dateRange[0].endDate).format("YYYY-MM-DD");
+      queryParams.push(`start_date=${startDate}`);
+      queryParams.push(`end_date=${endDate}`);
+    }
+
+    // If no filters are applied, prevent export and show error
+    if (queryParams.length === 0) {
+      toast.error("Please enter at least one filter to export.");
+      return;
+    }
+
+    const queryString = queryParams.join("&");
+    let exportUrl = ""; // Initialize the exportUrl variable
+
+    if (searchUser !== "" && dateRange && dateRange[0]) {
+      exportUrl = `https://api.mylottohub.com/v1/admin/export-user-get-transactions${queryString}`;
+    } else if (searchUser !== "") {
+      exportUrl = `https://api.mylottohub.com/v1/admin/export-user-get-transactions?${searchUser}`;
+    } else if (dateRange && dateRange[0]) {
+      exportUrl = `https://api.mylottohub.com/v1/admin/export-user-get-transactions?start_date=${moment(
+        dateRange[0].startDate
+      ).format("YYYY-MM-DD")}&end_date=${moment(dateRange[0].endDate).format(
+        "YYYY-MM-DD"
+      )}`;
+    }
+
+    try {
+      // Open the request in a new tab
+      window.open(exportUrl, "_blank");
+      toast.success("Exported Successfully");
+    } catch (error: any) {
+      toast.error(error.message || "Error exporting transactions.");
+    }
+  };
+
   useEffect(() => {
     fetchData();
   }, [currentPage]);
+
   return (
     <>
       <div>
@@ -201,7 +278,7 @@ const AllTransactions = () => {
                       aria-hidden="true"
                     />
                   </div>
-                ) : transactions?.data?.length === 0 ? (
+                ) : transactions?.length === 0 ? (
                   <div className="d-flex justify-content-center text-center p-5">
                     <div className="hidden-xs hidden-sm mx-auto">
                       <div
@@ -242,7 +319,7 @@ const AllTransactions = () => {
                                 <td>
                                   <select
                                     name="status"
-                                    className="form-control"
+                                    className="form-select"
                                     id="status"
                                   >
                                     <option value="">Select User Status</option>
@@ -263,29 +340,45 @@ const AllTransactions = () => {
                                       className="text-center btn btn-light mt-2"
                                     >
                                       {showDateRangePicker
-                                        ? "Hide Date Range"
+                                        ? "Hide"
                                         : "Select Date Range"}
                                     </p>
                                   </div>
-                                  {showDateRangePicker && (
-                                    <DateRangePicker
-                                      onChange={handleDateRangeChange}
-                                      moveRangeOnFirstSelection={false}
-                                      ranges={dateRange}
-                                    />
-                                  )}
+
+                                  <span id="searchDateRange">
+                                    {showDateRangePicker && (
+                                      <DateRangePicker
+                                        onChange={handleDateRangeChange}
+                                        moveRangeOnFirstSelection={false}
+                                        ranges={dateRange}
+                                      />
+                                    )}
+                                  </span>
+                                </td>
+                                &nbsp; &nbsp;
+                                <td>
+                                  <button
+                                    className="btn btn-primary"
+                                    onClick={handleFilter}
+                                  >
+                                    Filter
+                                  </button>
                                 </td>
                                 &nbsp;
+                                <td>
+                                  <button
+                                    className="btn btn-primary"
+                                    onClick={exportToExcel}
+                                    style={{
+                                      display: showExportButton
+                                        ? "block"
+                                        : "none",
+                                    }}
+                                  >
+                                    Export
+                                  </button>
+                                </td>
                               </tr>
-                              <>
-                                <button
-                                  type="button"
-                                  className="btn btn-primary w-100 mt-3"
-                                  onClick={handleFilter}
-                                >
-                                  Filter
-                                </button>
-                              </>
                             </tbody>
                           </table>
                         </form>
@@ -296,7 +389,7 @@ const AllTransactions = () => {
                     <div>
                       <div className="table-responsive card shadow">
                         <table className="table table-express app__transaction-web table-hover mt-4">
-                          <tbody>
+                          <thead>
                             <tr>
                               <th className="fw-bolder">USER ID</th>
                               <th className="fw-bolder">USERNAME</th>
@@ -308,86 +401,72 @@ const AllTransactions = () => {
                               <th className="fw-bolder">CURRENT BALANCE</th>
                               <th className="fw-bolder">DATE</th>
                             </tr>
-                          </tbody>
+                          </thead>
 
                           <tbody>
-                            <>
-                              {(filteredTransactions || transactions?.data)
-                                ?.sort(
-                                  (a: any, b: any) =>
-                                    new Date(b?.created_at) -
-                                    new Date(a?.created_at)
-                                )
-                                .map((record: any, index: any) => {
-                                  // const formattedDate = moment
-                                  //   .utc(
-                                  //     record?.created_at || record?.date,
-                                  //     "DD-MM-YYYY HH:mm"
-                                  //   )
-                                  //   .local()
-                                  //   .format("YYYY MMM Do  | h:mm:ssA");
-                                  const formattedDate = moment
-                                    .utc(record?.created_at || record?.date)
-                                    .local()
-                                    .format("YYYY MMM Do | h:mm:ssA");
+                            {transactionData
+                              ?.sort(
+                                (a: any, b: any) =>
+                                  new Date(b?.created_at).getTime() -
+                                  new Date(a?.created_at).getTime()
+                              )
+                              .map((record: any, index: any) => {
+                                const formattedDate = moment
+                                  .utc(record?.created_at || record?.date)
+                                  .local()
+                                  .format("YYYY MMM Do | h:mm:ssA");
 
-                                  return (
-                                    <tr key={index}>
-                                      <td
-                                        className="text-primary"
-                                        style={{ cursor: "pointer" }}
-                                        onClick={() => handleEdit(record?.user)}
-                                      >
-                                        {record?.user}
-                                      </td>
-                                      <td
-                                        className="text-primary"
-                                        style={{ cursor: "pointer" }}
-                                        onClick={() => handleEdit(record?.user)}
-                                      >
-                                        {record?.username}
-                                      </td>
-                                      <td>{record?.ref}</td>
-                                      <td>{record?.type}</td>
-                                      <td>{record?.description}</td>
-                                      <td>₦{record?.amount}</td>
-                                      <td>{record?.channel}</td>
-                                      <td>₦{record?.abalance}</td>
-                                      <td>{formattedDate}</td>
-                                    </tr>
-                                  );
-                                })}
-                            </>
+                                return (
+                                  <tr key={index}>
+                                    <td
+                                      className="text-primary"
+                                      style={{ cursor: "pointer" }}
+                                      onClick={() => handleEdit(record?.user)}
+                                    >
+                                      {record?.user}
+                                    </td>
+                                    <td
+                                      className="text-primary"
+                                      style={{ cursor: "pointer" }}
+                                      onClick={() => handleEdit(record?.user)}
+                                    >
+                                      {record?.username}
+                                    </td>
+                                    <td>{record?.ref}</td>
+                                    <td>{record?.type}</td>
+                                    <td>{record?.description}</td>
+                                    <td>₦{record?.amount}</td>
+                                    <td>{record?.channel}</td>
+                                    <td>₦{record?.abalance}</td>
+                                    <td>{formattedDate}</td>
+                                  </tr>
+                                );
+                              })}
                           </tbody>
                         </table>
 
                         <nav aria-label="Page navigation example">
                           <ul className="pagination">
                             {transactions?.links?.map(
-                              (link: any, index: any) => {
-                                return (
-                                  <>
-                                    <div key={index}>
-                                      <li
-                                        className={`page-item ${
-                                          link?.active ? "active" : ""
-                                        }`}
-                                      >
-                                        <a
-                                          className="page-link"
-                                          href={link?.url}
-                                          onClick={(e) => {
-                                            e.preventDefault();
-                                            fetchDataTransact(link?.label);
-                                          }}
-                                        >
-                                          {renderPaginationLabel(link?.label)}
-                                        </a>
-                                      </li>
-                                    </div>
-                                  </>
-                                );
-                              }
+                              (link: any, index: any) => (
+                                <li
+                                  className={`page-item ${
+                                    link?.active ? "active" : ""
+                                  }`}
+                                  key={index}
+                                >
+                                  <a
+                                    className="page-link"
+                                    href={link?.url}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      fetchDataTransact(link?.label);
+                                    }}
+                                  >
+                                    {renderPaginationLabel(link?.label)}
+                                  </a>
+                                </li>
+                              )
                             )}
                           </ul>
                         </nav>

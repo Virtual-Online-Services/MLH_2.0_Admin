@@ -3,9 +3,9 @@ import queryKeys from "../constants";
 import { HTTP } from "../../utils";
 import { useSelector } from "react-redux";
 
-const getUsersAdminProfile = async (token: any) => {
+const getAllWithdraw = async (token) => {
   try {
-    const res = await HTTP.get(`/get-admins`, {
+    const res = await HTTP.get(`/get-agentwithdraws`, {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -18,20 +18,20 @@ const getUsersAdminProfile = async (token: any) => {
   }
 };
 
-const useGetAdmin = () => {
+const useGetAllRequestWithdrawAgent = () => {
   const userInfo = useSelector((state) => state.auth.userInfo);
   const token = userInfo?.token?.accessToken;
-  // const userId = userInfo?.data?.id;
 
   const { data, isLoading } = useQuery({
-    queryKey: [queryKeys.GET_ADMIN_PROFILE],
-    queryFn: () => getUsersAdminProfile(token),
+    queryKey: [queryKeys.GET_ALL_AGENT_WITHDRAW],
+    queryFn: () => getAllWithdraw(token),
   });
+
   return {
-    userAdminResponse: data?.data,
+    userWithdrawDetails: data?.data?.data,
     token,
-    isLoadingAdmin: isLoading,
+    isLoadingUserWithdraw: isLoading,
   };
 };
 
-export default useGetAdmin;
+export default useGetAllRequestWithdrawAgent;

@@ -120,6 +120,12 @@ export const menu = [
         icon: "fa fa-american-sign-language-interpreting",
       },
       {
+        id: 2,
+        title: "Withdrawals",
+        url: "/agent-withdraw",
+        icon: "fa fa-money",
+      },
+      {
         id: 3,
         title: "Users",
         url: "/agent-users",

@@ -1,6 +1,6 @@
 import { GridColDef } from "@mui/x-data-grid";
 import DataTable from "../../components/dataTable/DataTable";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Footer from "../../components/footer/Footer";
 import Menu from "../../components/menu/Menu";
 import Navbar from "../../components/navbar/Navbar";
@@ -10,9 +10,13 @@ import UploadCode from "../../components/sports/UploadCode";
 import useGetSportCode from "../../react-query/api-hooks/useGetSportCode";
 import moment from "moment";
 import { Spinner } from "react-bootstrap";
+import { useSelector } from "react-redux";
+import axios from "axios";
 
 const SportCode = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [count, setCount] = useState(0);
+  const [isLoadingCount, setIsLoadingCount] = useState(false);
   const handleClose = () => setIsOpen(false);
   const handleOpen = () => setIsOpen(true);
   const handleAdvert = () => {
@@ -52,6 +56,31 @@ const SportCode = () => {
       renderCell: (params) => <span>{formatCreatedAt(params.value)}</span>,
     },
   ];
+  const userInfo = useSelector((state) => state.auth.userInfo);
+  const token = userInfo?.token?.accessToken;
+  useEffect(() => {
+    const fetchCount = async () => {
+      setIsLoadingCount(true);
+      try {
+        const response = await axios.post(
+          "https://api.mylottohub.com/v1/get-sports-code",
+          {}, // Empty payload
+          {
+            headers: {
+              Accept: "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setCount(response.data.code_used);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoadingCount(false);
+      }
+    };
+    fetchCount();
+  }, []);
 
   return (
     <div>
@@ -109,6 +138,7 @@ const SportCode = () => {
                   <>
                     <p className="mt-4">
                       {userSportCode?.data?.length} Records
+                      <p className="mt-4">{count} codes have been played</p>
                     </p>
                     <DataTable
                       slug="sport-code"

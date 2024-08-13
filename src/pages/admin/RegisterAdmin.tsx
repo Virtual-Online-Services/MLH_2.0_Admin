@@ -21,6 +21,12 @@ const RegisterAdmin = () => {
 
   const columns: GridColDef[] = [
     {
+      field: "id",
+      type: "string",
+      headerName: "No",
+      width: 300,
+    },
+    {
       field: "name",
       type: "string",
       headerName: "Name",
@@ -65,7 +71,6 @@ const RegisterAdmin = () => {
                 </a>
               </p>
               <p>{userAdminResponse?.data?.length} Records</p>
-              {/* <DataTable slug="users" columns={columns} rows={formattedData} /> */}
               {isLoadingAdmin ? (
                 <div className="spinner text-center mt-5">
                   <Spinner
@@ -92,7 +97,8 @@ const RegisterAdmin = () => {
                   <DataTable
                     slug="admin_register"
                     columns={columns}
-                    rows={[userAdminResponse?.data]}
+                    rows={userAdminResponse?.data}
+                    getRowId={(row) => row.id}
                   />
                 </>
               )}
