@@ -7,13 +7,13 @@ import * as yup from "yup";
 import { useState } from "react";
 import HTTP from "../../utils/httpClient";
 import { useQueryClient } from "@tanstack/react-query";
-import useGetSportsForecast from "../../react-query/api-hooks/useGetSportsForecast";
 
 const schema = yup.object().shape({
-  code: yup.string().required("This is a required field"),
+  name: yup.string().required("This is a required field"),
+  logo: yup.mixed().required("This is a required field"),
 });
 
-const UploadCode = ({ handleClose }) => {
+const UploadForecasters = ({ handleClose }) => {
   const {
     register,
     handleSubmit,
@@ -24,13 +24,8 @@ const UploadCode = ({ handleClose }) => {
 
   const userInfo = useSelector((state) => state.auth.userInfo);
   const token = userInfo?.token?.accessToken;
-  const { userSportForecast, isLoadingSportForecast } = useGetSportsForecast(
-    []
-  );
-  const [selectedForecasterId, setSelectedForecasterId] = useState("");
 
   const [isLoading, setIsLoading] = useState(false);
-  const [datetime, setDatetime] = useState("");
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -44,20 +39,19 @@ const UploadCode = ({ handleClose }) => {
     setIsLoading(true);
 
     const formData = new FormData();
-    formData.append("code", data.code);
-    formData.append("date", datetime);
-    formData.append("id", selectedForecasterId);
+    formData.append("name", data.name);
+    formData.append("logo", data.logo[0]);
 
-    HTTP.post("/add-sports-bet", formData, config)
-      .then((response: any) => {
+    HTTP.post("/add-proforcaster ", formData, config)
+      .then((response) => {
         setIsLoading(false);
         toast.success(response.data.message);
         handleClose();
         if (response.data.message) {
-          queryClient.invalidateQueries("GET_SPORT_CODE");
+          queryClient.invalidateQueries("GET_SPORT_FORECAST");
         }
       })
-      .catch((error: any) => {
+      .catch((error) => {
         setIsLoading(false);
 
         if (
@@ -73,28 +67,15 @@ const UploadCode = ({ handleClose }) => {
       });
   };
 
-  const handleChange = (e: any) => {
-    const selectedDatetime = new Date(e.target.value);
-
-    const timezoneOffset = selectedDatetime.getTimezoneOffset() * 60000;
-
-    const localDatetime = new Date(selectedDatetime.getTime() - timezoneOffset);
-
-    const formattedDatetime = localDatetime
-      .toISOString()
-      .slice(0, 19)
-      .replace("T", " ");
-
-    setDatetime(formattedDatetime);
-  };
-
   return (
     <div>
       <div>
         <div>
           <div className="container">
             <span>
-              <strong className="text-dark">Upload Betting Code</strong>
+              <strong className="text-dark">
+                Upload Sport Forecaster Details
+              </strong>
             </span>
             <br />
 
@@ -104,54 +85,35 @@ const UploadCode = ({ handleClose }) => {
               onSubmit={handleSubmit(submitForm)}
             >
               <div className="mb-3">
-                {isLoadingSportForecast ? (
-                  <Spinner animation="border" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                  </Spinner>
-                ) : (
-                  <div className="mb-3">
-                    <select
-                      name="status"
-                      className="form-select"
-                      id="status"
-                      value={selectedForecasterId}
-                      onChange={(e) => setSelectedForecasterId(e.target.value)}
-                    >
-                      <option value="">Select Forecaster</option>
-                      {/* Ensure userSportForecast is an array */}
-                      {Array.isArray(userSportForecast) &&
-                        userSportForecast.map((forecaster) => (
-                          <option key={forecaster.id} value={forecaster.id}>
-                            {forecaster.name}
-                          </option>
-                        ))}
-                    </select>
-                  </div>
-                )}
-              </div>
-              <div className="mb-3">
                 <input
                   type="text"
                   className="form-control mb-2 p-3"
-                  placeholder="Enter Code"
-                  {...register("code", {
+                  placeholder="Name"
+                  {...register("name", {
                     required: "Required",
                   })}
                 />
-                {errors.code && (
+                {errors.name && (
                   <p className="text-danger text-capitalize">
-                    {errors.code.message}
+                    {errors.name.message}
                   </p>
                 )}
               </div>
 
               <div className="mb-3">
                 <input
-                  type="datetime-local"
+                  type="file"
                   className="form-control mb-2 p-3"
-                  value={datetime}
-                  onChange={handleChange}
+                  {...register("logo", {
+                    required: "Required",
+                  })}
+                  name="logo"
                 />
+                {errors.logo && (
+                  <p className="text-danger text-capitalize">
+                    {errors.logo.message}
+                  </p>
+                )}
               </div>
 
               <Button
@@ -169,7 +131,7 @@ const UploadCode = ({ handleClose }) => {
                     aria-hidden="true"
                   />
                 ) : (
-                  " Upload"
+                  " Proceed"
                 )}
               </Button>
             </form>
@@ -180,4 +142,4 @@ const UploadCode = ({ handleClose }) => {
   );
 };
 
-export default UploadCode;
+export default UploadForecasters;

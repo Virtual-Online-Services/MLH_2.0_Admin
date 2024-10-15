@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import "./menu.scss";
 import { menu } from "../../data";
 import { logout } from "../../pages/slices/authSlice";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const MenuItem = ({ item }) => {
   const [isActive, setIsActive] = useState(false);
+  const userInfo = useSelector((state) => state.auth.userInfo);
+  const usernamePermission = userInfo;
 
   const handleItemClick = () => {
     setIsActive(!isActive);

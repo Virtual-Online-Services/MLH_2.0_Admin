@@ -45,6 +45,8 @@ const SetBonus = () => {
             return "Referral Bonus";
           case 4:
             return "Welcome Bonus";
+          case 5:
+            return "Deposit Bonus";
           default:
             return "-";
         }
@@ -98,7 +100,7 @@ const SetBonus = () => {
       valueFormatter: (params) => `₦${params.value} `,
     },
     {
-      field: "updated_at",
+      field: "start_date",
       headerName: "DATE CREATED",
       width: 200,
       valueFormatter: (params) => formatDate(params.value),

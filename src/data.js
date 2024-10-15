@@ -1,4 +1,6 @@
+
 export const menu = [
+  
   {
     id: 1,
     title: "General",
@@ -142,6 +144,12 @@ export const menu = [
         title: "Operators",
         url: "/sport-operator",
         icon: "fa fa-android",
+      },
+      {
+        id: 3,
+        title: "Forecasters",
+        url: "/sport-forecast",
+        icon: "fa fa-user",
       },
       {
         id: 2,

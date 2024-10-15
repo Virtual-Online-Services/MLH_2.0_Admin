@@ -14,24 +14,26 @@ const getUsers = async (userId, token) => {
     });
     return res;
   } catch (error) {
-    return error;
+    throw new Error(error.response?.data?.message || "Failed to fetch user");
   }
 };
 
 const useGetProfileUser = () => {
   const userInfo = useSelector((state) => state.auth.userInfo);
+  const token = userInfo?.token?.accessToken;
   const userId = userInfo?.data?.id;
-  const token = userInfo?.token;
 
-  const { data, isLoading } = useQuery(
-    [queryKeys.GET_USER_PROFILE, userId],
-    () => getUsers(userId, token)
-  );
+  const { data, isLoading, error } = useQuery({
+    queryKey: [queryKeys.GET_USER_PROFILE, userId],
+    queryFn: () => getUsers(userId, token),
+    enabled: !!userId && !!token, // Ensure query only runs if userId and token exist
+  });
 
   return {
     userProfileResponse: data?.data?.[0],
     token,
     isLoadingUserProfile: isLoading,
+    error, // You can use error in your component to handle error states
   };
 };
 

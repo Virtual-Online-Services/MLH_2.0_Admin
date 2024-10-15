@@ -14,6 +14,8 @@ const schema = yup.object().shape({
   stake: yup.string(),
   percentage: yup.string(),
   duration: yup.string(),
+  start_date: yup.string(),
+  end_date: yup.string(),
   wallet: yup.string(),
   game: yup.string(),
   bonus_amount: yup.string(),
@@ -133,6 +135,15 @@ const LottoBonusModal = ({ handleClose }) => {
       appendString("duration", data.duration);
       appendString("percentage", data.percentage);
       appendString("wallet", data.wallet);
+      appendString("stake", data.stake);
+    }
+
+    if (data.bonus_type === "5") {
+      appendString("bonus_type", data.bonus_type);
+      appendString("bonus_amount", data.bonus_amount);
+      appendString("start_date", data.start_date);
+      appendString("end_date", data.end_date);
+      appendString("percentage", data.percentage);
       appendString("stake", data.stake);
     }
 
@@ -315,6 +326,76 @@ const LottoBonusModal = ({ handleClose }) => {
                     {errors.wallet && (
                       <p className="text-danger text-capitalize">
                         {errors.wallet.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="mb-3">
+                    <input
+                      type="number"
+                      min={1}
+                      className="form-control mb-2 p-3"
+                      placeholder="Bonus Amount"
+                      {...register("bonus_amount")}
+                    />
+                    {errors.bonus_amount && (
+                      <p className="text-danger text-capitalize">
+                        {errors.bonus_amount.message}
+                      </p>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {selectedBonusType === "5" && (
+                <>
+                  <div className="mb-3">
+                    <input
+                      type="number"
+                      min={1}
+                      className="form-control mb-2 p-3"
+                      placeholder="Stake"
+                      {...register("stake")}
+                    />
+                    {errors.stake && (
+                      <p className="text-danger text-capitalize">
+                        {errors.stake.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="mb-3">
+                    <input
+                      type="number"
+                      min={1}
+                      className="form-control mb-2 p-3"
+                      placeholder="Percentage"
+                      {...register("percentage")}
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="text-dark">Start Date</label>
+                    <input
+                      type="datetime-local"
+                      className="form-control mb-2 p-3"
+                      {...register("start_date")}
+                    />
+                    {errors.start_date && (
+                      <p className="text-danger text-capitalize">
+                        {errors.start_date.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="mb-3">
+                    <label className="text-dark">End Date</label>
+                    <input
+                      type="datetime-local"
+                      className="form-control mb-2 p-3"
+                      {...register("end_date")}
+                    />
+                    {errors.end_date && (
+                      <p className="text-danger text-capitalize">
+                        {errors.end_date.message}
                       </p>
                     )}
                   </div>

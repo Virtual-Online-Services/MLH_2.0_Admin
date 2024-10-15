@@ -57,6 +57,8 @@ const DataTable = (props: Props) => {
         endpoint = `/delete/sport-operator/${id}`;
       } else if (props.slug === "sport-code") {
         endpoint = `/delete-sports-code/${id}`;
+      } else if (props.slug === "sport-forecast") {
+        endpoint = `/delete-admin/${id}`;
       }
       return HTTP.post(
         endpoint,
@@ -230,6 +232,17 @@ const DataTable = (props: Props) => {
         });
         setSport(response.data);
       }
+      // else if (props.slug === "sport-forecast") {
+      //   endpoint = `/user/proforcasters/${id}`;
+      //   const response = await HTTP.get(endpoint, {
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //       Accept: "application/json",
+      //       Authorization: `Bearer ${token}`,
+      //     },
+      //   });
+      //   setSport(response.data);
+      // }
     } catch (error) {
       console.error("Error fetching game details:", error);
       // Handle error
@@ -243,6 +256,7 @@ const DataTable = (props: Props) => {
       props.slug === "top_five_transaction" ||
       props.slug === "sport-activity" ||
       props.slug === "transactions" ||
+      // props.slug === "sport-forecast" ||
       props.slug === "agent-commission"
         ? ""
         : "action",
@@ -253,6 +267,7 @@ const DataTable = (props: Props) => {
       props.slug === "top_five_transaction" ||
       props.slug === "sport-activity" ||
       props.slug === "transactions" ||
+      // props.slug === "sport-forecast" ||
       props.slug === "agent-commission"
         ? ""
         : "Action",
@@ -295,6 +310,7 @@ const DataTable = (props: Props) => {
             props.slug === "sports" ||
             props.slug === "sports-affilates" ||
             props.slug === "sport-operator" ||
+            // props.slug === "sport-forecast" ||
             props.slug === "instant-operator" ||
             props.slug === "sport-code" ||
             props.slug === "users") && (
@@ -318,6 +334,7 @@ const DataTable = (props: Props) => {
             props.slug !== "users" &&
             props.slug !== "agent-commission" &&
             props.slug !== "top_five_transaction" &&
+            // props.slug !== "sport-forecast" &&
             props.slug !== "sport-activity" &&
             props.slug !== "transactions" && (
               <div

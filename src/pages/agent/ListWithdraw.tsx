@@ -9,230 +9,76 @@ import Footer from "../../components/footer/Footer";
 import moment from "moment";
 import { useSelector } from "react-redux";
 import { useState } from "react";
-import SingleUser from "../../components/SingleUser/SingleUser";
 import { toast } from "react-toastify";
-import HTTP from "../../utils/httpClient";
-import { useQueryClient } from "@tanstack/react-query";
+import BModal from "../../components/BModal/BModal";
+import WithdrawModal from "./WithdrawModal";
+import AgentUser from "../../components/agent/AgentUser";
 
 const ListWithdraw = () => {
   const { userWithdrawDetails, isLoadingUserWithdraw } =
     useGetAllRequestWithdrawAgent([]);
   const userInfo = useSelector((state) => state.auth.userInfo);
-  const [userDetails, setUserDetails] = useState(null);
-  const [isProcessing, setIsProcessing] = useState(null);
-  const [isCancel, setIsCancel] = useState(null);
-  const queryClient = useQueryClient();
+  const [isOpen, setIsOpen] = useState(false);
+  const handleClose = () => setIsOpen(false);
+  const handleOpen = () => setIsOpen(true);
+  // const [isProcessing, setIsProcessing] = useState(null);
+  // const [isCancel, setIsCancel] = useState(null);
+  // const queryClient = useQueryClient();
   const token = userInfo?.token?.accessToken;
+  const [agentDetails, setAgentDetails] = useState(null);
+  const handleWithdraw = () => {
+    handleOpen();
+  };
   const formatCreatedAt = (createdAt: any) => {
     return moment(createdAt).format("MMM Do YYYY | hh:mm:ss a");
   };
+  const handleEdit = async (id: number) => {
+    try {
+      const endpoint = `https://api.mylottohub.com/v1/get-agent/${id}`;
+      const requestOptions = {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      };
 
-  //   const handleEdit = async (id: number) => {
-  //     try {
-  //       const endpoint = `https://api.mylottohub.com/v1/get-agent/${id}`;
-  //       const requestOptions = {
-  //         method: "GET",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Accept: "application/json",
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       };
-
-  //       const response = await fetch(endpoint, requestOptions);
-  //       if (!response.ok) {
-  //         const errorData = await response.json();
-  //         if (response.status === 400) {
-  //           toast.error("User does not Exist");
-  //         } else {
-  //           throw new Error(errorData.error || "Network response was not ok");
-  //         }
-  //       }
-
-  //       const data = await response.json();
-  //       setUserDetails(data);
-  //     } catch (error: any) {}
-  //   };
-
-  // const handlePayWithMonnify = async (id: any) => {
-  //   toast.warn(
-  //     <>
-  //       Are you sure you want to process this withdrawal?
-  //       <br />
-  //       <button
-  //         onClick={async () => {
-  //           setIsProcessing(id);
-  //           try {
-  //             const endpoint = `/process-user-withdraw`;
-  //             const payload = {
-  //               id: id,
-  //               paymentgateway: "monnify",
-  //             };
-  //             const requestOptions = {
-  //               headers: {
-  //                 "Content-Type": "application/json",
-  //                 Accept: "application/json",
-  //                 Authorization: `Bearer ${token}`,
-  //               },
-  //             };
-
-  //             const response = await HTTP.post(
-  //               endpoint,
-  //               payload,
-  //               requestOptions
-  //             );
-  //             toast.success("Withdrawal processed successfully");
-  //             queryClient.invalidateQueries("GET_ALL_WITHDRAW");
-  //             // Close the toast
-  //             return response;
-  //           } catch (error) {
-  //             toast.error("Failed to process withdrawal");
-  //             setIsProcessing(null);
-  //           }
-  //         }}
-  //         className="btn btn-success w-100 mt-4"
-  //       >
-  //         Confirm
-  //       </button>
-  //     </>,
-  //     {
-  //       position: "top-center",
-  //       autoClose: false,
-  //       hideProgressBar: true,
-  //       closeOnClick: true,
-  //       pauseOnHover: true,
-  //       draggable: true,
-  //       progress: undefined,
-  //     }
-  //   );
-  // };
-  const handlePayWithMonnify = async (rowData: any) => {
-    const { id, type } = rowData;
-    const endpoint =
-      type === "Refferal"
-        ? `/process-user-refferal-withdraw`
-        : `/process-user-withdraw`;
-
-    toast.warn(
-      <>
-        Are you sure you want to process this withdrawal?
-        <br />
-        <button
-          onClick={async () => {
-            setIsProcessing(id);
-            try {
-              const payload = {
-                id: id,
-                paymentgateway: "monnify",
-              };
-              const requestOptions = {
-                headers: {
-                  "Content-Type": "application/json",
-                  Accept: "application/json",
-                  Authorization: `Bearer ${token}`,
-                },
-              };
-
-              const response = await HTTP.post(
-                endpoint,
-                payload,
-                requestOptions
-              );
-              toast.success("Withdrawal processed successfully");
-              queryClient.invalidateQueries("GET_ALL_WITHDRAW");
-              // Close the toast
-              return response;
-            } catch (error) {
-              toast.error("Failed to process withdrawal");
-              setIsProcessing(null);
-            }
-          }}
-          className="btn btn-success w-100 mt-4"
-        >
-          Confirm
-        </button>
-      </>,
-      {
-        position: "top-center",
-        autoClose: false,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
+      const response = await fetch(endpoint, requestOptions);
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (response.status === 400) {
+          toast.error("User does not Exist");
+          // Display or handle the error here
+        } else {
+          throw new Error(errorData.error || "Network response was not ok");
+        }
       }
-    );
-  };
 
-  const handlePayWithCancel = async (id: any) => {
-    toast.warn(
-      <>
-        Are you sure you want to cancel this withdrawal?
-        <br />
-        <button
-          onClick={async () => {
-            setIsCancel(id);
-            try {
-              const endpoint = `/process-user-withdraw`;
-              const payload = {
-                id: id,
-                action: "cancel",
-              };
-              const requestOptions = {
-                headers: {
-                  "Content-Type": "application/json",
-                  Accept: "application/json",
-                  Authorization: `Bearer ${token}`,
-                },
-              };
-
-              const response = await HTTP.post(
-                endpoint,
-                payload,
-                requestOptions
-              );
-              toast.success("Withdrawal canceled successfully");
-              queryClient.invalidateQueries("GET_ALL_WITHDRAW");
-              // Close the toast
-              return response;
-            } catch (error) {
-              toast.error("Failed to process withdrawal");
-              setIsCancel(null);
-            }
-          }}
-          className="btn btn-success w-100 mt-4"
-        >
-          Confirm
-        </button>
-      </>,
-      {
-        position: "top-center",
-        autoClose: false,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      }
-    );
+      const data = await response.json();
+      setAgentDetails(data);
+    } catch (error: any) {
+      // toast.error(error.error);
+      // Display error message or handle error appropriately
+    }
   };
 
   const columns: GridColDef[] = [
-    // {
-    //   field: "id",
-    //   type: "string",
-    //   headerName: "ID",
-    //   width: 130,
-    //   renderCell: (params) => (
-    //     <a
-    //       className="text-primary"
-    //       style={{ cursor: "pointer" }}
-    //       onClick={() => handleEdit(params.row.id)}
-    //     >
-    //       {params.value}
-    //     </a>
-    //   ),
-    // },
+    {
+      field: "user",
+      type: "string",
+      headerName: "ID",
+      width: 130,
+      renderCell: (params) => (
+        <a
+          className="text-primary"
+          style={{ cursor: "pointer" }}
+          onClick={() => handleEdit(params.row.user)}
+        >
+          {params.value}
+        </a>
+      ),
+    },
     {
       field: "amount",
       type: "string",
@@ -240,46 +86,39 @@ const ListWithdraw = () => {
       width: 150,
       valueGetter: (params) => `₦${params.value}`,
     },
-    // {
-    //   field: "bname",
-    //   type: "string",
-    //   headerName: "BANK NAME",
-    //   width: 200,
-    // },
+
     {
       field: "account",
       type: "string",
-      headerName: "ACC NO",
+      headerName: "PHONE NUMBER",
       width: 200,
     },
-    // {
-    //   field: "aname",
-    //   headerName: "ACC NAME",
-    //   width: 250,
-    //   type: "string",
-    // },
+
     {
       field: "ref",
       headerName: "REFERENCE",
-      width: 150,
+      width: 200,
       type: "string",
     },
-    // {
-    //   field: "balance",
-    //   headerName: "BALANCE",
-    //   width: 150,
-    //   type: "string",
-    //   valueGetter: (params) => `₦${params.value}`,
-    // },
-    // {
-    //   field: "type",
-    //   headerName: "TYPE",
-    //   width: 150,
-    //   type: "string",
-    // },
+    {
+      field: "payout_reference",
+      headerName: "PAYMENT REFERENCE",
+      width: 230,
+      type: "string",
+      renderCell: (params) => (
+        <span>{params.value ? params.value : "Unpaid"}</span>
+      ),
+    },
+    {
+      field: "payout_date",
+      headerName: "PAYMENT DATE",
+      width: 250,
+      type: "string",
+      renderCell: (params) => <span>{formatCreatedAt(params.value)}</span>,
+    },
 
     {
-      field: "date",
+      field: "created_at",
       headerName: "DATE",
       width: 250,
       type: "string",
@@ -292,51 +131,6 @@ const ListWithdraw = () => {
       width: 150,
       type: "string",
     },
-
-    // {
-    //   field: "withdraw_action",
-    //   headerName: "ACTION",
-    //   width: 550,
-    //   renderCell: (params) => (
-    //     <div className="d-flex">
-    //       {params.row.status === "Pending" && (
-    //         <>
-    //           <button
-    //             className="btn btn-success"
-    //             onClick={() => handlePayWithMonnify(params.row)}
-    //             disabled={isProcessing === params.row.id}
-    //           >
-    //             {isProcessing === params.row.id ? (
-    //               <Spinner animation="border" size="sm" role="status" />
-    //             ) : (
-    //               "Pay with Monnify"
-    //             )}
-    //           </button>
-    //           &nbsp; &nbsp;
-    //           <button
-    //             className="btn btn-primary"
-    //             // onClick={() => handleViewDatetime(params.row)}
-    //           >
-    //             Pay With Opay
-    //           </button>
-    //           &nbsp; &nbsp;
-    //           <button
-    //             className="btn btn-danger"
-    //             // onClick={() => handleViewDatetime(params.row)}
-    //             onClick={() => handlePayWithCancel(params.row.id)}
-    //             disabled={isCancel === params.row.id}
-    //           >
-    //             {isCancel === params.row.id ? (
-    //               <Spinner animation="border" size="sm" role="status" />
-    //             ) : (
-    //               "Cancel"
-    //             )}
-    //           </button>
-    //         </>
-    //       )}
-    //     </div>
-    //   ),
-    // },
   ];
 
   return (
@@ -388,6 +182,16 @@ const ListWithdraw = () => {
                     <p className="mt-4">
                       {userWithdrawDetails?.data?.length} Records
                     </p>
+                    <div className="d-flex">
+                      <i
+                        className="fa fa-plus mb-3 fw-bolder text-uppercase"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => handleWithdraw()}
+                      >
+                        {" "}
+                        <span className="fw-bolder">Payout for Agency</span>
+                      </i>
+                    </div>
                     <DataTable
                       slug="withdraw-agent"
                       columns={columns}
@@ -405,7 +209,20 @@ const ListWithdraw = () => {
           <Footer />
         </div>
       </div>
-      <SingleUser userDetails={userDetails} setUserDetails={setUserDetails} />
+      <AgentUser
+        agentDetails={agentDetails}
+        setAgentDetails={setAgentDetails}
+      />
+
+      <BModal
+        backdrop="static"
+        keyboard={false}
+        show={isOpen}
+        onHide={handleClose}
+        size="md"
+      >
+        <WithdrawModal handleClose={handleClose} />
+      </BModal>
     </div>
   );
 };

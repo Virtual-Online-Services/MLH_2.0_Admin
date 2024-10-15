@@ -229,6 +229,14 @@ const Users = () => {
       toast.error("No data available for export.");
       return;
     }
+    const totalWallet = dataToExport.reduce(
+      (acc: number, record: any) => acc + parseFloat(record?.wallet || 0),
+      0
+    );
+    const totalWinWallet = dataToExport.reduce(
+      (acc: number, record: any) => acc + parseFloat(record?.wwallet || 0),
+      0
+    );
 
     // Prepare the data for the worksheet
     const formattedData = dataToExport.map((record: any) => ({
@@ -237,13 +245,15 @@ const Users = () => {
       Name: record?.name,
       "Email/Phone Number": record?.email || record?.tell,
       "User Type": record?.type,
-      Wallet: `₦${record?.wallet}`,
-      "Win Wallet": `₦${record?.wwallet}`,
+      Wallet: `${record?.wallet}`,
+      "Win Wallet": `${record?.wwallet}`,
       Status: getStatusText(record?.status),
       "Signup Date": moment
         .utc(record?.date || record?.created_at, "YYYY-MM-DD HH:mm:ss")
         .local()
         .format("Do MMM YYYY | h:mm:ssA"),
+      "Total Money Funded": totalWallet,
+      "Total Winnings": totalWinWallet,
     }));
 
     // Create a new workbook and add a worksheet

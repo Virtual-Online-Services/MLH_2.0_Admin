@@ -25,6 +25,7 @@ import Bonus from "../pages/bonus/bonus";
 import SetBonus from "../pages/bonus/SetBonus";
 import PlayHistory from "../pages/play-history/PlayHistory";
 import ListWithdraw from "../pages/agent/ListWithdraw";
+import SportForecasters from "../pages/sports/SportForecasters";
 
 export const routes = [
   {
@@ -187,6 +188,12 @@ export const routes = [
     id: 27,
     path: "/agent-withdraw",
     element: <ListWithdraw />,
+    protected: true,
+  },
+  {
+    id: 28,
+    path: "/sport-forecast",
+    element: <SportForecasters />,
     protected: true,
   },
 ];

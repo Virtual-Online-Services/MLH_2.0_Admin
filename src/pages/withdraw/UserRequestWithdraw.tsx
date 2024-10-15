@@ -21,6 +21,7 @@ const UserRequestWithdraw = () => {
   const [userDetails, setUserDetails] = useState(null);
   const [isProcessing, setIsProcessing] = useState(null);
   const [isCancel, setIsCancel] = useState(null);
+  const [isDelete, setIsDelete] = useState(null);
   const queryClient = useQueryClient();
   const token = userInfo?.token?.accessToken;
   const formatCreatedAt = (createdAt: any) => {
@@ -108,7 +109,10 @@ const UserRequestWithdraw = () => {
   // };
   const handlePayWithMonnify = async (rowData: any) => {
     const { id, type } = rowData;
-    const endpoint = type === "Refferal" ? `/process-user-refferal-withdraw` : `/process-user-withdraw`;
+    const endpoint =
+      type === "Refferal"
+        ? `/process-user-refferal-withdraw`
+        : `/process-user-withdraw`;
 
     toast.warn(
       <>
@@ -195,6 +199,65 @@ const UserRequestWithdraw = () => {
             } catch (error) {
               toast.error("Failed to process withdrawal");
               setIsCancel(null);
+            }
+          }}
+          className="btn btn-success w-100 mt-4"
+        >
+          Confirm
+        </button>
+      </>,
+      {
+        position: "top-center",
+        autoClose: false,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      }
+    );
+  };
+  const handlePayDelete = async (rowData: any) => {
+    const { id, type } = rowData;
+    const endpoint =
+      type === "Refferal"
+        ? `/delete-referral-withdraw/${id}`
+        : `/delete-withdraw/${id}`;
+    toast.warn(
+      <>
+        Are you sure you want to delete this withdrawal?
+        <br />
+        <button
+          onClick={async () => {
+            setIsDelete(id);
+
+            try {
+              // const endpoint = `/delete-withdraw/${id}`;
+              // const payload = {
+              //   id: id,
+              //   action: "cancel",
+              // };
+              const requestOptions = {
+                headers: {
+                  "Content-Type": "application/json",
+                  Accept: "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+              };
+
+              const response = await HTTP.post(
+                endpoint,
+                {},
+                // payload,
+                requestOptions
+              );
+              toast.success("Withdrawal deleted successfully");
+              queryClient.invalidateQueries("GET_ALL_WITHDRAW");
+              // Close the toast
+              return response;
+            } catch (error) {
+              toast.error("Failed to process withdrawal");
+              setIsDelete(null);
             }
           }}
           className="btn btn-success w-100 mt-4"
@@ -328,6 +391,19 @@ const UserRequestWithdraw = () => {
                   <Spinner animation="border" size="sm" role="status" />
                 ) : (
                   "Cancel"
+                )}
+              </button>
+              &nbsp;&nbsp;
+              <button
+                className="btn btn-danger"
+                // onClick={() => handleViewDatetime(params.row)}
+                onClick={() => handlePayDelete(params.row)}
+                disabled={isDelete === params.row.id}
+              >
+                {isDelete === params.row.id ? (
+                  <Spinner animation="border" size="sm" role="status" />
+                ) : (
+                  <i className="fa fa-trash"></i>
                 )}
               </button>
             </>
