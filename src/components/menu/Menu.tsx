@@ -8,8 +8,12 @@ import { useDispatch, useSelector } from "react-redux";
 
 const MenuItem = ({ item }) => {
   const [isActive, setIsActive] = useState(false);
-  const userInfo = useSelector((state) => state.auth.userInfo);
-  const usernamePermission = userInfo;
+  const usernamePermission = useSelector((state) => state.auth.userInfo);
+  // console.log(usernamePermission?.permission);
+
+  const hasPermission = (menuItem: any) => {
+    return usernamePermission?.permission?.includes(menuItem?.permission);
+  };
 
   const handleItemClick = () => {
     setIsActive(!isActive);
@@ -21,13 +25,24 @@ const MenuItem = ({ item }) => {
       onClick={handleItemClick}
     >
       <span className="title">{item?.title}</span>
-      {item?.listItems &&
+      {/* {item?.listItems &&
         item.listItems.map((listItem) => (
           <Link to={listItem?.url} className="listItem" key={listItem?.id}>
             <i className={listItem?.icon}></i>
             <span className="listItemTitle mt-1">{listItem?.title}</span>
           </Link>
-        ))}
+        ))} */}
+
+      {item?.listItems &&
+        item.listItems
+          .filter((listItem: any) => hasPermission(listItem)) // Filter by permission
+          .map((listItem: any) => (
+            <Link to={listItem?.url} className="listItem" key={listItem?.id}>
+              <i className={listItem?.icon}></i>
+              <span className="listItemTitle mt-1">{listItem?.title}</span>
+            </Link>
+          ))}
+
       {item.listItems[1]?.subItems && (
         <div className="subItems">
           {item.listItems[1]?.subItems.map((subItem) => (

@@ -46,6 +46,7 @@ const UserLogin = () => {
         setCredentials({
           token: res.token,
           data: res.data,
+          permission: res.permission,
         })
       );
 

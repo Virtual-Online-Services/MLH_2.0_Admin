@@ -26,14 +26,14 @@ const useGetProfileUser = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: [queryKeys.GET_USER_PROFILE, userId],
     queryFn: () => getUsers(userId, token),
-    enabled: !!userId && !!token, // Ensure query only runs if userId and token exist
+    enabled: !!userId && !!token,
   });
 
   return {
     userProfileResponse: data?.data?.[0],
     token,
     isLoadingUserProfile: isLoading,
-    error, // You can use error in your component to handle error states
+    error,
   };
 };
 
