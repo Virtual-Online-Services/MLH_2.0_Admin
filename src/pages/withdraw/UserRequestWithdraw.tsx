@@ -20,6 +20,7 @@ const UserRequestWithdraw = () => {
   const userInfo = useSelector((state) => state.auth.userInfo);
   const [userDetails, setUserDetails] = useState(null);
   const [isProcessing, setIsProcessing] = useState(null);
+  const [isProcessingOpay, setIsProcessingOpay] = useState(null);
   const [isCancel, setIsCancel] = useState(null);
   const [isDelete, setIsDelete] = useState(null);
   const queryClient = useQueryClient();
@@ -107,6 +108,63 @@ const UserRequestWithdraw = () => {
   //     }
   //   );
   // };
+  const handlePayWithOPay = async (rowData: any) => {
+    const { id, type } = rowData;
+    const endpoint =
+      type === "Refferal"
+        ? `/process-user-refferal-withdraw`
+        : `/process-user-withdraw`;
+
+    toast.warn(
+      <>
+        Are you sure you want to process this withdrawal?
+        <br />
+        <button
+          onClick={async () => {
+            setIsProcessingOpay(id);
+            try {
+              const payload = {
+                id: id,
+                paymentgateway: "opay",
+              };
+              const requestOptions = {
+                headers: {
+                  "Content-Type": "application/json",
+                  Accept: "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+              };
+
+              const response = await HTTP.post(
+                endpoint,
+                payload,
+                requestOptions
+              );
+              toast.success("Withdrawal processed successfully");
+              queryClient.invalidateQueries("GET_ALL_WITHDRAW");
+              // Close the toast
+              return response;
+            } catch (error) {
+              toast.error("Failed to process withdrawal");
+              setIsProcessingOpay(null);
+            }
+          }}
+          className="btn btn-success w-100 mt-4"
+        >
+          Confirm
+        </button>
+      </>,
+      {
+        position: "top-center",
+        autoClose: false,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      }
+    );
+  };
   const handlePayWithMonnify = async (rowData: any) => {
     const { id, type } = rowData;
     const endpoint =
@@ -376,9 +434,13 @@ const UserRequestWithdraw = () => {
               &nbsp; &nbsp;
               <button
                 className="btn btn-primary"
-                // onClick={() => handleViewDatetime(params.row)}
+                onClick={() => handlePayWithOPay(params.row)}
               >
-                Pay With Opay
+                {isProcessingOpay === params.row.id ? (
+                  <Spinner animation="border" size="sm" role="status" />
+                ) : (
+                  "Pay with Opay"
+                )}
               </button>
               &nbsp; &nbsp;
               <button

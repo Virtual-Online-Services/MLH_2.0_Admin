@@ -18,7 +18,7 @@ const AgentUser = ({ agentDetails, setAgentDetails }) => {
   const [bankName, setBankName] = useState(agentDetails?.data?.bname || "");
   const [accountNo, setAccountNo] = useState(agentDetails?.data?.accno || "");
   const [loadingBank, setLoadingBank] = useState(false);
-
+  const adminName = userInfo?.data?.name;
   const handleBankNameChange = (e: any) => {
     setBankName(e.target.value);
   };
@@ -252,35 +252,38 @@ const AgentUser = ({ agentDetails, setAgentDetails }) => {
                     Transactions
                   </button>
                 </li>
-
-                <li className="nav-item" role="presentation">
-                  <button
-                    className="nav-link"
-                    id="transfer-tab"
-                    data-bs-toggle="tab"
-                    data-bs-target="#transfer-tab-pane"
-                    type="button"
-                    role="tab"
-                    aria-controls="transfer-tab-pane"
-                    aria-selected="false"
-                  >
-                    Transfer
-                  </button>
-                </li>
-                <li className="nav-item" role="presentation">
-                  <button
-                    className="nav-link"
-                    id="bank-tab"
-                    data-bs-toggle="tab"
-                    data-bs-target="#bank-tab-pane"
-                    type="button"
-                    role="tab"
-                    aria-controls="bank-tab-pane"
-                    aria-selected="false"
-                  >
-                    Edit User Bank Details
-                  </button>
-                </li>
+                {adminName === "Super Admin" && (
+                  <>
+                    <li className="nav-item" role="presentation">
+                      <button
+                        className="nav-link"
+                        id="transfer-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#transfer-tab-pane"
+                        type="button"
+                        role="tab"
+                        aria-controls="transfer-tab-pane"
+                        aria-selected="false"
+                      >
+                        Transfer
+                      </button>
+                    </li>
+                    <li className="nav-item" role="presentation">
+                      <button
+                        className="nav-link"
+                        id="bank-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#bank-tab-pane"
+                        type="button"
+                        role="tab"
+                        aria-controls="bank-tab-pane"
+                        aria-selected="false"
+                      >
+                        Edit User Bank Details
+                      </button>
+                    </li>
+                  </>
+                )}
               </ul>
               <div className="tab-content" id="myTabContent">
                 <div

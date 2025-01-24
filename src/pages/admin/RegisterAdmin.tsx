@@ -9,6 +9,7 @@ import { Spinner } from "react-bootstrap";
 import BModal from "../../components/BModal/BModal";
 import { Link } from "react-router-dom";
 import AddAdmin from "../../components/admin/AddAdmin";
+import { useSelector } from "react-redux";
 
 const RegisterAdmin = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,8 +18,9 @@ const RegisterAdmin = () => {
   const handleAdvert = () => {
     handleOpen();
   };
+  const userInfo = useSelector((state) => state.auth.userInfo);
   const { userAdminResponse, isLoadingAdmin } = useGetAdmin([]);
-
+  const adminName = userInfo?.data?.name;
   const columns: GridColDef[] = [
     {
       field: "id",
@@ -62,15 +64,22 @@ const RegisterAdmin = () => {
             </div>
 
             <div>
-              <p>
-                <a
-                  onClick={() => handleAdvert()}
-                  className="btn btn-primary mt-4"
-                >
-                  <i className="fa fa-plus-circle"></i>{" "}
-                </a>
-              </p>
-              <p>{userAdminResponse?.data?.length} Records</p>
+              {adminName === "Super Admin" && (
+                <>
+                  <a
+                    onClick={() => handleAdvert()}
+                    className="btn btn-primary mt-4"
+                  >
+                    <i className="fa fa-plus-circle"></i>{" "}
+                  </a>
+                </>
+              )}
+              {adminName === "Super Admin" && (
+                <>
+                  <p>{userAdminResponse?.data?.length} Records</p>
+                </>
+              )}
+
               {isLoadingAdmin ? (
                 <div className="spinner text-center mt-5">
                   <Spinner
@@ -92,15 +101,17 @@ const RegisterAdmin = () => {
                     </div>
                   </div>
                 </div>
+              ) : adminName === "Super Admin" ? (
+                <DataTable
+                  slug="admin_register"
+                  columns={columns}
+                  rows={userAdminResponse?.data}
+                  getRowId={(row) => row.id}
+                />
               ) : (
-                <>
-                  <DataTable
-                    slug="admin_register"
-                    columns={columns}
-                    rows={userAdminResponse?.data}
-                    getRowId={(row) => row.id}
-                  />
-                </>
+                <div className="alert alert-danger text-center mt-4">
+                  You don't have the permission to view this content.
+                </div>
               )}
 
               <br />

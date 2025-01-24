@@ -4,6 +4,7 @@ import HTTP from "../../utils/httpClient";
 import { useSelector } from "react-redux";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import useGetAdmin from "../../react-query/api-hooks/useGetAdmin";
 
 const SingleAdmin = ({ adminDetails, setAdminDetails }) => {
   const [editedDetails, setEditedDetails] = useState({});
@@ -20,14 +21,17 @@ const SingleAdmin = ({ adminDetails, setAdminDetails }) => {
       [name]: value,
     }));
   };
+  const { userAdminResponse } = useGetAdmin();
+  // console.log(userAdminResponse);
+  // console.log(userInfo?.permission);
 
-  const handlePermissionChange = (e) => {
+  const handlePermissionChange = (e: any) => {
     const { value, checked } = e.target;
     setSelectedPermissions((prevPermissions) => {
       if (checked) {
-        return [...new Set([...prevPermissions, value])]; // Add value only if it's not already in the array
+        return [...new Set([...prevPermissions, value])];
       } else {
-        return prevPermissions.filter((perm) => perm !== value); // Remove value if unchecked
+        return prevPermissions.filter((perm) => perm !== value);
       }
     });
   };
@@ -40,7 +44,7 @@ const SingleAdmin = ({ adminDetails, setAdminDetails }) => {
         `/update-admin/${adminDetails.data.id}`,
         {
           ...editedDetails,
-          perm: selectedPermissions, // Ensure unique permissions are sent
+          perm: selectedPermissions,
         },
         {
           headers: {
@@ -55,8 +59,6 @@ const SingleAdmin = ({ adminDetails, setAdminDetails }) => {
 
       queryClient.invalidateQueries("GET_ADMIN_DETAILS");
     } catch (error) {
-      console.error("Error editing admin:", error);
-      // Handle error
       toast.error("An error occurred while updating the admin details.");
     } finally {
       setIsLoading(false);

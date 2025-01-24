@@ -3,7 +3,7 @@ import Navbar from "../../components/navbar/Navbar";
 import Menu from "../../components/menu/Menu";
 import { Link } from "react-router-dom";
 import { Spinner } from "react-bootstrap";
-// import useGetUsers from "../../react-query/api-hooks/useGetUsers";
+import useGetAdmin from "../../react-query/api-hooks/useGetAdmin";
 import Footer from "../../components/footer/Footer";
 import moment from "moment";
 import { useEffect, useState } from "react";

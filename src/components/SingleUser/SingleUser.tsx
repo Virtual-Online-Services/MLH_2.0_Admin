@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import HTTP from "../../utils/httpClient";
 import { toast } from "react-toastify";
 import useGetAllBank from "../../react-query/api-hooks/useGetAllBank";
+// import useGetAdmin from "../../react-query/api-hooks/useGetAdmin";
 
 const SingleUser = ({ userDetails, setUserDetails }) => {
   const [userTransaction, setUserTransaction] = useState([]);
@@ -23,7 +24,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
   const handleBankNameChange = (e: any) => {
     setBankName(e.target.value);
   };
-
+  const adminName = userInfo?.data?.name;
   const handleAccountNoChange = (e: any) => {
     setAccountNo(e.target.value);
   };
@@ -81,7 +82,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
         );
         setUserTransaction(sortedTransactions);
       } catch (error) {
-        console.error("Error fetching user transactions:");
+        // console.error("Error fetching user transactions:");
       }
     };
 
@@ -105,7 +106,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
         });
         setUserBonus(response.data);
       } catch (error) {
-        console.error("Error fetching user transactions:");
+        // console.error("Error fetching user transactions:");
       }
     };
 
@@ -303,7 +304,7 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                   </button>
                 </li>
 
-                <li className="nav-item" role="presentation">
+                {/* <li className="nav-item" role="presentation">
                   <button
                     className="nav-link"
                     id="transfer-tab"
@@ -330,7 +331,39 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                   >
                     Edit User Bank Details
                   </button>
-                </li>
+                </li> */}
+                {adminName === "Super Admin" && (
+                  <>
+                    <li className="nav-item" role="presentation">
+                      <button
+                        className="nav-link"
+                        id="transfer-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#transfer-tab-pane"
+                        type="button"
+                        role="tab"
+                        aria-controls="transfer-tab-pane"
+                        aria-selected="false"
+                      >
+                        Transfer
+                      </button>
+                    </li>
+                    <li className="nav-item" role="presentation">
+                      <button
+                        className="nav-link"
+                        id="bank-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#bank-tab-pane"
+                        type="button"
+                        role="tab"
+                        aria-controls="bank-tab-pane"
+                        aria-selected="false"
+                      >
+                        Edit User Bank Details
+                      </button>
+                    </li>
+                  </>
+                )}
               </ul>
               <div className="tab-content" id="myTabContent">
                 <div

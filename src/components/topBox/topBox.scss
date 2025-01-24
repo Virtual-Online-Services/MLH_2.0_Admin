@@ -1,25 +1,21 @@
-@import "../../styles/responsive.scss";
-
 .topBox {
   h1 {
     margin-bottom: 20px;
-
-    @include xxl {
-      font-size: 24px;
-    }
+    font-size: 24px;
   }
 
   .list {
     .listItem_top {
       display: flex;
       align-items: center;
-      justify-content: space-evenly;
-      margin-bottom: 30px;
-      gap: 150px;
+      justify-content: space-between; 
+      margin-bottom: 20px; 
+      padding: 10px 0;
+      border-bottom: 1px solid #e0e0e0; 
 
       .user {
         display: flex;
-        gap: 20px;
+        gap: 10px; 
 
         img {
           width: 40px;
@@ -27,39 +23,33 @@
           border-radius: 50%;
           object-fit: cover;
 
-          @include xxl {
-            display: none;
-          }
-          @include lg {
-            display: block;
-          }
+         
         }
 
         .userTexts {
           display: flex;
           flex-direction: column;
-          gap: 5px;
+          gap: 2px; 
 
           .username {
-            font-size: 13px;
-            font-weight: 500;
+            font-size: 14px; 
+            font-weight: 600;
           }
+
           .email {
             font-size: 12px;
+            color: #666;
 
-            @include xxl {
-              display: none;
-            }
-            @include lg {
-              display: block;
-            }
+          
           }
         }
       }
 
       .amount {
-        font-weight: 500;
-        font-size: 13px;
+        font-weight: 600;
+        font-size: 14px;
+        color: #333; 
+        text-align: right; 
       }
     }
   }

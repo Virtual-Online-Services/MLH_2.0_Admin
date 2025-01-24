@@ -4,16 +4,36 @@ import useGetDashBoardInfo from "../../react-query/api-hooks/useGetDashBoardInfo
 
 const PieChartBox = () => {
   const { dashboardData, isLoadingData } = useGetDashBoardInfo();
+  if (isLoadingData) {
+    return <div>Loading...</div>;
+  }
 
+  if (!dashboardData || dashboardData.status !== "successful") {
+    return <div>Failed to load data</div>;
+  }
   const data = [
     {
       name: "Total Pay",
-      value: dashboardData?.total_pay,
+      value: dashboardData?.total_pay || 0, // Numerical value for chart rendering
+      formattedValue: `₦${(dashboardData?.total_pay / 1_000_000).toLocaleString(
+        "en-US",
+        {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }
+      )}M`, // Formatted value for display
       color: "#fc0202",
     },
     {
       name: "Total Win",
-      value: dashboardData?.total_win,
+      value: dashboardData?.total_win || 0, // Numerical value for chart rendering
+      formattedValue: `₦${(dashboardData?.total_win / 1_000_000).toLocaleString(
+        "en-US",
+        {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }
+      )}M`, // Formatted value for display
       color: "#00C49F",
     },
   ];
@@ -25,6 +45,12 @@ const PieChartBox = () => {
         <ResponsiveContainer width="99%" height={300}>
           <PieChart>
             <Tooltip
+              formatter={(value) =>
+                `₦${(value / 1_000_000).toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}M`
+              }
               contentStyle={{ background: "white", borderRadius: "5px" }}
             />
             <Pie
@@ -32,12 +58,11 @@ const PieChartBox = () => {
               innerRadius={"70%"}
               outerRadius={"90%"}
               paddingAngle={5}
-              dataKey="value"
+              dataKey="value" // Uses the numerical value
             >
               {data.map((item) => (
                 <Cell key={item.name} fill={item.color} />
               ))}
-              {/* <Cell key={dashboardData.total_pay} /> */}
             </Pie>
           </PieChart>
         </ResponsiveContainer>
@@ -49,7 +74,7 @@ const PieChartBox = () => {
               <div className="dot" style={{ backgroundColor: item.color }} />
               <span>{item.name}</span>
             </div>
-            <span>₦{item.value}</span>
+            <span>{item.formattedValue}</span> {/* Use formatted value */}
           </div>
         ))}
       </div>
