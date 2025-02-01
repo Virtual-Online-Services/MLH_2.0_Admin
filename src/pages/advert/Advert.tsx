@@ -9,7 +9,9 @@ import moment from "moment";
 import { Spinner } from "react-bootstrap";
 import BModal from "../../components/BModal/BModal";
 import AdvertModal from "../../components/AdvertModal/AdvertModal";
+
 import { Link } from "react-router-dom";
+import useGetLottoOperator from "../../react-query/api-hooks/useGetLottoOperator";
 
 const Advert = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,11 +22,23 @@ const Advert = () => {
   };
   const { userAdvertResponse, isLoadingAdvert } = useGetAdvert([]);
 
-  const formatDate = (timestamp) => {
+  const { userLottoOperator, isLoadingLottoOperator } = useGetLottoOperator();
+  const operatorMap = Array.isArray(userLottoOperator?.data)
+    ? userLottoOperator.data.reduce((acc, operator) => {
+        acc[operator.id] = operator.name;
+        return acc;
+      }, {})
+    : {};
+
+  const formatDate = (timestamp: any) => {
     return moment.unix(timestamp).format("Do MMM YYYY");
   };
 
-  const getStatus = (endTimestamp) => {
+  const formatTime = (timestamp: any) => {
+    return timestamp ? moment.unix(timestamp).format("HH:mm:ss") : "";
+  };
+
+  const getStatus = (endTimestamp: any) => {
     const currentDate = moment();
     const endDate = moment.unix(endTimestamp);
     return endDate.isBefore(currentDate) ? "Inactive" : "Active";
@@ -32,9 +46,10 @@ const Advert = () => {
 
   // Modify userAdvertResponse.data to include the status field
   const formattedData =
-    userAdvertResponse?.data.map((ad) => ({
+    userAdvertResponse?.data.map((ad: any) => ({
       ...ad,
       status: getStatus(ad.end_date),
+      operator_name: operatorMap[ad.operator_id] || "No chosen yet",
     })) || [];
 
   const columns: GridColDef[] = [
@@ -78,6 +93,39 @@ const Advert = () => {
       headerName: "End Date",
       width: 200,
       valueFormatter: (params) => formatDate(params.value),
+    },
+    {
+      field: "page_web",
+      type: "string",
+      headerName: "Web Page",
+      width: 200,
+    },
+    {
+      field: "page_app",
+      type: "string",
+      headerName: "App Page",
+      width: 200,
+    },
+    {
+      field: "operator_id",
+      type: "number",
+      headerName: "Operator ID",
+      width: 150,
+      valueGetter: (params) => params.row.operator_name,
+    },
+    {
+      field: "start_time",
+      type: "string",
+      headerName: "Start Time",
+      width: 200,
+      valueFormatter: (params) => formatTime(params.value),
+    },
+    {
+      field: "end_time",
+      type: "string",
+      headerName: "End Time",
+      width: 200,
+      valueFormatter: (params) => formatTime(params.value),
     },
     {
       field: "status",

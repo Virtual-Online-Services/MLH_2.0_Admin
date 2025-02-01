@@ -12,6 +12,7 @@ import Footer from "../../components/footer/Footer";
 import useGetDashBoardInfo from "../../react-query/api-hooks/useGetDashBoardInfo.js";
 import ChartGames from "../../components/chartBox/ChartGames.js";
 import TopFiveTransactions from "../transaction/TopFiveTransactions";
+import Analytics from "../../components/bigChartBox/Analytics.js";
 
 const Home = () => {
   const { dashboardData, isLoadingData } = useGetDashBoardInfo();
@@ -55,7 +56,7 @@ const Home = () => {
               <BarChartBox {...barChartBoxVisit} />
             </div>
             <div className="box box9">
-              <BarChartBox {...barChartBoxRevenue} />
+              <Analytics />
             </div>
           </div>
           <div className="mt-5">Top 5 Transactions</div>

@@ -14,26 +14,26 @@ const PieChartBox = () => {
   const data = [
     {
       name: "Total Pay",
-      value: dashboardData?.total_pay || 0, // Numerical value for chart rendering
+      value: dashboardData?.total_pay || 0,
       formattedValue: `₦${(dashboardData?.total_pay / 1_000_000).toLocaleString(
         "en-US",
         {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         }
-      )}M`, // Formatted value for display
+      )}M`,
       color: "#fc0202",
     },
     {
       name: "Total Win",
-      value: dashboardData?.total_win || 0, // Numerical value for chart rendering
+      value: dashboardData?.total_win || 0,
       formattedValue: `₦${(dashboardData?.total_win / 1_000_000).toLocaleString(
         "en-US",
         {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         }
-      )}M`, // Formatted value for display
+      )}M`,
       color: "#00C49F",
     },
   ];
@@ -58,7 +58,7 @@ const PieChartBox = () => {
               innerRadius={"70%"}
               outerRadius={"90%"}
               paddingAngle={5}
-              dataKey="value" // Uses the numerical value
+              dataKey="value"
             >
               {data.map((item) => (
                 <Cell key={item.name} fill={item.color} />
@@ -74,7 +74,7 @@ const PieChartBox = () => {
               <div className="dot" style={{ backgroundColor: item.color }} />
               <span>{item.name}</span>
             </div>
-            <span>{item.formattedValue}</span> {/* Use formatted value */}
+            <span>{item.formattedValue}</span>
           </div>
         ))}
       </div>

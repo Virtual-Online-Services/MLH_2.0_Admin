@@ -3,9 +3,9 @@ import queryKeys from "../constants";
 import { HTTP } from "../../utils";
 import { useSelector } from "react-redux";
 
-const getInfo = async (token) => {
+const getInfo = async (token: any) => {
   try {
-    const res = await HTTP.get(`/admin-dashboard`, {
+    const res = await HTTP.get(`/admin-get-uservisits`, {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -18,13 +18,13 @@ const getInfo = async (token) => {
   }
 };
 
-const useGetDashBoardInfo = () => {
+const useGetTotalVisit = () => {
   const userInfo = useSelector((state) => state.auth.userInfo);
   const token = userInfo?.token?.accessToken;
   //   console.log(token);
 
   const { data, isLoading } = useQuery({
-    queryKey: [queryKeys.GET_DASHBOARD_INFO],
+    queryKey: [queryKeys.GET_TOTAL_VISIT],
     queryFn: () => getInfo(token),
   });
   return {
@@ -33,4 +33,4 @@ const useGetDashBoardInfo = () => {
   };
 };
 
-export default useGetDashBoardInfo;
+export default useGetTotalVisit;

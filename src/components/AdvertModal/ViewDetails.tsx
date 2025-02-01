@@ -4,12 +4,14 @@ import HTTP from "../../utils/httpClient";
 import { useSelector } from "react-redux";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import useGetLottoOperator from "../../react-query/api-hooks/useGetLottoOperator";
 
 const ViewDetails = ({ advert, setAdvert }) => {
   const [editedDetails, setEditedDetails] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const userInfo = useSelector((state) => state.auth.userInfo);
   const token = userInfo?.token?.accessToken;
+  const { userLottoOperator, isLoadingLottoOperator } = useGetLottoOperator();
 
   const handleChange = (e: any) => {
     const { name, value } = e.target;
@@ -79,6 +81,73 @@ const ViewDetails = ({ advert, setAdvert }) => {
                   htmlFor="name"
                   className="form-label fw-bolder text-dark"
                 >
+                  Page Web
+                </label>
+                <select className="form-control">
+                  <option
+                    value={editedDetails.page_web || advert.data.page_web}
+                  >
+                    {editedDetails.page_web || advert.data.page_web}
+                  </option>
+                  <option value="Home or Lotto">Home or Lotto</option>
+                  <option value="Results">Results</option>
+                  <option value="Timetable">Timetable</option>
+                  <option value="Tutorials">Tutorials</option>
+                </select>
+              </div>
+              <div className="mb-3">
+                <label
+                  htmlFor="name"
+                  className="form-label fw-bolder text-dark"
+                >
+                  Page App
+                </label>
+                <select className="form-control">
+                  <option
+                    value={editedDetails.page_app || advert.data.page_app}
+                  >
+                    {editedDetails.page_app || advert.data.page_app}
+                  </option>
+                  <option value="Home or Lotto">Home or Lotto</option>
+                  <option value="Results">Results</option>
+                  <option value="Timetable">Timetable</option>
+                  <option value="Tutorials">Tutorials</option>
+                </select>
+              </div>
+
+              <div className="mb-3">
+                <label
+                  htmlFor="name"
+                  className="form-label fw-bolder text-dark"
+                >
+                  Select Operator
+                </label>
+                <select className="form-control">
+                  <option
+                    value={editedDetails.operator_id || advert.data.operator_id}
+                  >
+                    {userLottoOperator?.data?.find(
+                      (operator: any) =>
+                        operator.id ===
+                        (editedDetails.operator_id || advert.data.operator_id)
+                    )?.name || "Not chosen yet"}
+                  </option>
+
+                  {userLottoOperator?.data
+                    ?.filter((operator: any) => operator.del !== "Y")
+                    .map((operator: any) => (
+                      <option key={operator.id} value={operator.id}>
+                        {operator.name}
+                      </option>
+                    ))}
+                </select>
+              </div>
+
+              <div className="mb-3">
+                <label
+                  htmlFor="name"
+                  className="form-label fw-bolder text-dark"
+                >
                   Name
                 </label>
                 <input
@@ -124,6 +193,9 @@ const ViewDetails = ({ advert, setAdvert }) => {
                 />
               </div>
               <div className="mb-3 w-100">
+                <label htmlFor="start_time" className="mb-2">
+                  Start Date
+                </label>
                 <input
                   type="date"
                   className="form-control mb-2 p-3"
@@ -133,12 +205,41 @@ const ViewDetails = ({ advert, setAdvert }) => {
                 />
               </div>
               <div className="mb-3">
+                <label htmlFor="start_time" className="mb-2">
+                  End Date
+                </label>
                 <input
                   type="date"
-                  className="form-control mb-2 p-3"
+                  className="form-control"
                   placeholder="End Date"
                   min={getCurrentDate()}
                   value={editedDetails.end_date || advert.data.end_date}
+                />
+              </div>
+
+              <div className="mb-3">
+                <label htmlFor="start_time" className="mb-2">
+                  Start Time
+                </label>
+                <input
+                  id="start_time"
+                  type="time"
+                  className="form-control"
+                  placeholder="Start Time"
+                  value={editedDetails.start_time || advert.data.start_time}
+                />
+              </div>
+
+              <div className="mb-3">
+                <label htmlFor="start_time" className="mb-2">
+                  End Time
+                </label>
+                <input
+                  id="start_time"
+                  type="time"
+                  className="form-control"
+                  placeholder="Start Time"
+                  value={editedDetails.end_time || advert.data.end_time}
                 />
               </div>
 

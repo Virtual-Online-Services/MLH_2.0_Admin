@@ -21,5 +21,7 @@ export { default as useGetInstantGamesOperator } from "./api-hooks/useGetInstant
 export { default as useGetBonus } from "./api-hooks/useGetBonus";
 export { default as useGetLottoBonus } from "./api-hooks/useGetLottoBonus";
 export { default as useGetAllRequestWithdrawAgent } from "./api-hooks/useGetAllRequestWithdrawAgent";
-export {default as useGetPlayActivity} from "./api-hooks/useGetPlayActivity"
-export {default as useGetRevenue} from "./api-hooks/useGetRevenue"
+export {default as useGetPlayActivity} from "./api-hooks/useGetPlayActivity";
+export {default as useGetRevenue} from "./api-hooks/useGetRevenue";
+export {default as useGetTotalVisit} from "./api-hooks/useGetTotalVisit";
+export {default as useGetSummary} from "./api-hooks/useGetSummary";
