@@ -48,6 +48,26 @@ const TopBox = () => {
       today: dashboardData.goldenchance_lotto_today,
       all: dashboardData.goldenchance_lotto_all,
     },
+    {
+      name: "Gd Ghana",
+      today: dashboardData.gd_ghana_today,
+      all: dashboardData.gd_ghana_all,
+    },
+    {
+      name: "Gd Lotto",
+      today: dashboardData.gd_lotto_today,
+      all: dashboardData.gd_lotto_all,
+    },
+    {
+      name: "Gd Jackpot",
+      today: dashboardData.gd_jackpot_today,
+      all: dashboardData.gd_jackpot_all,
+    },
+    {
+      name: "NNP",
+      today: dashboardData.nnp_today,
+      all: dashboardData.nnp_all,
+    },
   ];
 
   return (

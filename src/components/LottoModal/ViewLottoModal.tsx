@@ -12,7 +12,7 @@ const EditOperatorModal = ({ operatorDetails, setOperatorDetails }) => {
   const userInfo = useSelector((state) => state.auth.userInfo);
   const token = userInfo?.token?.accessToken;
 
-  const handleChange = (e:any) => {
+  const handleChange = (e: any) => {
     const { name, value } = e.target;
     setEditedDetails((prevDetails) => ({
       ...prevDetails,
@@ -20,19 +20,23 @@ const EditOperatorModal = ({ operatorDetails, setOperatorDetails }) => {
     }));
   };
 
-  const handleFileChange = (e:any) => {
+  const handleFileChange = (e: any) => {
     setLogoFile(e.target.files[0]);
   };
 
   const queryClient = useQueryClient();
 
-  const handleSubmit = async (e:any) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     setIsLoading(true);
     const formData = new FormData();
     formData.append("name", editedDetails?.name || operatorDetails.data.name);
     formData.append("del", editedDetails?.del || operatorDetails.data.del);
     formData.append("play", editedDetails?.play || operatorDetails.data.play);
+    formData.append(
+      "play_order",
+      editedDetails?.play_order || operatorDetails.data.play_order
+    );
     if (logoFile) {
       formData.append("logo", logoFile);
     }
@@ -71,13 +75,18 @@ const EditOperatorModal = ({ operatorDetails, setOperatorDetails }) => {
         centered
       >
         <Modal.Header closeButton>
-          <Modal.Title className="fw-bolder text-dark">Edit Operator</Modal.Title>
+          <Modal.Title className="fw-bolder text-dark">
+            Edit Operator
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {operatorDetails && (
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
-                <label htmlFor="name" className="form-label fw-bolder text-dark">
+                <label
+                  htmlFor="name"
+                  className="form-label fw-bolder text-dark"
+                >
                   Name
                 </label>
                 <input
@@ -107,7 +116,10 @@ const EditOperatorModal = ({ operatorDetails, setOperatorDetails }) => {
               </div>
 
               <div className="mb-3">
-                <label htmlFor="play" className="form-label fw-bolder text-dark">
+                <label
+                  htmlFor="play"
+                  className="form-label fw-bolder text-dark"
+                >
                   Enable Play
                 </label>
                 <select
@@ -123,7 +135,10 @@ const EditOperatorModal = ({ operatorDetails, setOperatorDetails }) => {
               </div>
 
               <div className="mb-3">
-                <label htmlFor="logo" className="form-label fw-bolder text-dark">
+                <label
+                  htmlFor="logo"
+                  className="form-label fw-bolder text-dark"
+                >
                   Logo
                 </label>
                 <input
@@ -136,8 +151,34 @@ const EditOperatorModal = ({ operatorDetails, setOperatorDetails }) => {
                 />
               </div>
 
+              <div className="mb-3">
+                <label
+                  htmlFor="play_order"
+                  className="form-label fw-bolder text-dark"
+                >
+                  Position
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  className="form-control"
+                  id="play_order"
+                  name="play_order"
+                  value={
+                    editedDetails.play_order !== undefined
+                      ? editedDetails.play_order
+                      : operatorDetails.data.play_order
+                  }
+                  onChange={handleChange}
+                />
+              </div>
+
               <Button variant="primary" type="submit" disabled={isLoading}>
-                {isLoading ? <Spinner animation="border" size="lg" /> : "Save Changes"}
+                {isLoading ? (
+                  <Spinner animation="border" size="lg" />
+                ) : (
+                  "Save Changes"
+                )}
               </Button>
             </form>
           )}

@@ -1,23 +1,13 @@
 import "./analytics.scss";
 import useGetSummary from "../../react-query/api-hooks/useGetSummary.js";
 
-const formatNumber = (num: number) => {
-  if (num >= 1_000_000_000) {
-    return `₦${(num / 1_000_000_000).toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}B`;
-  } else if (num >= 1_000_000) {
-    return `₦${(num / 1_000_000).toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}M`;
-  } else {
-    return `₦${num.toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`;
-  }
+// Helper function to format numbers with commas and two decimals.
+const formatNumber = (num) => {
+  const number = Number(num);
+  return number.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 };
 
 const Analytics = () => {
@@ -41,7 +31,10 @@ const Analytics = () => {
       name: "Total Bonus Played",
       value: dashboardSummaryData?.total_bonus_played,
     },
-    { name: "Total Deposit", value: dashboardSummaryData?.total_deposit },
+    {
+      name: "Total Deposit",
+      value: dashboardSummaryData?.total_deposit,
+    },
   ];
 
   return (
@@ -52,7 +45,9 @@ const Analytics = () => {
           <div className="listItem_top small-item" key={index}>
             <p className="small-text">{activity.name}</p>
             <span className="small-text small-value">
-              {formatNumber(activity.value)}
+              {activity.value !== undefined
+                ? formatNumber(activity.value)
+                : "-"}
             </span>
           </div>
         ))}
