@@ -4,20 +4,20 @@ import { useState } from "react";
 import Footer from "../../components/footer/Footer";
 import Menu from "../../components/menu/Menu";
 import Navbar from "../../components/navbar/Navbar";
-import useGetLottoGames from "../../react-query/api-hooks/useGetLottoGames";
+import useGetInstantGames from "../../react-query/api-hooks/useGetInstantGames";
 import { Spinner } from "react-bootstrap";
 import BModal from "../../components/BModal/BModal";
 import { Link, useNavigate } from "react-router-dom";
-import GameLotto from "../../components/LottoModal/GameLotto";
+import InstantGameLotto from "../../components/instant-game/InstantGameLotto";
 
-const Games = () => {
+const InstantGames = () => {
   const [isOpen, setIsOpen] = useState(false);
   const handleClose = () => setIsOpen(false);
   const handleOpen = () => setIsOpen(true);
   const handleGame = () => {
     handleOpen();
   };
-  const { userLottoGame, isLoadingLottoGame } = useGetLottoGames([]);
+  const { userLottoGame, isLoadingLottoGame } = useGetInstantGames([]);
   const navigate = useNavigate();
 
   const columns: GridColDef[] = [
@@ -74,7 +74,7 @@ const Games = () => {
                     Dashboard
                   </Link>
                 </li>
-                <li className="breadcrumb-item active">Games</li>
+                <li className="breadcrumb-item active">Instant Games</li>
               </ol>
             </div>
 
@@ -128,11 +128,11 @@ const Games = () => {
           onHide={handleClose}
           size="md"
         >
-          <GameLotto handleClose={handleClose} />
+          <InstantGameLotto handleClose={handleClose} />
         </BModal>
       </div>
     </div>
   );
 };
 
-export default Games;
+export default InstantGames;

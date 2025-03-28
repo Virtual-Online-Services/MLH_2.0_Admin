@@ -210,7 +210,7 @@ export const menu = [
       {
         id: 2,
         title: "Game",
-        url: "#",
+        url: "/instant-game",
         icon: "fa fa-gamepad",
         permission: "operator",
       },

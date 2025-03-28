@@ -11,7 +11,7 @@ import { useQueryClient } from "@tanstack/react-query";
 const schema = yup.object().shape({
   name: yup.string().required("This is a required field"),
   link: yup.string().required("This is a required field"),
-  pix: yup.mixed().required("This is a required field"),
+  logo: yup.mixed().required("This is a required field"),
 });
 
 const UploadInstant = ({ handleClose }) => {
@@ -30,41 +30,34 @@ const UploadInstant = ({ handleClose }) => {
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
+      "Content-Type": "multipart/form-data",
       Accept: "application/json",
     },
   };
   const queryClient = useQueryClient();
 
-  const convertFileToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = (error) => reject(error);
-    });
-  };
-
-  const submitForm = async (data) => {
+  const submitForm = async (data: any) => {
     setIsLoading(true);
 
     try {
-      const base64Logo = await convertFileToBase64(data.pix[0]);
+      const formData = new FormData();
+      formData.append("name", data.name);
+      formData.append("link", data.link);
 
-      const payload = {
-        name: data.name,
-        link: data.link,
-        pix: base64Logo, // Send the base64 string
-      };
+      if (data.logo && data.logo.length > 0) {
+        formData.append("logo", data.logo[0]);
+      }
 
       const response = await HTTP.post(
         "/add-instantgame-operator",
-        payload,
+        formData,
         config
       );
+
       setIsLoading(false);
       toast.success(response.data.message);
       handleClose();
+
       if (response.data.message) {
         queryClient.invalidateQueries("GET_INSTANT_OPERATOR");
       }
@@ -72,7 +65,7 @@ const UploadInstant = ({ handleClose }) => {
       setIsLoading(false);
 
       if (error.response && error.response.data && error.response.data.errors) {
-        const bannerError = error.response.data.errors.pix[0];
+        const bannerError = error.response.data.errors.logo[0];
         toast.error(bannerError);
       } else {
         toast.error("An error occurred.");
@@ -128,14 +121,14 @@ const UploadInstant = ({ handleClose }) => {
               <input
                 type="file"
                 className="form-control mb-2 p-3"
-                {...register("pix", {
+                {...register("logo", {
                   required: "Required",
                 })}
-                name="pix"
+                name="logo"
               />
-              {errors.pix && (
+              {errors.logo && (
                 <p className="text-danger text-capitalize">
-                  {errors.pix.message}
+                  {errors.logo.message}
                 </p>
               )}
             </div>

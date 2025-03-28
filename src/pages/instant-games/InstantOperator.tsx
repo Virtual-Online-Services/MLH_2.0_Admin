@@ -16,7 +16,7 @@ const columns: GridColDef[] = [
   { field: "name", type: "string", headerName: "Operator", width: 150 },
   { field: "link", type: "string", headerName: "Link", width: 650 },
   {
-    field: "pix",
+    field: "logo",
     headerName: "Logo",
     width: 200,
     renderCell: (params) => {

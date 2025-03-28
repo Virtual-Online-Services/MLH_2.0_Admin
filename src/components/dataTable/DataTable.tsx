@@ -57,6 +57,8 @@ const DataTable = (props: Props) => {
         endpoint = `/delete/sport-operator/${id}`;
       } else if (props.slug === "sport-code") {
         endpoint = `/delete-sports-code/${id}`;
+      } else if (props.slug === "instant-operator") {
+        endpoint = `/delete/instantgame-operator/${id}`;
       } else if (props.slug === "sport-forecast") {
         endpoint = `/delete-admin/${id}`;
       }
@@ -202,7 +204,7 @@ const DataTable = (props: Props) => {
         });
         setResultsDetails(response.data);
       } else if (props.slug === "instant-operator") {
-        endpoint = `/get-instantgame/${id}`;
+        endpoint = `/get-instantgame-operator/${id}`;
         const response = await HTTP.get(endpoint, {
           headers: {
             "Content-Type": "application/json",

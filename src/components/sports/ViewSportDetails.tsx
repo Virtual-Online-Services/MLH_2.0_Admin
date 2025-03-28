@@ -53,7 +53,7 @@ const ViewSportDetails = ({ sport, setSport }) => {
       <Modal show={sport !== null} onHide={() => setSport(null)} centered>
         <Modal.Header closeButton>
           <Modal.Title className="fw-bolder text-dark">
-            Edit Instant Operator
+            Edit Sport Operator
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>

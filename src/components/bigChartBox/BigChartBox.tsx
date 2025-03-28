@@ -35,6 +35,10 @@ const BigChartBox = () => {
     Lottomania: dashboardData.lottoManiaMonthlyTransactions[index] || 0,
     GreenLotto: dashboardData.greenLottoMonthlyTransactions[index] || 0,
     SetLotto: dashboardData.setLottoMonthlyTransactions[index] || 0,
+    GDGhana: dashboardData.GDGhanaMonthlyTransactions[index] || 0,
+    GDJackpot: dashboardData.GDJackPotMonthlyTransactions[index] || 0,
+    GDNNP: dashboardData.NNPMonthlyTransactions[index] || 0,
+    GDLotto: dashboardData.gdlottoMonthlyTransactions[index] || 0,
   }));
 
   return (
@@ -100,6 +104,34 @@ const BigChartBox = () => {
               stackId="1"
               stroke="#ccc000"
               fill="#ccc000"
+            />
+            <Area
+              type="monotone"
+              dataKey="GDGhana"
+              stackId="1"
+              stroke="#00712"
+              fill="#00712"
+            />
+            <Area
+              type="monotone"
+              dataKey="GDJackpot"
+              stackId="1"
+              stroke="#890341"
+              fill="#890341"
+            />
+            <Area
+              type="monotone"
+              dataKey="GDNNP"
+              stackId="1"
+              stroke="#764371"
+              fill="#764371"
+            />
+            <Area
+              type="monotone"
+              dataKey="GDLotto"
+              stackId="1"
+              stroke="#909090"
+              fill="#909090"
             />
           </AreaChart>
         </ResponsiveContainer>
