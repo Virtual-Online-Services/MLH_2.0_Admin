@@ -23,7 +23,7 @@ const useGetInstantGamesOperator = () => {
   const token = userInfo?.token?.accessToken;
 
   const { data, isLoading } = useQuery({
-    queryKey: [queryKeys.GET_INSTANT_OPERATOR],
+    queryKey: [queryKeys.GET_INSTANT_GAME_OPERATOR],
     queryFn: () => useAllInstantOperator(token),
   });
 

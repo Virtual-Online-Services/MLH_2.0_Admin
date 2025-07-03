@@ -215,6 +215,7 @@ const LottoBonusModal = ({ handleClose }) => {
                       <option value="27">Baba Ijebu</option>
                       <option value="45">Lottomania</option>
                       <option value="57">Set Lotto</option>
+                      <option value="42">Golden Chance</option>
                     </select>
                   </div>
                   <div className="mb-3">
@@ -347,7 +348,7 @@ const LottoBonusModal = ({ handleClose }) => {
                 </>
               )}
 
-              {selectedBonusType === "5" && (
+              {(selectedBonusType === "5" || selectedBonusType === "6") && (
                 <>
                   <div className="mb-3">
                     <input

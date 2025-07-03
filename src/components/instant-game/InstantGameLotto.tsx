@@ -13,7 +13,7 @@ const schema = yup.object().shape({
   name: yup.string().required("This is a required field"),
   link: yup.string().required("This is a required field"),
   operator: yup.string().required("This is a required field"),
-  logo: yup.string().required("This is a required field"),
+  logo: yup.mixed().required("This is a required field"),
 });
 
 const InstantGameLotto = ({ handleClose }) => {
@@ -57,7 +57,7 @@ const InstantGameLotto = ({ handleClose }) => {
         toast.success(response.data.message);
         handleClose();
         if (response.data.message) {
-          queryClient.invalidateQueries("GET_INSTANT_OPERATOR");
+          queryClient.invalidateQueries("GET_INSTANT_GAME_OPERATOR");
         }
       })
       .catch((error: any) => {

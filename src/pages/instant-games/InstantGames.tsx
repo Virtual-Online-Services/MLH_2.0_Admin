@@ -21,6 +21,7 @@ const InstantGames = () => {
   const navigate = useNavigate();
 
   const columns: GridColDef[] = [
+    { field: "id", headerName: "ID", width: 90 },
     {
       field: "name",
       type: "string",
@@ -52,10 +53,7 @@ const InstantGames = () => {
     navigate(`/game-datetime/${row.id}`);
   };
 
-  const rowsWithIds = userLottoGame?.data?.map((row: any, index: any) => ({
-    ...row,
-    id: index,
-  }));
+  const rowsWithIds = userLottoGame?.data;
 
   return (
     <div>
@@ -111,7 +109,11 @@ const InstantGames = () => {
                 </div>
               ) : (
                 <>
-                  <DataTable slug="game" columns={columns} rows={rowsWithIds} />
+                  <DataTable
+                    slug="instant-game-operator"
+                    columns={columns}
+                    rows={rowsWithIds}
+                  />
                 </>
               )}
 

@@ -59,6 +59,8 @@ const DataTable = (props: Props) => {
         endpoint = `/delete-sports-code/${id}`;
       } else if (props.slug === "instant-operator") {
         endpoint = `/delete/instantgame-operator/${id}`;
+      } else if (props.slug === "instant-game-operator") {
+        endpoint = `/delete/instantgame/${id}`;
       } else if (props.slug === "sport-forecast") {
         endpoint = `/delete-admin/${id}`;
       }

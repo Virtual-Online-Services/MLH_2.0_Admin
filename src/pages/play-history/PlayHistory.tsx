@@ -112,6 +112,7 @@ const PlayHistory = () => {
     "27": "Baba Ijebu",
     "45": "Lottomania",
     "57": "Set Lotto",
+    "42": ">Golden Chance",
   };
 
   const handleEdit = async (id: number) => {
@@ -186,6 +187,7 @@ const PlayHistory = () => {
                   <option value="27">Baba Ijebu</option>
                   <option value="45">Lottomania</option>
                   <option value="57">Set Lotto</option>
+                  <option value="42">Golden Chance</option>
                 </select>
                 <i
                   className="bi bi-chevron-down position-absolute"
