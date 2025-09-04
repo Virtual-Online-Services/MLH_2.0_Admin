@@ -516,6 +516,21 @@ const SingleUser = ({ userDetails, setUserDetails }) => {
                         </span>
                       </p>
                       <hr style={{ backgroundColor: "black" }} />
+
+                       <p
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <span className="fw-bolder text-dark">
+                          Referral Balance:
+                        </span>{" "}
+                        <span className="text-dark">
+                          ₦{userDetails?.data?.ref_give}
+                        </span>
+                      </p>
+                        <hr style={{ backgroundColor: "black" }} />
                       <p
                         style={{
                           display: "flex",

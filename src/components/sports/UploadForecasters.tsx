@@ -18,6 +18,7 @@ const UploadForecasters = ({ handleClose }) => {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm({
     resolver: yupResolver(schema),
   });
@@ -26,13 +27,6 @@ const UploadForecasters = ({ handleClose }) => {
   const token = userInfo?.token?.accessToken;
 
   const [isLoading, setIsLoading] = useState(false);
-  const config = {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "multipart/form-data",
-      Accept: "application/json",
-    },
-  };
   const queryClient = useQueryClient();
 
   const submitForm = (data) => {
@@ -40,104 +34,76 @@ const UploadForecasters = ({ handleClose }) => {
 
     const formData = new FormData();
     formData.append("name", data.name);
-    formData.append("logo", data.logo[0]);
+    formData.append("logo", data.logo[0]); // ✅ actual file
 
-    HTTP.post("/add-proforcaster ", formData, config)
+    HTTP.post("/add-proforcaster", formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+        // ❌ DO NOT set Content-Type, browser will handle boundary
+      },
+    })
       .then((response) => {
-        setIsLoading(false);
         toast.success(response.data.message);
         handleClose();
-        if (response.data.message) {
-          queryClient.invalidateQueries("GET_SPORT_FORECAST");
-        }
+        reset();
+        queryClient.invalidateQueries("GET_SPORT_FORECAST");
       })
       .catch((error) => {
-        setIsLoading(false);
-
-        if (
-          error.response &&
-          error.response.data &&
-          error.response.data.errors
-        ) {
-          const bannerError = error.response.data.errors.logo[0];
-          toast.error(bannerError);
-        } else {
-          toast.error("An error occurred.");
-        }
-      });
+        const message =
+          error.response?.data?.errors?.logo?.[0] ||
+          error.response?.data?.message ||
+          "An error occurred.";
+        toast.error(message);
+      })
+      .finally(() => setIsLoading(false));
   };
 
   return (
-    <div>
-      <div>
-        <div>
-          <div className="container">
-            <span>
-              <strong className="text-dark">
-                Upload Sport Forecaster Details
-              </strong>
-            </span>
-            <br />
+    <div className="container">
+      <span>
+        <strong className="text-dark">Upload Sport Forecaster Details</strong>
+      </span>
+      <br />
 
-            <form
-              className="mt-4"
-              encType="multipart/form-data"
-              onSubmit={handleSubmit(submitForm)}
-            >
-              <div className="mb-3">
-                <input
-                  type="text"
-                  className="form-control mb-2 p-3"
-                  placeholder="Name"
-                  {...register("name", {
-                    required: "Required",
-                  })}
-                />
-                {errors.name && (
-                  <p className="text-danger text-capitalize">
-                    {errors.name.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="mb-3">
-                <input
-                  type="file"
-                  className="form-control mb-2 p-3"
-                  {...register("logo", {
-                    required: "Required",
-                  })}
-                  name="logo"
-                />
-                {errors.logo && (
-                  <p className="text-danger text-capitalize">
-                    {errors.logo.message}
-                  </p>
-                )}
-              </div>
-
-              <Button
-                type="submit"
-                className="w-100 p-3"
-                style={{ background: "#27AAE1" }}
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <Spinner
-                    as="span"
-                    animation="border"
-                    size="lg"
-                    role="status"
-                    aria-hidden="true"
-                  />
-                ) : (
-                  " Proceed"
-                )}
-              </Button>
-            </form>
-          </div>
+      <form className="mt-4" onSubmit={handleSubmit(submitForm)}>
+        <div className="mb-3">
+          <input
+            type="text"
+            className="form-control mb-2 p-3"
+            placeholder="Name"
+            {...register("name")}
+          />
+          {errors.name && (
+            <p className="text-danger text-capitalize">{errors.name.message}</p>
+          )}
         </div>
-      </div>
+
+        <div className="mb-3">
+          <input
+            type="file"
+            className="form-control mb-2 p-3"
+            {...register("logo")}
+            name="logo"
+          />
+          {errors.logo && (
+            <p className="text-danger text-capitalize">{errors.logo.message}</p>
+          )}
+        </div>
+
+        <Button
+          type="submit"
+          className="w-100 p-3"
+          style={{ background: "#27AAE1" }}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <Spinner as="span" animation="border" size="lg" />
+          ) : (
+            "Proceed"
+          )}
+        </Button>
+      </form>
     </div>
   );
 };

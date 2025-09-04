@@ -1,6 +1,4 @@
-
 export const menu = [
-  
   {
     id: 1,
     title: "General",
@@ -24,7 +22,7 @@ export const menu = [
         title: "Message User",
         url: "/single-user-message",
         icon: "fa fa-envelope-o",
-         permission: "message",
+        permission: "message",
       },
       {
         id: 4,
@@ -41,6 +39,13 @@ export const menu = [
         permission: "user",
       },
       {
+        id: 14,
+        title: "Onboarder Users",
+        url: "/onboarder-users",
+        icon: "fa fa-users",
+        permission: "user",
+      },
+      {
         id: 6,
         title: "Transactions",
         url: "/all-transactions",
@@ -51,6 +56,13 @@ export const menu = [
         id: 7,
         title: "Withdrawals",
         url: "/all-withdraw",
+        icon: "fa fa-cloud-download",
+        permission: "transaction",
+      },
+        {
+        id: 15,
+        title: "Onboarder Withdrawals",
+        url: "/all-onboarder-withdraw",
         icon: "fa fa-cloud-download",
         permission: "transaction",
       },

@@ -7,29 +7,27 @@ import Footer from "../../components/footer/Footer";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { DateRangePicker } from "react-date-range";
-import "react-date-range/dist/styles.css";
+import "react-date-range/dist/styles.css"; 
 import "react-date-range/dist/theme/default.css"; 
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
-import SingleUser from "../../components/SingleUser/SingleUser";
-// import { useQueryClient } from "@tanstack/react-query";
 import * as XLSX from "xlsx";
-
 import HTTP from "../../utils/httpClient";
+import SingleReferralUser from "../../components/SingleUser/SingleReferralUser";
 interface User {
   id: number;
   username: string;
   status: number;
 }
 
-const Users = () => {
+const Onboarder = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const userInfo = useSelector((state) => state.auth.userInfo);
   const token = userInfo?.token?.accessToken;
   const [userDetails, setUserDetails] = useState(null);
-  const [filteredTransactions, setFilteredTransactions] = useState(null);
+  const [filteredTransactions, setFilteredTransactions] = useState<any[]>([]);
   const [showDateRangePicker, setShowDateRangePicker] = useState(false);
   const [isExportAvailable, setIsExportAvailable] = useState(false); // New state variable
 
@@ -43,7 +41,7 @@ const Users = () => {
 
   const fetchData = () => {
     setIsLoading(true);
-    HTTP.get(`/admin-get-users?page=${currentPage}`, {
+    HTTP.get(`/get-onboarders?page=${currentPage}`, {
       ...configHeaders,
     })
       .then((response: any) => {
@@ -88,23 +86,17 @@ const Users = () => {
 
   const handleFilter = () => {
     const searchUserInput = document.getElementById("searchUser");
-    const selectedStatusInput = document.getElementById("status");
 
-    if (!searchUserInput || !selectedStatusInput) {
+    if (!searchUserInput) {
       toast.error("Search input or status input not found");
       return;
     }
 
     const searchUser = searchUserInput?.value.trim();
-    const selectedStatus = selectedStatusInput?.value;
     let queryParams = "";
 
     if (searchUser !== "") {
       queryParams += `&search=${searchUser}`;
-    }
-
-    if (selectedStatus !== "") {
-      queryParams += `&status=${selectedStatus}`;
     }
 
     if (showDateRangePicker) {
@@ -113,11 +105,10 @@ const Users = () => {
       queryParams += `&start_date=${startDate}&end_date=${endDate}`;
     }
 
-    // Reset current page to 1 when filtering
     setCurrentPage(1);
 
     setIsLoading(true);
-    HTTP.get(`/admin-get-users?page=${currentPage}${queryParams}`, {
+    HTTP.get(`/get-onboarders?page=${currentPage}${queryParams}`, {
       ...configHeaders,
     })
       .then((response: any) => {
@@ -125,7 +116,6 @@ const Users = () => {
 
         setFilteredTransactions(filteredData || []);
 
-        // Check if filtered data is available and update the export availability state
         if (filteredData && filteredData.length > 0) {
           setIsExportAvailable(true);
           toast.success(`Found ${filteredData.length} records`);
@@ -134,8 +124,8 @@ const Users = () => {
           toast.error("No records found");
         }
 
-        if (!searchUser && !selectedStatus && !showDateRangePicker) {
-          setFilteredTransactions(null);
+        if (!searchUser && !showDateRangePicker) {
+          setFilteredTransactions([]);
           setIsExportAvailable(false);
         }
       })
@@ -146,14 +136,9 @@ const Users = () => {
         setIsLoading(false);
       });
   };
-
-  const getStatusText = (status: any) => {
-    return status === 1 ? "Active" : "Inactive";
-  };
-
   const handleEdit = async (id: number) => {
     try {
-      const endpoint = `https://api.mylottohub.com/v1/admin/get-user/${id}`;
+      const endpoint = `https://api.mylottohub.com/v1/admin/referral/${id}`;
       const requestOptions = {
         method: "GET",
         headers: {
@@ -179,48 +164,6 @@ const Users = () => {
     } catch (error: any) {}
   };
 
-  const handleBlockUser = async (id: number) => {
-    try {
-      await HTTP.post(
-        `/user-blockuser/${id}`,
-        {},
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      toast.success("User blocked successfully");
-
-      fetchData();
-    } catch (error) {
-      toast.error("Failed to block user");
-    }
-  };
-
-  const handleUnblockUser = async (id: number) => {
-    try {
-      await HTTP.post(
-        `/user-unblockuser/${id}`,
-        {},
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      toast.success("User unblocked successfully");
-      fetchData();
-    } catch (error) {
-      toast.error("Failed to unblock user");
-    }
-  };
-
   const handleExport = () => {
     const dataToExport = filteredTransactions || users?.data;
 
@@ -228,39 +171,26 @@ const Users = () => {
       toast.error("No data available for export.");
       return;
     }
-    const totalWallet = dataToExport.reduce(
-      (acc: number, record: any) => acc + parseFloat(record?.wallet || 0),
-      0
-    );
-    const totalWinWallet = dataToExport.reduce(
-      (acc: number, record: any) => acc + parseFloat(record?.wwallet || 0),
-      0
-    );
 
-    // Prepare the data for the worksheet
     const formattedData = dataToExport.map((record: any) => ({
       "User ID": record?.id,
       Username: record?.username,
       Name: record?.name,
-      "Email/Phone Number": record?.email || record?.tell,
+      "Email/Phone Number": [record?.email, record?.tell]
+        .filter(Boolean)
+        .join(" / "),
       "User Type": record?.type,
-      Wallet: `${record?.wallet}`,
-      "Win Wallet": `${record?.wwallet}`,
-      Status: getStatusText(record?.status),
+      Wallet: `${record?.ref_give}`,
       "Signup Date": moment
-        .utc(record?.date || record?.created_at, "YYYY-MM-DD HH:mm:ss")
+        .utc(record?.num_pos || record?.created_at, "YYYY-MM-DD HH:mm:ss")
         .local()
         .format("Do MMM YYYY | h:mm:ssA"),
-      "Total Money Funded": totalWallet,
-      "Total Winnings": totalWinWallet,
     }));
 
-    // Create a new workbook and add a worksheet
     const worksheet = XLSX.utils.json_to_sheet(formattedData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
 
-    // Generate an Excel file and trigger download
     XLSX.writeFile(workbook, "filtered_users.xlsx");
   };
 
@@ -278,14 +208,16 @@ const Users = () => {
             </div>
             <div className="container">
               <div className="page-title mb-4">
-                <h4 className="mb-0"> Users </h4>
+                <h4 className="mb-0">Onboarder Users</h4>
                 <ol className="breadcrumb mb-0 pl-0 pt-1 pb-0">
                   <li className="breadcrumb-item mt-3">
                     <Link to="/home" className="default-color">
                       Dashboard
                     </Link>
                   </li>
-                  <li className="breadcrumb-item active mt-3">User</li>
+                  <li className="breadcrumb-item active mt-3">
+                    Onboarder Users
+                  </li>
                 </ol>
               </div>
 
@@ -337,21 +269,7 @@ const Users = () => {
                                     className="form-control"
                                   />
                                 </td>
-                                &nbsp;
-                                <td>
-                                  <select
-                                    name="status"
-                                    className="form-select"
-                                    id="status"
-                                  >
-                                    <option value="">Select User Status</option>
-                                    <option value="1">Active</option>
-                                    <option value="2">Blocked</option>
-                                    <option value="0">Inactive</option>
-                                    <option value="3">Not Verified</option>
-                                  </select>
-                                </td>
-                                &nbsp;
+                                &nbsp; &nbsp;
                                 <td width="30%">
                                   <div
                                     onClick={toggleDateRangePicker}
@@ -410,81 +328,58 @@ const Users = () => {
                               <th className="fw-bolder">USER ID</th>
                               <th className="fw-bolder">USERNAME</th>
                               <th className="fw-bolder">NAME</th>
+                              <th className="fw-bolder">STATE</th>
+                              <th className="fw-bolder">LGA</th>
                               <th className="fw-bolder">EMAIL/PHONE NUMBER</th>
-                              <th className="fw-bolder">USER TYPE</th>
-                              <th className="fw-bolder">WALLET</th>
-                              <th className="fw-bolder">WIN WALLET</th>
-                              <th className="fw-bolder">STATUS</th>
+                              <th className="fw-bolder">REFERRAL BALANCE</th>
                               <th className="fw-bolder">SIGNUP DATE</th>
-                              <th className="fw-bolder">MODIFY</th>
                             </tr>
                           </tbody>
 
                           <tbody>
                             <>
-                              {(filteredTransactions || users?.data)
-                                ?.sort(
-                                  (a: any, b: any) =>
-                                    new Date(b?.created_at) -
-                                    new Date(a?.created_at)
-                                )
-                                .map((record: any, index: any) => {
-                                  const formattedDate = moment
-                                    .utc(
-                                      record?.date || record?.created_at,
-                                      "YYYY-MM-DD HH:mm:ss"
-                                    )
-                                    .local()
-                                    .format("Do MMM YYYY | h:mm:ssA");
-
-                                  return (
-                                    <tr key={index}>
-                                      <td
-                                        className="text-primary"
-                                        style={{ cursor: "pointer" }}
-                                        onClick={() => handleEdit(record?.id)}
-                                      >
-                                        {record?.id}
-                                      </td>
-                                      <td
-                                        className="text-primary"
-                                        style={{ cursor: "pointer" }}
-                                        onClick={() => handleEdit(record?.id)}
-                                      >
-                                        {record?.username}
-                                      </td>
-                                      <td>{record?.name}</td>
-                                      <td>{record?.email || record?.tell}</td>
-                                      <td>{record?.type}</td>
-                                      <td>₦{record?.wallet}</td>
-                                      <td>₦{record?.wwallet}</td>
-                                      <td>{getStatusText(record?.status)}</td>
-                                      <td>{formattedDate}</td>
-                                      <td>
-                                        {" "}
-                                        <div className="d-flex">
-                                          <button
-                                            className={`btn btn-${
-                                              record?.status === 1
-                                                ? "danger"
-                                                : "success"
-                                            }`}
-                                            onClick={() =>
-                                              record?.status === 1
-                                                ? handleBlockUser(record?.id)
-                                                : handleUnblockUser(record?.id)
-                                            }
-                                          >
-                                            {record?.status === 1
-                                              ? "Block"
-                                              : "Unblock"}
-                                          </button>
-                                          &nbsp; &nbsp;
-                                        </div>
-                                      </td>
-                                    </tr>
-                                  );
-                                })}
+                              {(Array.isArray(filteredTransactions) &&
+                              filteredTransactions.length > 0
+                                ? filteredTransactions
+                                : Array.isArray(users?.data)
+                                ? users.data
+                                : []
+                              ).map((record, index) => (
+                                <tr key={index}>
+                                  <td
+                                    className="text-primary"
+                                    style={{ cursor: "pointer" }}
+                                    onClick={() => handleEdit(record?.id)}
+                                  >
+                                    {record?.id}
+                                  </td>
+                                  <td
+                                    className="text-primary"
+                                    style={{ cursor: "pointer" }}
+                                    onClick={() => handleEdit(record?.id)}
+                                  >
+                                    {record?.username}
+                                  </td>
+                                  <td>{record?.name}</td>
+                                  <td>{record?.state}</td>
+                                  <td>{record?.lga}</td>
+                                  <td>
+                                    {[record?.email, record?.tell]
+                                      .filter(Boolean)
+                                      .join(" / ")}
+                                  </td>
+                                  <td>₦{record?.ref_give}</td>
+                                  <td>
+                                    {moment
+                                      .utc(
+                                        record?.created_at || record?.date,
+                                        "YYYY-MM-DD HH:mm:ss"
+                                      )
+                                      .local()
+                                      .format("Do MMM YYYY | h:mm:ssA")}
+                                  </td>
+                                </tr>
+                              ))}
                             </>
                           </tbody>
                         </table>
@@ -527,7 +422,7 @@ const Users = () => {
               </div>
             </div>
           </div>
-          <SingleUser
+          <SingleReferralUser
             userDetails={userDetails}
             setUserDetails={setUserDetails}
           />
@@ -539,4 +434,4 @@ const Users = () => {
   );
 };
 
-export default Users;
+export default Onboarder;

@@ -27,6 +27,8 @@ import PlayHistory from "../pages/play-history/PlayHistory";
 import ListWithdraw from "../pages/agent/ListWithdraw";
 import SportForecasters from "../pages/sports/SportForecasters";
 import InstantGames from "../pages/instant-games/InstantGames";
+import Onboarder from "../pages/users/Onboarder";
+import OnboarderRequestWithdraw from "../pages/withdraw/OnboarderRequestWithdraw";
 
 export const routes = [
   {
@@ -45,6 +47,18 @@ export const routes = [
     id: 3,
     path: "/users",
     element: <Users />,
+    protected: true,
+  },
+  {
+    id: 30,
+    path: "/onboarder-users",
+    element: <Onboarder />,
+    protected: true,
+  },
+    {
+    id: 31,
+    path: "/all-onboarder-withdraw",
+    element: <OnboarderRequestWithdraw />,
     protected: true,
   },
   {

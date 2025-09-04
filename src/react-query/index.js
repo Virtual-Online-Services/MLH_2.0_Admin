@@ -26,4 +26,5 @@ export {default as useGetRevenue} from "./api-hooks/useGetRevenue";
 export {default as useGetTotalVisit} from "./api-hooks/useGetTotalVisit";
 export {default as useGetSummary} from "./api-hooks/useGetSummary";
 export {default as useGetInstantGames} from "./api-hooks/useGetInstantGames";
+export {default as useGetAllOnboarderRequestWithdraw} from "./api-hooks/useGetAllOnboarderRequestWithdraw";
 

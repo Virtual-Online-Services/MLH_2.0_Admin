@@ -9,8 +9,6 @@ import { useDispatch, useSelector } from "react-redux";
 const MenuItem = ({ item }) => {
   const [isActive, setIsActive] = useState(false);
   const usernamePermission = useSelector((state) => state.auth.userInfo);
-  // console.log(usernamePermission?.permission);
-
   const hasPermission = (menuItem: any) => {
     return usernamePermission?.permission?.includes(menuItem?.permission);
   };
@@ -25,14 +23,6 @@ const MenuItem = ({ item }) => {
       onClick={handleItemClick}
     >
       <span className="title">{item?.title}</span>
-      {/* {item?.listItems &&
-        item.listItems.map((listItem) => (
-          <Link to={listItem?.url} className="listItem" key={listItem?.id}>
-            <i className={listItem?.icon}></i>
-            <span className="listItemTitle mt-1">{listItem?.title}</span>
-          </Link>
-        ))} */}
-
       {item?.listItems &&
         item.listItems
           .filter((listItem: any) => hasPermission(listItem)) // Filter by permission
