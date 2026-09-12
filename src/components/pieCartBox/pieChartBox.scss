@@ -1,14 +1,18 @@
 @import "../../styles/responsive.scss";
+@import "../../styles/tokens.scss";
 
 .pieChartBox {
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  color: var(--color-text-primary);
 
   h1 {
+    color: var(--color-text-primary);
+
     @include xxl {
-      font-size: 24px;
+      font-size: $font-size-heading-md;
     }
   }
 
@@ -23,23 +27,24 @@
   .options {
     display: flex;
     justify-content: space-between;
-    gap: 100px;
-    font-size: 14px;
+    gap: $space-12;
+    font-size: $font-size-body-md;
 
     .option {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: $space-2;
       align-items: center;
 
       .title {
         display: flex;
-        gap: 10px;
+        gap: $space-2;
         align-items: center;
+        color: var(--color-text-secondary);
 
         .dot {
-          width: 10px;
-          height: 10px;
+          width: $space-2;
+          height: $space-2;
           border-radius: 50%;
         }
       }

@@ -1,4 +1,5 @@
 @import "../../styles/responsive.scss";
+@import "../../styles/tokens.scss";
 
 .chartBox {
   // display: flex;
@@ -15,23 +16,30 @@
     justify-content: space-between;
 
     @include sm {
-      gap: 20px;
+      gap: $space-5;
     }
 
     .title {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: $space-2;
+      color: var(--color-text-secondary);
 
       @include xxl {
-        font-size: 14px;
+        font-size: $font-size-body-md;
       }
     }
 
     h1 {
+      color: var(--color-text-primary);
+
       @include xxl {
-        font-size: 20px;
+        font-size: $font-size-heading-md;
       }
+    }
+
+    .viewAll {
+      color: var(--color-brand);
     }
   }
 
@@ -52,16 +60,17 @@
       text-align: right;
 
       .percentage {
-        font-weight: bold;
-        font-size: 20px;
+        font-weight: $font-weight-bold;
+        font-size: $font-size-heading-md;
 
         @include xxl {
-          font-size: 16px;
+          font-size: $font-size-body-lg;
         }
       }
 
       .duration {
-        font-size: 14px;
+        font-size: $font-size-body-md;
+        color: var(--color-text-secondary);
       }
     }
   }

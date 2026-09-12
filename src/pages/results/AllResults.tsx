@@ -1,9 +1,7 @@
 import { GridColDef } from "@mui/x-data-grid";
 import DataTable from "../../components/dataTable/DataTable";
 import { useEffect, useState } from "react";
-import Footer from "../../components/footer/Footer";
-import Menu from "../../components/menu/Menu";
-import Navbar from "../../components/navbar/Navbar";
+import Shell from "../../components/layout/Shell";
 import useGetResults from "../../react-query/api-hooks/useGetResults";
 import { Spinner } from "react-bootstrap";
 import BModal from "../../components/BModal/BModal";
@@ -84,13 +82,7 @@ const AllResults = () => {
   }, [userResults]);
 
   return (
-    <div>
-      <div className="main">
-        <Navbar />
-        <div className="container__flex">
-          <div className="menuContainer">
-            <Menu />
-          </div>
+    <Shell>
           <div className="container">
             <div className="page-title">
               <h4 className="mb-0"> Results </h4>
@@ -226,8 +218,6 @@ const AllResults = () => {
               <br />
             </div>
           </div>
-        </div>
-        <Footer />
         <BModal
           backdrop="static"
           keyboard={false}
@@ -237,8 +227,7 @@ const AllResults = () => {
         >
           <AddResult handleClose={handleClose} />
         </BModal>
-      </div>
-    </div>
+    </Shell>
   );
 };
 

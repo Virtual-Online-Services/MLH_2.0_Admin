@@ -1,18 +1,22 @@
 @import "../../styles/responsive.scss";
+@import "../../styles/tokens.scss";
 
-.bigChartBox{
+.bigChartBox {
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  color: var(--color-text-primary);
 
-  h1{
-    @include xxl{
-      font-size: 24px;
+  h1 {
+    color: var(--color-text-primary);
+
+    @include xxl {
+      font-size: $font-size-heading-md;
     }
   }
-  .chart{
+  .chart {
     width: 100%;
     height: 300px;
   }

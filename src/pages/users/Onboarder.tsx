@@ -1,9 +1,7 @@
 import "./users.scss";
-import Navbar from "../../components/navbar/Navbar";
-import Menu from "../../components/menu/Menu";
+import Shell from "../../components/layout/Shell";
 import { Link } from "react-router-dom";
 import { Spinner } from "react-bootstrap";
-import Footer from "../../components/footer/Footer";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { DateRangePicker } from "react-date-range";
@@ -198,14 +196,7 @@ const Onboarder = () => {
     fetchData();
   }, [currentPage]);
   return (
-    <>
-      <div>
-        <div className="main">
-          <Navbar />
-          <div className="container__flex">
-            <div className="menuContainer">
-              <Menu />
-            </div>
+    <Shell>
             <div className="container">
               <div className="page-title mb-4">
                 <h4 className="mb-0">Onboarder Users</h4>
@@ -421,16 +412,11 @@ const Onboarder = () => {
                 <br />
               </div>
             </div>
-          </div>
           <SingleReferralUser
             userDetails={userDetails}
             setUserDetails={setUserDetails}
           />
-
-          <Footer />
-        </div>
-      </div>
-    </>
+    </Shell>
   );
 };
 

@@ -1,0 +1,150 @@
+// =============================================================================
+// Design System — Design Tokens
+// Feature: admin-dashboard-redesign (Requirements 1.1, 1.2, 1.3, 1.4, 1.6)
+//
+// Single source of truth for the Admin_App visual design decisions:
+//   - Color_Tokens        -> CSS custom properties, themeable via [data-theme]
+//   - Spacing_Scale       -> SCSS variables ($space-*)
+//   - Typography_Scale    -> SCSS variables (heading/body/label size + weight)
+//   - Card style tokens    -> SCSS variables ($card-radius/$card-border/$card-shadow)
+//
+// Colors that differ between light and dark Theme are exposed as CSS custom
+// properties scoped by [data-theme="..."], so a single component style resolves
+// to the correct theme value at runtime. Non-themeable tokens (spacing, radius,
+// typography) remain SCSS variables.
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Color_Tokens (Requirement 1.1, 1.6)
+//
+// Defined once here for both themes. The default (light) values live on :root so
+// that when the `data-theme` attribute is missing the light Theme still applies
+// (Requirement 1.6 + design "Theme/token resolution" fallback).
+//
+// Contrast note (Property 5 / Requirement 9.1): every text/background pairing
+// actually used for normal-size text or interactive controls meets WCAG AA
+// (>= 4.5:1) in both themes. Ratios below are independently computed via
+// relative luminance and (L1 + 0.05) / (L2 + 0.05):
+//   Light: text-primary   #0f172a on surface #ffffff  ~ 17.85:1
+//          text-primary   #0f172a on bg      #f3f6f9  ~ 16.46:1
+//          text-secondary #475569 on surface #ffffff  ~ 7.58:1
+//          text-secondary #475569 on bg      #f3f6f9  ~ 6.99:1
+//          brand          #946011 on surface #ffffff  ~ 5.33:1
+//          brand          #946011 on bg      #f3f6f9  ~ 4.91:1
+//          danger         #b91c1c on surface #ffffff  ~ 6.47:1
+//          danger         #b91c1c on bg      #f3f6f9  ~ 5.97:1
+//   Dark:  text-primary   #f2f2f2 on surface #12121c  ~ 16.61:1
+//          text-primary   #f2f2f2 on bg      #05010a  ~ 18.48:1
+//          text-secondary #b0b8c4 on surface #12121c  ~ 9.30:1
+//          text-secondary #b0b8c4 on bg      #05010a  ~ 10.34:1
+//          brand          #27aae1 on surface #12121c  ~ 7.02:1
+//          brand          #27aae1 on bg      #05010a  ~ 7.80:1
+//          danger         #f87171 on surface #12121c  ~ 6.72:1
+//          danger         #f87171 on bg      #05010a  ~ 7.48:1
+// -----------------------------------------------------------------------------
+
+// Light Theme is the default and applies when `data-theme` is absent.
+:root,
+[data-theme="light"] {
+  // Brand / primary
+  // Deep gold — darkened from #dfb017 so the brand also passes WCAG AA
+  // (>= 4.5:1) as normal-size text / interactive-control color on the light
+  // surface and bg (Requirement 9.1 / Property 5). The original #dfb017 only
+  // reached ~2:1 on white. #946011 keeps the same gold/amber brand identity
+  // while measuring ~5.3:1 on #ffffff and ~4.9:1 on #f3f6f9.
+  --color-brand: #946011;
+
+  // Surfaces & background
+  --color-surface: #ffffff;
+  --color-bg: #f3f6f9;
+
+  // Text
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+
+  // Status
+  --color-success: #15803d;
+  --color-danger: #b91c1c;
+  --color-warning: #b45309;
+}
+
+[data-theme="dark"] {
+  // Brand / primary
+  --color-brand: #27aae1;
+
+  // Surfaces & background
+  --color-surface: #12121c;
+  --color-bg: #05010a;
+
+  // Text
+  --color-text-primary: #f2f2f2;
+  --color-text-secondary: #b0b8c4;
+
+  // Status
+  --color-success: #4ade80;
+  --color-danger: #f87171;
+  --color-warning: #fbbf24;
+}
+
+// -----------------------------------------------------------------------------
+// Spacing_Scale (Requirement 1.2)
+// Ordered set of spacing tokens for padding, margin, and gap values.
+// -----------------------------------------------------------------------------
+$space-0: 0;
+$space-1: 4px;
+$space-2: 8px;
+$space-3: 12px;
+$space-4: 16px;
+$space-5: 20px;
+$space-6: 24px;
+$space-8: 32px;
+$space-10: 40px;
+$space-12: 48px;
+
+// -----------------------------------------------------------------------------
+// Typography_Scale (Requirement 1.3)
+// Named font-size and font-weight tokens for headings, body, and labels.
+// -----------------------------------------------------------------------------
+
+// Font sizes — headings
+$font-size-heading-lg: 28px;
+$font-size-heading-md: 22px;
+$font-size-heading-sm: 18px;
+
+// Font sizes — body
+$font-size-body-lg: 16px;
+$font-size-body-md: 14px;
+$font-size-body-sm: 13px;
+
+// Font sizes — label
+$font-size-label: 12px;
+
+// Line heights
+$line-height-heading: 1.25;
+$line-height-body: 1.5;
+
+// Font weights
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+// -----------------------------------------------------------------------------
+// Card style tokens (Requirement 1.4)
+// Applied uniformly to every Stat_Card and Chart_Widget (Requirement 1.7, 5.2).
+// -----------------------------------------------------------------------------
+$card-radius: 12px;
+$card-border: 1px solid var(--color-bg);
+$card-shadow: 0 1px 3px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.06);
+
+// -----------------------------------------------------------------------------
+// Shared `card` mixin (Requirement 1.7, 5.2)
+// Applies the card radius/border/shadow tokens so cards are visually identical.
+// -----------------------------------------------------------------------------
+@mixin card {
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  border-radius: $card-radius;
+  border: $card-border;
+  box-shadow: $card-shadow;
+}

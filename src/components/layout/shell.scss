@@ -1,0 +1,78 @@
+// =============================================================================
+// Application Shell layout styles
+// Feature: admin-dashboard-redesign — Task 7.1
+//
+// The Shell composes the persistent chrome (Navbar, Sidebar, content container,
+// Footer) rendered on every page. These rules keep page content fully within
+// the visible viewport at sm/md/lg/xl/xxl, ensure the Sidebar never overlaps
+// the content on Mobile_Viewport, and reflow the layout across breakpoints
+// using the existing responsive.scss mixins (Requirements 2.4, 2.5, 2.6, 10.5).
+//
+// All values reference Design_Tokens (Spacing_Scale) rather than literals; the
+// Color_Tokens are consumed via the CSS custom properties exposed globally by
+// the Design System entry.
+// =============================================================================
+
+@import "../../styles/tokens.scss";
+@import "../../styles/responsive.scss";
+
+// Root shell wrapper. Prevent horizontal overflow so nothing is clipped or
+// scrolls sideways at any breakpoint (Requirement 2.4).
+.shell {
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+}
+
+// The flex row that holds the Sidebar rail and the content container.
+.shell__body {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+
+// Sidebar rail. On Desktop/Tablet it reserves horizontal space so the fixed
+// `.menu` does not sit on top of the content. On Mobile_Viewport (<= md) the
+// Sidebar becomes an off-canvas drawer (handled in menu.scss), so the rail
+// collapses to zero width and the content spans the full viewport — the
+// Sidebar therefore never overlaps content (Requirements 2.5, 2.6).
+.shell__sidebar {
+  flex: 0 0 auto;
+  width: 250px;
+  padding: $space-1 $space-5;
+
+  @include lg {
+    // Collapsed icon rail on tablet widths (labels hidden by menu.scss).
+    width: max-content;
+  }
+
+  @include md {
+    // Off-canvas drawer on mobile: reserve no horizontal space and never
+    // overlap or clip the content container (Requirements 2.4, 2.5).
+    width: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+}
+
+// Content container. Uses safe token-based padding, fills the remaining space,
+// and is allowed to shrink (min-width: 0) so long content / tables never force
+// horizontal overflow of the shell across sm/md/lg/xl/xxl (Requirements 2.4,
+// 2.6).
+.shell__content {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  padding: $space-1 $space-5;
+
+  @include md {
+    padding: $space-1 $space-4;
+  }
+
+  @include sm {
+    padding: $space-1 $space-3;
+  }
+}

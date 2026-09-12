@@ -1,3 +1,4 @@
+@import "./tokens.scss";
 @import "./variables.scss";
 @import "./responsive.scss";
 
@@ -22,19 +23,47 @@ a {
 
 .container__flex {
   display: flex;
+  // Prevent sideways overflow so no content is clipped across breakpoints
+  // (Requirement 2.4).
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .menuContainer {
+  flex: 0 0 auto;
   width: 250px;
-  padding: 5px 20px;
+  padding: $space-1 $space-5;
   // border-right: 2px solid $soft-bg;
 
   @include lg {
     width: max-content;
   }
+
+  // On Mobile_Viewport (<= md) the Sidebar becomes an off-canvas drawer
+  // (handled in menu.scss), so the rail reserves no horizontal space and the
+  // content container spans the full viewport width — the Sidebar therefore
+  // never overlaps content (Requirements 2.5, 2.6).
+  @include md {
+    width: 0;
+    padding: 0;
+    overflow: hidden;
+  }
 }
 
 .contentContainer {
-  padding: 5px 20px;
+  // Allow the content to shrink so long content / tables never force
+  // horizontal overflow of the shell (Requirement 2.4).
+  flex: 1 1 auto;
+  min-width: 0;
   width: 100%;
+  max-width: 100%;
+  padding: $space-1 $space-5;
+
+  @include md {
+    padding: $space-1 $space-4;
+  }
+
+  @include sm {
+    padding: $space-1 $space-3;
+  }
 }

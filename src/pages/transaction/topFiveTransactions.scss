@@ -1,0 +1,73 @@
+// =============================================================================
+// Transactions_Table — Top 5 Transactions styling + responsiveness
+// Feature: admin-dashboard-redesign
+//
+// Applies Design_System typography and Color_Tokens to the @mui/x-data-grid
+// header and rows, and wraps the table in a horizontally scrollable container
+// so that on a Mobile_Viewport every column stays readable and no column is
+// clipped. All values reference Design_Tokens (no hard-coded literals) so the
+// table stays themeable via [data-theme].
+//
+// The existing @mui/x-data-grid DataTable usage is preserved (not replaced or
+// expanded); this file only styles it.
+//
+// Requirements: 7.1, 7.2, 7.3, 7.6
+// =============================================================================
+
+@import "../../styles/tokens.scss";
+
+.topFiveTransactions {
+  // Records-count line above the table (Requirement 7.6 — preserved display).
+  &__count {
+    margin: 0 0 $space-3;
+    font-size: $font-size-body-sm;
+    font-weight: $font-weight-semibold;
+    color: var(--color-text-secondary);
+  }
+
+  // -------------------------------------------------------------------------
+  // Mobile_Viewport readability (Requirement 7.3)
+  // Horizontal scroll so the wide @mui/x-data-grid never clips columns on
+  // small screens. -webkit-overflow-scrolling gives momentum scroll on iOS.
+  // -------------------------------------------------------------------------
+  &__scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+
+    // Ensure the grid keeps a usable minimum width while remaining scrollable.
+    .dataTable {
+      min-width: 720px;
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Typography + Color_Tokens for header and rows (Requirements 7.1, 7.2)
+  // Scoped to the MUI DataGrid rendered inside this table.
+  // -------------------------------------------------------------------------
+  .dataGrid {
+    color: var(--color-text-primary);
+    font-size: $font-size-body-md;
+    line-height: $line-height-body;
+
+    // Column headers — clear, legible headers for the same fields.
+    .MuiDataGrid-columnHeaders {
+      background-color: var(--color-bg);
+      color: var(--color-text-secondary);
+    }
+
+    .MuiDataGrid-columnHeaderTitle {
+      font-size: $font-size-label;
+      font-weight: $font-weight-semibold;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: var(--color-text-secondary);
+    }
+
+    // Rows / cells
+    .MuiDataGrid-cell {
+      font-size: $font-size-body-md;
+      color: var(--color-text-primary);
+    }
+  }
+}

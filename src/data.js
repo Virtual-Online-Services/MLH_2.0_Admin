@@ -249,6 +249,19 @@ export const menu = [
       },
     ],
   },
+  {
+    id: 9,
+    title: "CVM",
+    listItems: [
+      {
+        id: 100,
+        title: "Campaigns",
+        url: "/cvm-campaigns",
+        icon: "fa fa-bullhorn",
+        permission: "message",
+      },
+    ],
+  },
 ];
 
 export const topDealUsers = [

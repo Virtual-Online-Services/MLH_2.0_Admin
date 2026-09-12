@@ -1,9 +1,7 @@
 import { GridColDef } from "@mui/x-data-grid";
 import DataTable from "../../components/dataTable/DataTable";
 import { useState } from "react";
-import Footer from "../../components/footer/Footer";
-import Menu from "../../components/menu/Menu";
-import Navbar from "../../components/navbar/Navbar";
+import Shell from "../../components/layout/Shell";
 import BModal from "../../components/BModal/BModal";
 import { Link } from "react-router-dom";
 import UploadAffilates from "../../components/sports/UploadAffilates";
@@ -45,13 +43,7 @@ const SportAffilates = () => {
   };
 
   return (
-    <div>
-      <div className="main">
-        <Navbar />
-        <div className="container__flex">
-          <div className="menuContainer">
-            <Menu />
-          </div>
+    <Shell>
           <div className="container">
             <div className="page-title">
               <h4 className="mb-0">Sport Affiliates </h4>
@@ -85,8 +77,6 @@ const SportAffilates = () => {
               <br />
             </div>
           </div>
-        </div>
-        <Footer />
         <BModal
           backdrop="static"
           keyboard={false}
@@ -96,8 +86,7 @@ const SportAffilates = () => {
         >
           <UploadAffilates />
         </BModal>
-      </div>
-    </div>
+    </Shell>
   );
 };
 

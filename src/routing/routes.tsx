@@ -29,6 +29,8 @@ import SportForecasters from "../pages/sports/SportForecasters";
 import InstantGames from "../pages/instant-games/InstantGames";
 import Onboarder from "../pages/users/Onboarder";
 import OnboarderRequestWithdraw from "../pages/withdraw/OnboarderRequestWithdraw";
+import Campaigns from "../pages/campaign/Campaigns";
+import CampaignDetail from "../pages/campaign/CampaignDetail";
 
 export const routes = [
   {
@@ -215,6 +217,18 @@ export const routes = [
     id: 29,
     path: "/instant-game",
     element: <InstantGames />,
+    protected: true,
+  },
+  {
+    id: 32,
+    path: "/cvm-campaigns",
+    element: <Campaigns />,
+    protected: true,
+  },
+  {
+    id: 33,
+    path: "/cvm-campaign/:id",
+    element: <CampaignDetail />,
     protected: true,
   },
 ];

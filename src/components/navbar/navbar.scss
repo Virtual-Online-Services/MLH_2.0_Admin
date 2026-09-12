@@ -1,57 +1,95 @@
+@import "../../styles/tokens.scss";
 @import "../../styles/responsive.scss";
 
 .navbar {
   width: 100%;
-  padding: 20px;
+  padding: $space-5;
   display: flex;
+  align-items: center;
   justify-content: space-between;
+  gap: $space-4;
+
+  color: var(--color-text-primary);
+
+  .left {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+  }
+
+  // Menu_Toggle (hamburger) — hidden on desktop, shown on Mobile_Viewport
+  // (md breakpoint) per Requirement 4.4. aria-label lives on the element.
+  .menuToggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: $space-2;
+    border: $card-border;
+    border-radius: $card-radius;
+    background-color: var(--color-surface);
+    color: var(--color-text-primary);
+    cursor: pointer;
+    font-size: $font-size-heading-sm;
+    line-height: $line-height-body;
+
+    svg {
+      display: block;
+    }
+
+    // Visible focus indicator for keyboard users (Requirement 9.5).
+    &:focus-visible {
+      outline: 2px solid var(--color-brand);
+      outline-offset: 2px;
+    }
+
+    @include md {
+      display: inline-flex;
+    }
+  }
 
   .logo {
     display: flex;
     align-items: center;
-    font-weight: bold;
-    gap: 10px;
+    gap: $space-2;
+    font-weight: $font-weight-bold;
+    border-radius: $card-radius;
+
+    img {
+      display: block;
+    }
+
+    // Visible focus indicator for the brand link (Requirement 9.5). Uses the
+    // brand token which now meets AA contrast in both themes.
+    &:focus-visible {
+      outline: 2px solid var(--color-brand);
+      outline-offset: 2px;
+    }
   }
+
   .icons {
     display: flex;
     align-items: center;
-    gap: 20px;
-
-    .icon {
-      @include sm {
-        display: none;
-      }
-    }
-
-    .notification {
-      position: relative;
-
-      span {
-        background-color: red;
-        color: white;
-        width: 16px;
-        height: 16px;
-        border-radius: 50%;
-        position: absolute;
-        top: -10px;
-        right: -10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-      }
-    }
+    gap: $space-5;
 
     .user {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: $space-3;
 
-      img {
-        width: 26px;
-        height: 26px;
-        border-radius: 50%;
-        object-fit: cover;
+      .greeting {
+        font-size: $font-size-body-md;
+        font-weight: $font-weight-regular;
+        color: var(--color-text-secondary);
+
+        strong {
+          font-weight: $font-weight-semibold;
+          color: var(--color-text-primary);
+        }
+
+        // Keep the identity legible but compact on the smallest screens.
+        @include sm {
+          font-size: $font-size-body-sm;
+        }
       }
     }
   }

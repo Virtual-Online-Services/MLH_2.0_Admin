@@ -1,11 +1,9 @@
 import { GridColDef } from "@mui/x-data-grid";
 import DataTable from "../../components/dataTable/DataTable";
-import Navbar from "../../components/navbar/Navbar";
-import Menu from "../../components/menu/Menu";
+import Shell from "../../components/layout/Shell";
 import { Link } from "react-router-dom";
 import { Spinner } from "react-bootstrap";
 import useGetAllRequestWithdraw from "../../react-query/api-hooks/useGetAllRequestWithdraw";
-import Footer from "../../components/footer/Footer";
 import moment from "moment";
 import { useSelector } from "react-redux";
 import { useState } from "react";
@@ -476,14 +474,7 @@ const UserRequestWithdraw = () => {
   ];
 
   return (
-    <div>
-      <div>
-        <div className="main">
-          <Navbar />
-          <div className="container__flex">
-            <div className="menuContainer">
-              <Menu />
-            </div>
+    <Shell>
             <div className="container">
               <div className="page-title mb-4">
                 <h4 className="mb-0">Withdrawals </h4>
@@ -537,12 +528,8 @@ const UserRequestWithdraw = () => {
                 <br />
               </div>
             </div>
-          </div>
-          <Footer />
-        </div>
-      </div>
       <SingleUser userDetails={userDetails} setUserDetails={setUserDetails} />
-    </div>
+    </Shell>
   );
 };
 

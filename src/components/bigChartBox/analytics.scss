@@ -1,28 +1,32 @@
+@import "../../styles/tokens.scss";
+
 .small-container {
-    max-width: 500px; 
-    padding: 5px;
-  }
-  
-  .small-title {
-    font-size: 12px; 
-    margin-bottom: 5px;
-  }
-  
-  .small-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 15px;
-    padding: 2px 5px; 
-    margin-bottom: 3px; 
-  }
-  
-  .small-text {
-    font-size: 14px;
-    line-height: 1;
-  }
-  
-  .small-value {
-    font-weight: bold;
-  }
-  
+  max-width: 500px;
+  padding: $space-1;
+  color: var(--color-text-primary);
+}
+
+.small-title {
+  font-size: $font-size-label;
+  margin-bottom: $space-1;
+}
+
+.small-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: $font-size-body-md;
+  padding: $space-1 $space-1;
+  margin-bottom: $space-1;
+}
+
+.small-text {
+  font-size: $font-size-body-md;
+  line-height: 1;
+  color: var(--color-text-secondary);
+}
+
+.small-value {
+  font-weight: $font-weight-bold;
+  color: var(--color-text-primary);
+}

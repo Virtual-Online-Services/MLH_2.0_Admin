@@ -1,6 +1,9 @@
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 import "./barChartBox.scss";
 import useGetTotalVisit from "../../react-query/api-hooks/useGetTotalVisit";
+import { deriveViewState } from "../../pages/home/viewState";
+import { WidgetStateView } from "../widget-state";
+import { CHART_COLORS } from "../../styles/chartColors";
 
 type Props = {
   title: string;
@@ -11,42 +14,59 @@ type Props = {
 const BarChartBox = (props: Props) => {
   const { dashboardData, isLoadingData } = useGetTotalVisit();
 
-  if (isLoadingData) {
-    return <div>Loading...</div>;
-  }
-
-  if (!dashboardData || dashboardData.status !== "successful") {
-    return <div>Failed to load data</div>;
-  }
-
-  const chartData = Object.entries(dashboardData.daily_visits).map(
-    ([month, value]) => ({
-      name: month.substring(0, 3),
-      [props.dataKey]: value,
-    })
+  const isError = Boolean(
+    !isLoadingData && (!dashboardData || dashboardData.status !== "successful")
   );
+
+  // Same total-visits metric as before, keyed by props.dataKey.
+  const chartData =
+    !isLoadingData && !isError
+      ? Object.entries(dashboardData.daily_visits).map(([month, value]) => ({
+          name: month.substring(0, 3),
+          [props.dataKey]: value,
+        }))
+      : [];
+
+  // Loading precedes empty evaluation; content renders when data exists
+  // (Req 6.4, 6.5, 6.7).
+  const state = deriveViewState({
+    isLoading: isLoadingData,
+    isError,
+    data: chartData,
+  });
 
   return (
     <div className="barChartBox">
       <h1>{props.title}</h1>
-      <div className="chart">
-        <ResponsiveContainer width="99%" height={200}>
-          <BarChart data={chartData}>
-            <XAxis
-              dataKey="name"
-              tick={{ fontSize: 12 }}
-              interval={0}
-              angle={-45}
-              textAnchor="end"
-            />
-            <Tooltip
-              labelStyle={{ display: "none" }}
-              cursor={{ fill: "none" }}
-            />
-            <Bar dataKey={props.dataKey} fill={props.color} />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+      <WidgetStateView
+        state={state}
+        loadingLabel="Loading visits…"
+        emptyMessage="No visit data"
+        errorMessage="Failed to load data"
+      >
+        <div className="chart">
+          <ResponsiveContainer width="99%" height={200}>
+            <BarChart data={chartData}>
+              <XAxis
+                dataKey="name"
+                tick={{ fontSize: 12, fill: "var(--color-text-secondary)" }}
+                interval={0}
+                angle={-45}
+                textAnchor="end"
+              />
+              <Tooltip
+                labelStyle={{ display: "none" }}
+                cursor={{ fill: "none" }}
+                contentStyle={{
+                  background: "var(--color-surface)",
+                  border: "none",
+                }}
+              />
+              <Bar dataKey={props.dataKey} fill={CHART_COLORS.brand} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </WidgetStateView>
     </div>
   );
 };

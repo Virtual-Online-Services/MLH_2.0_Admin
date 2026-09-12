@@ -1,0 +1,103 @@
+// =============================================================================
+// Widget State UI — shared Loading_State / Empty_State / error fallback styles
+// Feature: admin-dashboard-redesign
+//
+// Styles for the reusable presentation components that render a Widget's
+// loading, empty, and error states (WidgetStateView + WidgetErrorBoundary).
+// All values reference Design_System Design_Tokens (no hard-coded literals),
+// so widgets stay visually consistent and themeable via [data-theme].
+//
+// Requirements: 5.4, 5.5, 5.6, 8.1, 8.2, 8.3, 8.4
+// =============================================================================
+
+@import "../../styles/tokens.scss";
+
+// Shared container for any non-content state (loading / empty / error).
+// Centers its indicator/message within the host widget's available space.
+.widgetState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $space-3;
+  width: 100%;
+  min-height: 96px;
+  padding: $space-6 $space-4;
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: $font-size-body-md;
+  line-height: $line-height-body;
+}
+
+// -----------------------------------------------------------------------------
+// Loading_State (Requirements 5.4, 8.1)
+// -----------------------------------------------------------------------------
+.widgetState__spinner {
+  width: $space-6;
+  height: $space-6;
+  border-radius: 50%;
+  border: 3px solid var(--color-bg);
+  border-top-color: var(--color-brand);
+  animation: widgetStateSpin 0.8s linear infinite;
+}
+
+.widgetState__label {
+  margin: 0;
+  font-size: $font-size-body-sm;
+  font-weight: $font-weight-medium;
+  color: var(--color-text-secondary);
+}
+
+@keyframes widgetStateSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Respect reduced-motion preferences: stop the spin animation.
+@media (prefers-reduced-motion: reduce) {
+  .widgetState__spinner {
+    animation: none;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Empty_State (Requirements 5.5, 8.2)
+// -----------------------------------------------------------------------------
+.widgetState__message {
+  margin: 0;
+  font-size: $font-size-body-md;
+  font-weight: $font-weight-medium;
+  color: var(--color-text-secondary);
+}
+
+.widgetState__hint {
+  margin: 0;
+  font-size: $font-size-label;
+  color: var(--color-text-secondary);
+}
+
+// -----------------------------------------------------------------------------
+// Error state (Requirements 5.5, 8.4)
+// -----------------------------------------------------------------------------
+.widgetState--error .widgetState__message {
+  color: var(--color-danger);
+  font-weight: $font-weight-semibold;
+}
+
+// -----------------------------------------------------------------------------
+// Basic fallback indicator (Requirement 5.6)
+// Shown by the error boundary when the state content itself throws.
+// Deliberately minimal so it can never itself fail to render.
+// -----------------------------------------------------------------------------
+.widgetState__fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 48px;
+  padding: $space-4;
+  color: var(--color-text-secondary);
+  font-size: $font-size-body-md;
+  font-weight: $font-weight-medium;
+}

@@ -2,11 +2,12 @@ import { GridColDef } from "@mui/x-data-grid";
 import DataTable from "../../components/dataTable/DataTable";
 import { useState } from "react";
 // import useGetAdvert from "../../react-query/api-hooks/useGetAdvert";
-import moment from "moment";
-import { Spinner } from "react-bootstrap";
 import BModal from "../../components/BModal/BModal";
 import AdvertModal from "../../components/AdvertModal/AdvertModal";
 import useGetDashBoardInfo from "../../react-query/api-hooks/useGetDashBoardInfo";
+import { deriveViewState } from "../home/viewState";
+import { WidgetStateView } from "../../components/widget-state";
+import "./topFiveTransactions.scss";
 
 const TopFiveTransactions = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,6 +19,16 @@ const TopFiveTransactions = () => {
   //   const { userAdvertResponse, isLoadingAdvert } = useGetAdvert([]);
   const { dashboardData, isLoadingData } = useGetDashBoardInfo();
   //   console.log(dashboardData?.transaction);
+
+  // Drive loading/empty/content through the shared view-state selector so the
+  // table never renders blank or broken. Loading takes precedence; the
+  // Empty_State only shows once loading has finished with no records
+  // (Requirements 7.4, 7.5).
+  const state = deriveViewState({
+    isLoading: isLoadingData,
+    isError: false,
+    data: dashboardData?.transaction,
+  });
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 90 },
@@ -73,37 +84,31 @@ const TopFiveTransactions = () => {
   ];
 
   return (
-    <div>
+    <div className="topFiveTransactions">
       <div className="container">
         <div>
-          <p>{dashboardData?.transaction?.length} Records</p>
-          {isLoadingData ? (
-            <div className="spinner text-dark text-center mt-5">
-              <Spinner
-                as="span"
-                animation="border"
-                size="lg"
-                role="status"
-                aria-hidden="true"
-              />
-            </div>
-          ) : dashboardData?.transaction?.length === 0 ? (
-            <div className="d-flex justify-content-center text-center p-5">
-              <div className="hidden-xs hidden-sm mx-auto">
-                <div className="alert alert-danger text-center" role="alert">
-                  No Record Found
-                </div>
-              </div>
-            </div>
-          ) : (
-            <>
+          {/* Preserve the records-count display (Requirement 7.6). */}
+          <p className="topFiveTransactions__count">
+            {dashboardData?.transaction?.length} Records
+          </p>
+
+          {/* Loading_State / Empty_State are driven by deriveViewState; the
+              @mui/x-data-grid DataTable is rendered unchanged as the content
+              (Requirements 7.4, 7.5, 7.6). The scroll wrapper keeps every
+              column readable on a Mobile_Viewport (Requirement 7.3). */}
+          <WidgetStateView
+            state={state}
+            loadingLabel="Loading transactions"
+            emptyMessage="No Record Found"
+          >
+            <div className="topFiveTransactions__scroll">
               <DataTable
                 slug="top_five_transaction"
                 columns={columns}
                 rows={dashboardData?.transaction}
               />
-            </>
-          )}
+            </div>
+          </WidgetStateView>
 
           <br />
           <br />

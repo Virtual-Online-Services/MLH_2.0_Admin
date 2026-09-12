@@ -1,6 +1,4 @@
-import Footer from "../../components/footer/Footer";
-import Menu from "../../components/menu/Menu";
-import Navbar from "../../components/navbar/Navbar";
+import Shell from "../../components/layout/Shell";
 import { Link } from "react-router-dom";
 import { Button, Spinner } from "react-bootstrap";
 import HTTP from "../../utils/httpClient"; // Ensure this is properly configured
@@ -96,13 +94,7 @@ const PasswordReset = () => {
     setSelectedAdminName(adminName); // Set selected admin's name
   };
   return (
-    <div>
-      <div className="main">
-        <Navbar />
-        <div className="container__flex">
-          <div className="menuContainer">
-            <Menu />
-          </div>
+    <Shell>
           <div className="container">
             <div className="page-title">
               <h4 className="mb-0">Password Reset</h4>
@@ -211,10 +203,7 @@ const PasswordReset = () => {
               )}
             </div>
           </div>
-        </div>
-        <Footer />
-      </div>
-    </div>
+    </Shell>
   );
 };
 

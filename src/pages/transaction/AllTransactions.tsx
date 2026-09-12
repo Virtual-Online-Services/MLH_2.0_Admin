@@ -1,8 +1,6 @@
-import Navbar from "../../components/navbar/Navbar";
-import Menu from "../../components/menu/Menu";
+import Shell from "../../components/layout/Shell";
 import { Link } from "react-router-dom";
 import { Spinner } from "react-bootstrap";
-import Footer from "../../components/footer/Footer";
 import moment from "moment";
 import { DateRangePicker } from "react-date-range";
 import "react-date-range/dist/styles.css"; // main style file
@@ -87,9 +85,17 @@ const AllTransactions = () => {
     setShowDateRangePicker((prevState) => !prevState);
   };
 
-  const handleFilter = () => {
-    const searchUserInput = document.getElementById("searchUser");
-    const selectedStatusInput = document.getElementById("status");
+  const handleFilter = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const searchUserInput = document.getElementById(
+      "searchUser"
+    ) as HTMLInputElement | null;
+    const selectedStatusInput = document.getElementById(
+      "status"
+    ) as HTMLSelectElement | null;
+    const selectedChannelInput = document.getElementById(
+      "channel"
+    ) as HTMLSelectElement | null;
     const selectedDateRange = document.getElementById("searchDateRange");
 
     if (!searchUserInput || !selectedStatusInput || !selectedDateRange) {
@@ -99,18 +105,26 @@ const AllTransactions = () => {
 
     const searchUser = searchUserInput.value.trim();
     const selectedStatus = selectedStatusInput.value;
-    const selectedDate = selectedDateRange.value;
+    const selectedChannel = selectedChannelInput?.value ?? "";
+    // selectedDate references the date-range wrapper span; presence of a chosen
+    // range is tracked via showDateRangePicker below.
     let queryParams = "";
 
+    // Filters are independent and can be combined. Channel is a first-class
+    // filter so admins can pull e.g. all Palmpay deposits directly.
     if (searchUser !== "") {
-      queryParams += `&search=${searchUser}`;
-    } else if (selectedStatus !== "") {
-      queryParams += `&search=${selectedStatus}`;
-    } else if (selectedDate !== "") {
+      queryParams += `&search=${encodeURIComponent(searchUser)}`;
+    }
+    if (selectedStatus !== "") {
+      queryParams += `&status=${encodeURIComponent(selectedStatus)}`;
+    }
+    if (selectedChannel !== "") {
+      queryParams += `&channel=${encodeURIComponent(selectedChannel)}`;
+    }
+    if (showDateRangePicker) {
       const startDate = moment(dateRange[0].startDate).format("YYYY-MM-DD");
       const endDate = moment(dateRange[0].endDate).format("YYYY-MM-DD");
       queryParams += `&start_date=${startDate}&end_date=${endDate}`;
-      // queryParams += `&search=${selectedDate}`;
     }
 
     // Reset current page to 1 when filtering
@@ -129,7 +143,12 @@ const AllTransactions = () => {
           toast.success(`Found ${response.data.data.total} records`);
         }
 
-        if (!searchUser && !selectedStatus && !showDateRangePicker) {
+        if (
+          !searchUser &&
+          !selectedStatus &&
+          !selectedChannel &&
+          !showDateRangePicker
+        ) {
           setFilteredTransactions(null);
           setShowExportButton(false);
         } else {
@@ -246,14 +265,7 @@ const AllTransactions = () => {
   }, [currentPage]);
 
   return (
-    <>
-      <div>
-        <div className="main">
-          <Navbar />
-          <div className="container__flex">
-            <div className="menuContainer">
-              <Menu />
-            </div>
+    <Shell>
             <div className="container">
               <div className="page-title mb-4">
                 <h4 className="mb-0"> Transactions </h4>
@@ -327,6 +339,24 @@ const AllTransactions = () => {
                                     <option value="2">Blocked</option>
                                     <option value="0">Inactive</option>
                                     <option value="3">Not Verified</option>
+                                  </select>
+                                </td>
+                                &nbsp;
+                                <td>
+                                  <select
+                                    name="channel"
+                                    className="form-select"
+                                    id="channel"
+                                  >
+                                    <option value="">Select Channel</option>
+                                    <option value="Paystack">Paystack</option>
+                                    <option value="Opay">Opay</option>
+                                    <option value="Monnify">Monnify</option>
+                                    <option value="Moniepoint">Moniepoint</option>
+                                    <option value="Palmpay">Palmpay</option>
+                                    <option value="Flutterwave">Flutterwave</option>
+                                    <option value="Coralpay">CoralPay</option>
+                                    <option value="Golden Chance">Golden Chance</option>
                                   </select>
                                 </td>
                                 &nbsp;
@@ -411,10 +441,14 @@ const AllTransactions = () => {
                                   new Date(a?.created_at).getTime()
                               )
                               .map((record: any, index: any) => {
-                                const formattedDate = moment
-                                  .utc(record?.created_at || record?.date)
-                                  .local()
-                                  .format("YYYY MMM Do | h:mm:ssA");
+                                const rawDate =
+                                  record?.created_at || record?.date;
+                                const parsedDate = moment.utc(rawDate);
+                                const formattedDate = parsedDate.isValid()
+                                  ? parsedDate
+                                      .local()
+                                      .format("YYYY MMM Do | h:mm:ssA")
+                                  : "—";
 
                                 return (
                                   <tr key={index}>
@@ -479,16 +513,11 @@ const AllTransactions = () => {
                 <br />
               </div>
             </div>
-          </div>
           <SingleUser
             userDetails={userDetails}
             setUserDetails={setUserDetails}
           />
-
-          <Footer />
-        </div>
-      </div>
-    </>
+    </Shell>
   );
 };
 

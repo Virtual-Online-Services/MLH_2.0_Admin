@@ -3,9 +3,7 @@ import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import HTTP from "../../utils/httpClient";
-import Footer from "../../components/footer/Footer";
-import Menu from "../../components/menu/Menu";
-import Navbar from "../../components/navbar/Navbar";
+import Shell from "../../components/layout/Shell";
 import { Button, Modal, Spinner } from "react-bootstrap";
 import SingleUser from "../../components/SingleUser/SingleUser";
 import moment from "moment";
@@ -153,13 +151,7 @@ const PlayHistory = () => {
   const transactionsToRender = filteredTransactions?.data || history?.data;
 
   return (
-    <div>
-      <div className="main">
-        <Navbar />
-        <div className="container__flex">
-          <div className="menuContainer">
-            <Menu />
-          </div>
+    <Shell>
           <div className="container">
             <div className="page-title">
               <h4 className="mb-0">Play History</h4>
@@ -368,7 +360,6 @@ const PlayHistory = () => {
               </>
             )}
           </div>
-        </div>
         <SingleUser userDetails={userDetails} setUserDetails={setUserDetails} />
         {selectedTransaction && (
           <Modal size="md" centered show={true} onHide={handleCloseModal}>
@@ -424,9 +415,7 @@ const PlayHistory = () => {
             </Modal.Body>
           </Modal>
         )}
-        <Footer />
-      </div>
-    </div>
+    </Shell>
   );
 };
 
