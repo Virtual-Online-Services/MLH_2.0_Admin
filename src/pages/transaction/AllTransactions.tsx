@@ -29,6 +29,7 @@ const AllTransactions = () => {
   >(null);
   const [showDateRangePicker, setShowDateRangePicker] = useState(false);
   const [showExportButton, setShowExportButton] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   const configHeaders = {
     headers: {
@@ -216,47 +217,65 @@ const AllTransactions = () => {
     const searchUser = searchUserInput.value.trim();
     const selectedStatus = selectedStatusInput.value;
 
-    let queryParams: string[] = [];
+    const queryParams = new URLSearchParams();
 
     // Construct the query parameters
     if (searchUser !== "") {
-      queryParams.push(`search=${encodeURIComponent(searchUser)}`);
-    } else if (selectedStatus !== "") {
-      queryParams.push(`status=${encodeURIComponent(selectedStatus)}`);
-    } else if (dateRange && dateRange[0]) {
+      queryParams.set("search", searchUser);
+    }
+    if (selectedStatus !== "") {
+      queryParams.set("status", selectedStatus);
+    }
+    if (showDateRangePicker && dateRange && dateRange[0]) {
       const startDate = moment(dateRange[0].startDate).format("YYYY-MM-DD");
       const endDate = moment(dateRange[0].endDate).format("YYYY-MM-DD");
-      queryParams.push(`start_date=${startDate}`);
-      queryParams.push(`end_date=${endDate}`);
+      queryParams.set("start_date", startDate);
+      queryParams.set("end_date", endDate);
     }
 
     // If no filters are applied, prevent export and show error
-    if (queryParams.length === 0) {
+    if (!queryParams.toString()) {
       toast.error("Please enter at least one filter to export.");
       return;
     }
 
-    const queryString = queryParams.join("&");
-    let exportUrl = ""; // Initialize the exportUrl variable
-
-    if (searchUser !== "" && dateRange && dateRange[0]) {
-      exportUrl = `https://api.mylottohub.com/v1/admin/export-user-get-transactions${queryString}`;
-    } else if (searchUser !== "") {
-      exportUrl = `https://api.mylottohub.com/v1/admin/export-user-get-transactions?${searchUser}`;
-    } else if (dateRange && dateRange[0]) {
-      exportUrl = `https://api.mylottohub.com/v1/admin/export-user-get-transactions?start_date=${moment(
-        dateRange[0].startDate
-      ).format("YYYY-MM-DD")}&end_date=${moment(dateRange[0].endDate).format(
-        "YYYY-MM-DD"
-      )}`;
-    }
-
+    setIsExporting(true);
     try {
-      // Open the request in a new tab
-      window.open(exportUrl, "_blank");
+      const response = await fetch(
+        `https://api.mylottohub.com/v1/admin/export-user-get-transactions?${queryParams.toString()}`,
+        {
+          headers: {
+            Accept: "application/octet-stream",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) {
+        const error = await response.json().catch(() => null);
+        throw new Error(error?.message || `Export failed (${response.status})`);
+      }
+
+      const blob = await response.blob();
+      const disposition = response.headers.get("content-disposition");
+      const filename = disposition?.match(
+        /filename\*=UTF-8''([^;]+)|filename="?([^";]+)"?/i
+      );
+      const downloadName = decodeURIComponent(
+        filename?.[1] || filename?.[2] || "transactions.xlsx"
+      );
+      const downloadUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.download = downloadName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(downloadUrl);
       toast.success("Exported Successfully");
     } catch (error: any) {
       toast.error(error.message || "Error exporting transactions.");
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -399,13 +418,28 @@ const AllTransactions = () => {
                                   <button
                                     className="btn btn-primary"
                                     onClick={exportToExcel}
+                                    disabled={isExporting}
                                     style={{
                                       display: showExportButton
                                         ? "block"
                                         : "none",
                                     }}
                                   >
-                                    Export
+                                    {isExporting ? (
+                                      <>
+                                        <Spinner
+                                          as="span"
+                                          animation="border"
+                                          size="sm"
+                                          role="status"
+                                          aria-hidden="true"
+                                          className="me-2"
+                                        />
+                                        Exporting...
+                                      </>
+                                    ) : (
+                                      "Export"
+                                    )}
                                   </button>
                                 </td>
                               </tr>

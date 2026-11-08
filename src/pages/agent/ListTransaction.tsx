@@ -29,6 +29,7 @@ const ListTransaction = () => {
   const [filteredTransactions, setFilteredTransactions] = useState(null);
   const [showDateRangePicker, setShowDateRangePicker] = useState(false);
   const [showExportButton, setShowExportButton] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   const configHeaders = {
     headers: {
@@ -221,12 +222,36 @@ const ListTransaction = () => {
     const queryString = queryParams.join("&");
     const exportUrl = `https://api.mylottohub.com/v1/admin/export-user-get-transactions?${queryString}`;
 
+    setIsExporting(true);
     try {
-      // Open the request in a new tab
-      window.open(exportUrl, "_blank");
+      const response = await fetch(exportUrl, {
+        headers: {
+          Accept: "application/octet-stream",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        const error = await response.json().catch(() => null);
+        throw new Error(error?.message || `Export failed (${response.status})`);
+      }
+
+      const blob = await response.blob();
+      const disposition = response.headers.get("content-disposition");
+      const filename = disposition?.match(/filename\*=UTF-8''([^;]+)|filename="?([^";]+)"?/i);
+      const downloadName = decodeURIComponent(filename?.[1] || filename?.[2] || "transactions.xlsx");
+      const downloadUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.download = downloadName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(downloadUrl);
       toast.success("Exported Successfully");
     } catch (error: any) {
       toast.error(error.message || "Error exporting transactions.");
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -433,13 +458,28 @@ const ListTransaction = () => {
                                   <button
                                     className="btn btn-primary"
                                     onClick={exportToExcel}
+                                    disabled={isExporting}
                                     style={{
                                       display: showExportButton
                                         ? "block"
                                         : "none",
                                     }}
                                   >
-                                    Export
+                                    {isExporting ? (
+                                      <>
+                                        <Spinner
+                                          as="span"
+                                          animation="border"
+                                          size="sm"
+                                          role="status"
+                                          aria-hidden="true"
+                                          className="me-2"
+                                        />
+                                        Exporting...
+                                      </>
+                                    ) : (
+                                      "Export"
+                                    )}
                                   </button>
                                 </td>
                               </tr>
